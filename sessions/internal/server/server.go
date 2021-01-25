@@ -23,6 +23,8 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/config"
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/internal/interceptors"
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/internal/session/delivery"
+	"github.com/AleksK1NG/hotels-mocroservices/sessions/internal/session/repository"
+	"github.com/AleksK1NG/hotels-mocroservices/sessions/internal/session/usecase"
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/pkg/logger"
 	sessionService "github.com/AleksK1NG/hotels-mocroservices/sessions/proto"
 )
@@ -43,6 +45,8 @@ func (s *Server) Run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	im := interceptors.NewInterceptorManager(s.logger, s.cfg)
+	sessionRedisRepo := repository.NewSessionRedisRepo(s.redisConn)
+	sessionUseCase := usecase.NewSessionUseCase(sessionRedisRepo)
 
 	router := echo.New()
 	router.GET("/api/v1/metrics", echo.WrapHandler(promhttp.Handler()))
@@ -75,7 +79,7 @@ func (s *Server) Run() error {
 		),
 	)
 
-	sessGRPCService := delivery.NewSessionGRPCDelivery()
+	sessGRPCService := delivery.NewSessionsService(s.logger, sessionUseCase)
 	sessionService.RegisterAuthorizationServiceServer(server, sessGRPCService)
 	grpc_prometheus.Register(server)
 
