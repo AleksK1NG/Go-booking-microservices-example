@@ -78,6 +78,8 @@ services:
       host
     expose:
       - "9090"
+    ports:
+      - '9090:9090'
 
   node_exporter:
     container_name: node_exporter_container
