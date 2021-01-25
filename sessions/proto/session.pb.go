@@ -31,16 +31,17 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
-type SessionID struct {
+type Session struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	SessionID string `protobuf:"bytes,1,opt,name=SessionID,proto3" json:"SessionID,omitempty"`
+	UserID    string `protobuf:"bytes,1,opt,name=UserID,proto3" json:"UserID,omitempty"`
+	SessionID string `protobuf:"bytes,2,opt,name=SessionID,proto3" json:"SessionID,omitempty"`
 }
 
-func (x *SessionID) Reset() {
-	*x = SessionID{}
+func (x *Session) Reset() {
+	*x = Session{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_session_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -48,13 +49,13 @@ func (x *SessionID) Reset() {
 	}
 }
 
-func (x *SessionID) String() string {
+func (x *Session) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SessionID) ProtoMessage() {}
+func (*Session) ProtoMessage() {}
 
-func (x *SessionID) ProtoReflect() protoreflect.Message {
+func (x *Session) ProtoReflect() protoreflect.Message {
 	mi := &file_session_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -66,63 +67,23 @@ func (x *SessionID) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SessionID.ProtoReflect.Descriptor instead.
-func (*SessionID) Descriptor() ([]byte, []int) {
+// Deprecated: Use Session.ProtoReflect.Descriptor instead.
+func (*Session) Descriptor() ([]byte, []int) {
 	return file_session_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *SessionID) GetSessionID() string {
+func (x *Session) GetUserID() string {
 	if x != nil {
-		return x.SessionID
+		return x.UserID
 	}
 	return ""
 }
 
-type UserID struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	UserID int64 `protobuf:"varint,1,opt,name=UserID,proto3" json:"UserID,omitempty"`
-}
-
-func (x *UserID) Reset() {
-	*x = UserID{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_session_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *UserID) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UserID) ProtoMessage() {}
-
-func (x *UserID) ProtoReflect() protoreflect.Message {
-	mi := &file_session_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UserID.ProtoReflect.Descriptor instead.
-func (*UserID) Descriptor() ([]byte, []int) {
-	return file_session_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *UserID) GetUserID() int64 {
+func (x *Session) GetSessionID() string {
 	if x != nil {
-		return x.UserID
+		return x.SessionID
 	}
-	return 0
+	return ""
 }
 
 type CsrfTokenInput struct {
@@ -137,7 +98,7 @@ type CsrfTokenInput struct {
 func (x *CsrfTokenInput) Reset() {
 	*x = CsrfTokenInput{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_session_proto_msgTypes[2]
+		mi := &file_session_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -150,7 +111,7 @@ func (x *CsrfTokenInput) String() string {
 func (*CsrfTokenInput) ProtoMessage() {}
 
 func (x *CsrfTokenInput) ProtoReflect() protoreflect.Message {
-	mi := &file_session_proto_msgTypes[2]
+	mi := &file_session_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -163,7 +124,7 @@ func (x *CsrfTokenInput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CsrfTokenInput.ProtoReflect.Descriptor instead.
 func (*CsrfTokenInput) Descriptor() ([]byte, []int) {
-	return file_session_proto_rawDescGZIP(), []int{2}
+	return file_session_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CsrfTokenInput) GetSessionID() string {
@@ -191,7 +152,7 @@ type CsrfToken struct {
 func (x *CsrfToken) Reset() {
 	*x = CsrfToken{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_session_proto_msgTypes[3]
+		mi := &file_session_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -204,7 +165,7 @@ func (x *CsrfToken) String() string {
 func (*CsrfToken) ProtoMessage() {}
 
 func (x *CsrfToken) ProtoReflect() protoreflect.Message {
-	mi := &file_session_proto_msgTypes[3]
+	mi := &file_session_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -217,7 +178,7 @@ func (x *CsrfToken) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CsrfToken.ProtoReflect.Descriptor instead.
 func (*CsrfToken) Descriptor() ([]byte, []int) {
-	return file_session_proto_rawDescGZIP(), []int{3}
+	return file_session_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CsrfToken) GetToken() string {
@@ -239,7 +200,7 @@ type CsrfTokenCheck struct {
 func (x *CsrfTokenCheck) Reset() {
 	*x = CsrfTokenCheck{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_session_proto_msgTypes[4]
+		mi := &file_session_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -252,7 +213,7 @@ func (x *CsrfTokenCheck) String() string {
 func (*CsrfTokenCheck) ProtoMessage() {}
 
 func (x *CsrfTokenCheck) ProtoReflect() protoreflect.Message {
-	mi := &file_session_proto_msgTypes[4]
+	mi := &file_session_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -265,7 +226,7 @@ func (x *CsrfTokenCheck) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CsrfTokenCheck.ProtoReflect.Descriptor instead.
 func (*CsrfTokenCheck) Descriptor() ([]byte, []int) {
-	return file_session_proto_rawDescGZIP(), []int{4}
+	return file_session_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *CsrfTokenCheck) GetSessionID() string {
@@ -293,7 +254,7 @@ type CheckResult struct {
 func (x *CheckResult) Reset() {
 	*x = CheckResult{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_session_proto_msgTypes[5]
+		mi := &file_session_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -306,7 +267,7 @@ func (x *CheckResult) String() string {
 func (*CheckResult) ProtoMessage() {}
 
 func (x *CheckResult) ProtoReflect() protoreflect.Message {
-	mi := &file_session_proto_msgTypes[5]
+	mi := &file_session_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -319,7 +280,7 @@ func (x *CheckResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CheckResult.ProtoReflect.Descriptor instead.
 func (*CheckResult) Descriptor() ([]byte, []int) {
-	return file_session_proto_rawDescGZIP(), []int{5}
+	return file_session_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CheckResult) GetResult() bool {
@@ -338,7 +299,7 @@ type Empty struct {
 func (x *Empty) Reset() {
 	*x = Empty{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_session_proto_msgTypes[6]
+		mi := &file_session_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -351,7 +312,7 @@ func (x *Empty) String() string {
 func (*Empty) ProtoMessage() {}
 
 func (x *Empty) ProtoReflect() protoreflect.Message {
-	mi := &file_session_proto_msgTypes[6]
+	mi := &file_session_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -364,7 +325,477 @@ func (x *Empty) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Empty.ProtoReflect.Descriptor instead.
 func (*Empty) Descriptor() ([]byte, []int) {
+	return file_session_proto_rawDescGZIP(), []int{5}
+}
+
+type CreateSessionRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserID string `protobuf:"bytes,1,opt,name=UserID,proto3" json:"UserID,omitempty"`
+}
+
+func (x *CreateSessionRequest) Reset() {
+	*x = CreateSessionRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_session_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateSessionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateSessionRequest) ProtoMessage() {}
+
+func (x *CreateSessionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_session_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateSessionRequest.ProtoReflect.Descriptor instead.
+func (*CreateSessionRequest) Descriptor() ([]byte, []int) {
 	return file_session_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *CreateSessionRequest) GetUserID() string {
+	if x != nil {
+		return x.UserID
+	}
+	return ""
+}
+
+type CreateSessionResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Session *Session `protobuf:"bytes,1,opt,name=Session,proto3" json:"Session,omitempty"`
+}
+
+func (x *CreateSessionResponse) Reset() {
+	*x = CreateSessionResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_session_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateSessionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateSessionResponse) ProtoMessage() {}
+
+func (x *CreateSessionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_session_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateSessionResponse.ProtoReflect.Descriptor instead.
+func (*CreateSessionResponse) Descriptor() ([]byte, []int) {
+	return file_session_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *CreateSessionResponse) GetSession() *Session {
+	if x != nil {
+		return x.Session
+	}
+	return nil
+}
+
+type GetSessionByIDRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	SessionID string `protobuf:"bytes,1,opt,name=SessionID,proto3" json:"SessionID,omitempty"`
+}
+
+func (x *GetSessionByIDRequest) Reset() {
+	*x = GetSessionByIDRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_session_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetSessionByIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSessionByIDRequest) ProtoMessage() {}
+
+func (x *GetSessionByIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_session_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSessionByIDRequest.ProtoReflect.Descriptor instead.
+func (*GetSessionByIDRequest) Descriptor() ([]byte, []int) {
+	return file_session_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GetSessionByIDRequest) GetSessionID() string {
+	if x != nil {
+		return x.SessionID
+	}
+	return ""
+}
+
+type GetSessionByIDResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Session *Session `protobuf:"bytes,1,opt,name=Session,proto3" json:"Session,omitempty"`
+}
+
+func (x *GetSessionByIDResponse) Reset() {
+	*x = GetSessionByIDResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_session_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetSessionByIDResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSessionByIDResponse) ProtoMessage() {}
+
+func (x *GetSessionByIDResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_session_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSessionByIDResponse.ProtoReflect.Descriptor instead.
+func (*GetSessionByIDResponse) Descriptor() ([]byte, []int) {
+	return file_session_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GetSessionByIDResponse) GetSession() *Session {
+	if x != nil {
+		return x.Session
+	}
+	return nil
+}
+
+type DeleteSessionRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	SessionID string `protobuf:"bytes,1,opt,name=SessionID,proto3" json:"SessionID,omitempty"`
+}
+
+func (x *DeleteSessionRequest) Reset() {
+	*x = DeleteSessionRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_session_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteSessionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteSessionRequest) ProtoMessage() {}
+
+func (x *DeleteSessionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_session_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteSessionRequest.ProtoReflect.Descriptor instead.
+func (*DeleteSessionRequest) Descriptor() ([]byte, []int) {
+	return file_session_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *DeleteSessionRequest) GetSessionID() string {
+	if x != nil {
+		return x.SessionID
+	}
+	return ""
+}
+
+type DeleteSessionResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	SessionID string `protobuf:"bytes,1,opt,name=SessionID,proto3" json:"SessionID,omitempty"`
+}
+
+func (x *DeleteSessionResponse) Reset() {
+	*x = DeleteSessionResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_session_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DeleteSessionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteSessionResponse) ProtoMessage() {}
+
+func (x *DeleteSessionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_session_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteSessionResponse.ProtoReflect.Descriptor instead.
+func (*DeleteSessionResponse) Descriptor() ([]byte, []int) {
+	return file_session_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *DeleteSessionResponse) GetSessionID() string {
+	if x != nil {
+		return x.SessionID
+	}
+	return ""
+}
+
+type CreateCsrfTokenRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CsrfTokenInput *CsrfTokenInput `protobuf:"bytes,1,opt,name=CsrfTokenInput,proto3" json:"CsrfTokenInput,omitempty"`
+}
+
+func (x *CreateCsrfTokenRequest) Reset() {
+	*x = CreateCsrfTokenRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_session_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateCsrfTokenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateCsrfTokenRequest) ProtoMessage() {}
+
+func (x *CreateCsrfTokenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_session_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateCsrfTokenRequest.ProtoReflect.Descriptor instead.
+func (*CreateCsrfTokenRequest) Descriptor() ([]byte, []int) {
+	return file_session_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *CreateCsrfTokenRequest) GetCsrfTokenInput() *CsrfTokenInput {
+	if x != nil {
+		return x.CsrfTokenInput
+	}
+	return nil
+}
+
+type CreateCsrfTokenResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CsrfToken *CsrfToken `protobuf:"bytes,1,opt,name=CsrfToken,proto3" json:"CsrfToken,omitempty"`
+}
+
+func (x *CreateCsrfTokenResponse) Reset() {
+	*x = CreateCsrfTokenResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_session_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CreateCsrfTokenResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateCsrfTokenResponse) ProtoMessage() {}
+
+func (x *CreateCsrfTokenResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_session_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateCsrfTokenResponse.ProtoReflect.Descriptor instead.
+func (*CreateCsrfTokenResponse) Descriptor() ([]byte, []int) {
+	return file_session_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *CreateCsrfTokenResponse) GetCsrfToken() *CsrfToken {
+	if x != nil {
+		return x.CsrfToken
+	}
+	return nil
+}
+
+type CheckCsrfTokenRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CsrfTokenCheck *CsrfTokenCheck `protobuf:"bytes,1,opt,name=CsrfTokenCheck,proto3" json:"CsrfTokenCheck,omitempty"`
+}
+
+func (x *CheckCsrfTokenRequest) Reset() {
+	*x = CheckCsrfTokenRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_session_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CheckCsrfTokenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckCsrfTokenRequest) ProtoMessage() {}
+
+func (x *CheckCsrfTokenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_session_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckCsrfTokenRequest.ProtoReflect.Descriptor instead.
+func (*CheckCsrfTokenRequest) Descriptor() ([]byte, []int) {
+	return file_session_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *CheckCsrfTokenRequest) GetCsrfTokenCheck() *CsrfTokenCheck {
+	if x != nil {
+		return x.CsrfTokenCheck
+	}
+	return nil
+}
+
+type CheckCsrfTokenResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CheckResult *CheckResult `protobuf:"bytes,1,opt,name=CheckResult,proto3" json:"CheckResult,omitempty"`
+}
+
+func (x *CheckCsrfTokenResponse) Reset() {
+	*x = CheckCsrfTokenResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_session_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CheckCsrfTokenResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckCsrfTokenResponse) ProtoMessage() {}
+
+func (x *CheckCsrfTokenResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_session_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckCsrfTokenResponse.ProtoReflect.Descriptor instead.
+func (*CheckCsrfTokenResponse) Descriptor() ([]byte, []int) {
+	return file_session_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *CheckCsrfTokenResponse) GetCheckResult() *CheckResult {
+	if x != nil {
+		return x.CheckResult
+	}
+	return nil
 }
 
 var File_session_proto protoreflect.FileDescriptor
@@ -372,52 +803,105 @@ var File_session_proto protoreflect.FileDescriptor
 var file_session_proto_rawDesc = []byte{
 	0x0a, 0x0d, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12,
 	0x0e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x22,
-	0x29, 0x0a, 0x09, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44, 0x12, 0x1c, 0x0a, 0x09,
+	0x3f, 0x0a, 0x07, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x16, 0x0a, 0x06, 0x55, 0x73,
+	0x65, 0x72, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x55, 0x73, 0x65, 0x72,
+	0x49, 0x44, 0x12, 0x1c, 0x0a, 0x09, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44,
+	0x22, 0x4c, 0x0a, 0x0e, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x49, 0x6e, 0x70,
+	0x75, 0x74, 0x12, 0x1c, 0x0a, 0x09, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44,
+	0x12, 0x1c, 0x0a, 0x09, 0x54, 0x69, 0x6d, 0x65, 0x53, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x03, 0x52, 0x09, 0x54, 0x69, 0x6d, 0x65, 0x53, 0x74, 0x61, 0x6d, 0x70, 0x22, 0x21,
+	0x0a, 0x09, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x14, 0x0a, 0x05, 0x54,
+	0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x54, 0x6f, 0x6b, 0x65,
+	0x6e, 0x22, 0x44, 0x0a, 0x0e, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x43, 0x68,
+	0x65, 0x63, 0x6b, 0x12, 0x1c, 0x0a, 0x09, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49,
+	0x44, 0x12, 0x14, 0x0a, 0x05, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x25, 0x0a, 0x0b, 0x43, 0x68, 0x65, 0x63, 0x6b,
+	0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x06, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x22, 0x07,
+	0x0a, 0x05, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x2e, 0x0a, 0x14, 0x43, 0x72, 0x65, 0x61, 0x74,
+	0x65, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x16, 0x0a, 0x06, 0x55, 0x73, 0x65, 0x72, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x06, 0x55, 0x73, 0x65, 0x72, 0x49, 0x44, 0x22, 0x4a, 0x0a, 0x15, 0x43, 0x72, 0x65, 0x61, 0x74,
+	0x65, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x31, 0x0a, 0x07, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x17, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69,
+	0x63, 0x65, 0x2e, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x07, 0x53, 0x65, 0x73, 0x73,
+	0x69, 0x6f, 0x6e, 0x22, 0x35, 0x0a, 0x15, 0x47, 0x65, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f,
+	0x6e, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1c, 0x0a, 0x09,
 	0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x09, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44, 0x22, 0x20, 0x0a, 0x06, 0x55, 0x73,
-	0x65, 0x72, 0x49, 0x44, 0x12, 0x16, 0x0a, 0x06, 0x55, 0x73, 0x65, 0x72, 0x49, 0x44, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x03, 0x52, 0x06, 0x55, 0x73, 0x65, 0x72, 0x49, 0x44, 0x22, 0x4c, 0x0a, 0x0e,
-	0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x1c,
-	0x0a, 0x09, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x09, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44, 0x12, 0x1c, 0x0a, 0x09,
-	0x54, 0x69, 0x6d, 0x65, 0x53, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52,
-	0x09, 0x54, 0x69, 0x6d, 0x65, 0x53, 0x74, 0x61, 0x6d, 0x70, 0x22, 0x21, 0x0a, 0x09, 0x43, 0x73,
-	0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x14, 0x0a, 0x05, 0x54, 0x6f, 0x6b, 0x65, 0x6e,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x44, 0x0a,
-	0x0e, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x12,
+	0x09, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44, 0x22, 0x4b, 0x0a, 0x16, 0x47, 0x65,
+	0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x31, 0x0a, 0x07, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53,
+	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x07,
+	0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x22, 0x34, 0x0a, 0x14, 0x44, 0x65, 0x6c, 0x65, 0x74,
+	0x65, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
 	0x1c, 0x0a, 0x09, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x09, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44, 0x12, 0x14, 0x0a,
-	0x05, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x54, 0x6f,
-	0x6b, 0x65, 0x6e, 0x22, 0x25, 0x0a, 0x0b, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x75,
-	0x6c, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x08, 0x52, 0x06, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x22, 0x07, 0x0a, 0x05, 0x45, 0x6d,
-	0x70, 0x74, 0x79, 0x32, 0x89, 0x03, 0x0a, 0x14, 0x41, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x7a,
-	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x44, 0x0a, 0x0d,
-	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x16, 0x2e,
-	0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x55,
-	0x73, 0x65, 0x72, 0x49, 0x44, 0x1a, 0x19, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53,
-	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44,
-	0x22, 0x00, 0x12, 0x45, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x49, 0x44, 0x42, 0x79, 0x53, 0x65, 0x73,
-	0x73, 0x69, 0x6f, 0x6e, 0x12, 0x19, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65,
-	0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44, 0x1a,
-	0x16, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
-	0x2e, 0x55, 0x73, 0x65, 0x72, 0x49, 0x44, 0x22, 0x00, 0x12, 0x43, 0x0a, 0x0d, 0x44, 0x65, 0x6c,
-	0x65, 0x74, 0x65, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x19, 0x2e, 0x73, 0x65, 0x73,
-	0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x53, 0x65, 0x73, 0x73,
-	0x69, 0x6f, 0x6e, 0x49, 0x44, 0x1a, 0x15, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53,
-	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x4e,
-	0x0a, 0x0f, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65,
-	0x6e, 0x12, 0x1e, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69,
-	0x63, 0x65, 0x2e, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x49, 0x6e, 0x70, 0x75,
-	0x74, 0x1a, 0x19, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69,
-	0x63, 0x65, 0x2e, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x00, 0x12, 0x4f,
-	0x0a, 0x0e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e,
-	0x12, 0x1e, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63,
-	0x65, 0x2e, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x43, 0x68, 0x65, 0x63, 0x6b,
-	0x1a, 0x1b, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63,
-	0x65, 0x2e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x22, 0x00, 0x42,
-	0x12, 0x5a, 0x10, 0x2e, 0x3b, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76,
-	0x69, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x28, 0x09, 0x52, 0x09, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x44, 0x22, 0x35, 0x0a,
+	0x15, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f,
+	0x6e, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x53, 0x65, 0x73, 0x73, 0x69,
+	0x6f, 0x6e, 0x49, 0x44, 0x22, 0x60, 0x0a, 0x16, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x73,
+	0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x46,
+	0x0a, 0x0e, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x49, 0x6e, 0x70, 0x75, 0x74,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e,
+	0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65,
+	0x6e, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x52, 0x0e, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65,
+	0x6e, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x22, 0x52, 0x0a, 0x17, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x37, 0x0a, 0x09, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65,
+	0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52,
+	0x09, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x22, 0x5f, 0x0a, 0x15, 0x43, 0x68,
+	0x65, 0x63, 0x6b, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x46, 0x0a, 0x0e, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e,
+	0x43, 0x68, 0x65, 0x63, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x73, 0x65,
+	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x73, 0x72,
+	0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52, 0x0e, 0x43, 0x73, 0x72,
+	0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x22, 0x57, 0x0a, 0x16, 0x43,
+	0x68, 0x65, 0x63, 0x6b, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3d, 0x0a, 0x0b, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52, 0x65,
+	0x73, 0x75, 0x6c, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x73, 0x65, 0x73,
+	0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x68, 0x65, 0x63,
+	0x6b, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x52, 0x0b, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x52, 0x65,
+	0x73, 0x75, 0x6c, 0x74, 0x32, 0x82, 0x04, 0x0a, 0x14, 0x41, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69,
+	0x7a, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x5e, 0x0a,
+	0x0d, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x24,
+	0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x25, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65,
+	0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x65, 0x73, 0x73,
+	0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x61, 0x0a,
+	0x0e, 0x47, 0x65, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x42, 0x79, 0x49, 0x44, 0x12,
+	0x25, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
+	0x2e, 0x47, 0x65, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x42, 0x79, 0x49, 0x44, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x26, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e,
+	0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69,
+	0x6f, 0x6e, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
+	0x12, 0x5e, 0x0a, 0x0d, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f,
+	0x6e, 0x12, 0x24, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69,
+	0x63, 0x65, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x25, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f,
+	0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x53,
+	0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
+	0x12, 0x64, 0x0a, 0x0f, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f,
+	0x6b, 0x65, 0x6e, 0x12, 0x26, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72,
+	0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x73, 0x72, 0x66, 0x54,
+	0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e, 0x73, 0x65,
+	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x72, 0x65,
+	0x61, 0x74, 0x65, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x61, 0x0a, 0x0e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x43,
+	0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x12, 0x25, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69,
+	0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x43,
+	0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x26, 0x2e, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
+	0x2e, 0x43, 0x68, 0x65, 0x63, 0x6b, 0x43, 0x73, 0x72, 0x66, 0x54, 0x6f, 0x6b, 0x65, 0x6e, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x12, 0x5a, 0x10, 0x2e, 0x3b, 0x73,
+	0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x62, 0x06, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -432,32 +916,47 @@ func file_session_proto_rawDescGZIP() []byte {
 	return file_session_proto_rawDescData
 }
 
-var file_session_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_session_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_session_proto_goTypes = []interface{}{
-	(*SessionID)(nil),      // 0: sessionService.SessionID
-	(*UserID)(nil),         // 1: sessionService.UserID
-	(*CsrfTokenInput)(nil), // 2: sessionService.CsrfTokenInput
-	(*CsrfToken)(nil),      // 3: sessionService.CsrfToken
-	(*CsrfTokenCheck)(nil), // 4: sessionService.CsrfTokenCheck
-	(*CheckResult)(nil),    // 5: sessionService.CheckResult
-	(*Empty)(nil),          // 6: sessionService.Empty
+	(*Session)(nil),                 // 0: sessionService.Session
+	(*CsrfTokenInput)(nil),          // 1: sessionService.CsrfTokenInput
+	(*CsrfToken)(nil),               // 2: sessionService.CsrfToken
+	(*CsrfTokenCheck)(nil),          // 3: sessionService.CsrfTokenCheck
+	(*CheckResult)(nil),             // 4: sessionService.CheckResult
+	(*Empty)(nil),                   // 5: sessionService.Empty
+	(*CreateSessionRequest)(nil),    // 6: sessionService.CreateSessionRequest
+	(*CreateSessionResponse)(nil),   // 7: sessionService.CreateSessionResponse
+	(*GetSessionByIDRequest)(nil),   // 8: sessionService.GetSessionByIDRequest
+	(*GetSessionByIDResponse)(nil),  // 9: sessionService.GetSessionByIDResponse
+	(*DeleteSessionRequest)(nil),    // 10: sessionService.DeleteSessionRequest
+	(*DeleteSessionResponse)(nil),   // 11: sessionService.DeleteSessionResponse
+	(*CreateCsrfTokenRequest)(nil),  // 12: sessionService.CreateCsrfTokenRequest
+	(*CreateCsrfTokenResponse)(nil), // 13: sessionService.CreateCsrfTokenResponse
+	(*CheckCsrfTokenRequest)(nil),   // 14: sessionService.CheckCsrfTokenRequest
+	(*CheckCsrfTokenResponse)(nil),  // 15: sessionService.CheckCsrfTokenResponse
 }
 var file_session_proto_depIdxs = []int32{
-	1, // 0: sessionService.AuthorizationService.CreateSession:input_type -> sessionService.UserID
-	0, // 1: sessionService.AuthorizationService.GetIDBySession:input_type -> sessionService.SessionID
-	0, // 2: sessionService.AuthorizationService.DeleteSession:input_type -> sessionService.SessionID
-	2, // 3: sessionService.AuthorizationService.CreateCsrfToken:input_type -> sessionService.CsrfTokenInput
-	4, // 4: sessionService.AuthorizationService.CheckCsrfToken:input_type -> sessionService.CsrfTokenCheck
-	0, // 5: sessionService.AuthorizationService.CreateSession:output_type -> sessionService.SessionID
-	1, // 6: sessionService.AuthorizationService.GetIDBySession:output_type -> sessionService.UserID
-	6, // 7: sessionService.AuthorizationService.DeleteSession:output_type -> sessionService.Empty
-	3, // 8: sessionService.AuthorizationService.CreateCsrfToken:output_type -> sessionService.CsrfToken
-	5, // 9: sessionService.AuthorizationService.CheckCsrfToken:output_type -> sessionService.CheckResult
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: sessionService.CreateSessionResponse.Session:type_name -> sessionService.Session
+	0,  // 1: sessionService.GetSessionByIDResponse.Session:type_name -> sessionService.Session
+	1,  // 2: sessionService.CreateCsrfTokenRequest.CsrfTokenInput:type_name -> sessionService.CsrfTokenInput
+	2,  // 3: sessionService.CreateCsrfTokenResponse.CsrfToken:type_name -> sessionService.CsrfToken
+	3,  // 4: sessionService.CheckCsrfTokenRequest.CsrfTokenCheck:type_name -> sessionService.CsrfTokenCheck
+	4,  // 5: sessionService.CheckCsrfTokenResponse.CheckResult:type_name -> sessionService.CheckResult
+	6,  // 6: sessionService.AuthorizationService.CreateSession:input_type -> sessionService.CreateSessionRequest
+	8,  // 7: sessionService.AuthorizationService.GetSessionByID:input_type -> sessionService.GetSessionByIDRequest
+	10, // 8: sessionService.AuthorizationService.DeleteSession:input_type -> sessionService.DeleteSessionRequest
+	12, // 9: sessionService.AuthorizationService.CreateCsrfToken:input_type -> sessionService.CreateCsrfTokenRequest
+	14, // 10: sessionService.AuthorizationService.CheckCsrfToken:input_type -> sessionService.CheckCsrfTokenRequest
+	7,  // 11: sessionService.AuthorizationService.CreateSession:output_type -> sessionService.CreateSessionResponse
+	9,  // 12: sessionService.AuthorizationService.GetSessionByID:output_type -> sessionService.GetSessionByIDResponse
+	11, // 13: sessionService.AuthorizationService.DeleteSession:output_type -> sessionService.DeleteSessionResponse
+	13, // 14: sessionService.AuthorizationService.CreateCsrfToken:output_type -> sessionService.CreateCsrfTokenResponse
+	15, // 15: sessionService.AuthorizationService.CheckCsrfToken:output_type -> sessionService.CheckCsrfTokenResponse
+	11, // [11:16] is the sub-list for method output_type
+	6,  // [6:11] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_session_proto_init() }
@@ -467,7 +966,7 @@ func file_session_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_session_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SessionID); i {
+			switch v := v.(*Session); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -479,18 +978,6 @@ func file_session_proto_init() {
 			}
 		}
 		file_session_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserID); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_session_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CsrfTokenInput); i {
 			case 0:
 				return &v.state
@@ -502,7 +989,7 @@ func file_session_proto_init() {
 				return nil
 			}
 		}
-		file_session_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_session_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CsrfToken); i {
 			case 0:
 				return &v.state
@@ -514,7 +1001,7 @@ func file_session_proto_init() {
 				return nil
 			}
 		}
-		file_session_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_session_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CsrfTokenCheck); i {
 			case 0:
 				return &v.state
@@ -526,7 +1013,7 @@ func file_session_proto_init() {
 				return nil
 			}
 		}
-		file_session_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_session_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CheckResult); i {
 			case 0:
 				return &v.state
@@ -538,8 +1025,128 @@ func file_session_proto_init() {
 				return nil
 			}
 		}
-		file_session_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_session_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Empty); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_session_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateSessionRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_session_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateSessionResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_session_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetSessionByIDRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_session_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetSessionByIDResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_session_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteSessionRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_session_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DeleteSessionResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_session_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateCsrfTokenRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_session_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateCsrfTokenResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_session_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CheckCsrfTokenRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_session_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CheckCsrfTokenResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -557,7 +1164,7 @@ func file_session_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_session_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -583,11 +1190,11 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AuthorizationServiceClient interface {
-	CreateSession(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*SessionID, error)
-	GetIDBySession(ctx context.Context, in *SessionID, opts ...grpc.CallOption) (*UserID, error)
-	DeleteSession(ctx context.Context, in *SessionID, opts ...grpc.CallOption) (*Empty, error)
-	CreateCsrfToken(ctx context.Context, in *CsrfTokenInput, opts ...grpc.CallOption) (*CsrfToken, error)
-	CheckCsrfToken(ctx context.Context, in *CsrfTokenCheck, opts ...grpc.CallOption) (*CheckResult, error)
+	CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (*CreateSessionResponse, error)
+	GetSessionByID(ctx context.Context, in *GetSessionByIDRequest, opts ...grpc.CallOption) (*GetSessionByIDResponse, error)
+	DeleteSession(ctx context.Context, in *DeleteSessionRequest, opts ...grpc.CallOption) (*DeleteSessionResponse, error)
+	CreateCsrfToken(ctx context.Context, in *CreateCsrfTokenRequest, opts ...grpc.CallOption) (*CreateCsrfTokenResponse, error)
+	CheckCsrfToken(ctx context.Context, in *CheckCsrfTokenRequest, opts ...grpc.CallOption) (*CheckCsrfTokenResponse, error)
 }
 
 type authorizationServiceClient struct {
@@ -598,8 +1205,8 @@ func NewAuthorizationServiceClient(cc grpc.ClientConnInterface) AuthorizationSer
 	return &authorizationServiceClient{cc}
 }
 
-func (c *authorizationServiceClient) CreateSession(ctx context.Context, in *UserID, opts ...grpc.CallOption) (*SessionID, error) {
-	out := new(SessionID)
+func (c *authorizationServiceClient) CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (*CreateSessionResponse, error) {
+	out := new(CreateSessionResponse)
 	err := c.cc.Invoke(ctx, "/sessionService.AuthorizationService/CreateSession", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -607,17 +1214,17 @@ func (c *authorizationServiceClient) CreateSession(ctx context.Context, in *User
 	return out, nil
 }
 
-func (c *authorizationServiceClient) GetIDBySession(ctx context.Context, in *SessionID, opts ...grpc.CallOption) (*UserID, error) {
-	out := new(UserID)
-	err := c.cc.Invoke(ctx, "/sessionService.AuthorizationService/GetIDBySession", in, out, opts...)
+func (c *authorizationServiceClient) GetSessionByID(ctx context.Context, in *GetSessionByIDRequest, opts ...grpc.CallOption) (*GetSessionByIDResponse, error) {
+	out := new(GetSessionByIDResponse)
+	err := c.cc.Invoke(ctx, "/sessionService.AuthorizationService/GetSessionByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authorizationServiceClient) DeleteSession(ctx context.Context, in *SessionID, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *authorizationServiceClient) DeleteSession(ctx context.Context, in *DeleteSessionRequest, opts ...grpc.CallOption) (*DeleteSessionResponse, error) {
+	out := new(DeleteSessionResponse)
 	err := c.cc.Invoke(ctx, "/sessionService.AuthorizationService/DeleteSession", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -625,8 +1232,8 @@ func (c *authorizationServiceClient) DeleteSession(ctx context.Context, in *Sess
 	return out, nil
 }
 
-func (c *authorizationServiceClient) CreateCsrfToken(ctx context.Context, in *CsrfTokenInput, opts ...grpc.CallOption) (*CsrfToken, error) {
-	out := new(CsrfToken)
+func (c *authorizationServiceClient) CreateCsrfToken(ctx context.Context, in *CreateCsrfTokenRequest, opts ...grpc.CallOption) (*CreateCsrfTokenResponse, error) {
+	out := new(CreateCsrfTokenResponse)
 	err := c.cc.Invoke(ctx, "/sessionService.AuthorizationService/CreateCsrfToken", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -634,8 +1241,8 @@ func (c *authorizationServiceClient) CreateCsrfToken(ctx context.Context, in *Cs
 	return out, nil
 }
 
-func (c *authorizationServiceClient) CheckCsrfToken(ctx context.Context, in *CsrfTokenCheck, opts ...grpc.CallOption) (*CheckResult, error) {
-	out := new(CheckResult)
+func (c *authorizationServiceClient) CheckCsrfToken(ctx context.Context, in *CheckCsrfTokenRequest, opts ...grpc.CallOption) (*CheckCsrfTokenResponse, error) {
+	out := new(CheckCsrfTokenResponse)
 	err := c.cc.Invoke(ctx, "/sessionService.AuthorizationService/CheckCsrfToken", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -645,30 +1252,30 @@ func (c *authorizationServiceClient) CheckCsrfToken(ctx context.Context, in *Csr
 
 // AuthorizationServiceServer is the server API for AuthorizationService service.
 type AuthorizationServiceServer interface {
-	CreateSession(context.Context, *UserID) (*SessionID, error)
-	GetIDBySession(context.Context, *SessionID) (*UserID, error)
-	DeleteSession(context.Context, *SessionID) (*Empty, error)
-	CreateCsrfToken(context.Context, *CsrfTokenInput) (*CsrfToken, error)
-	CheckCsrfToken(context.Context, *CsrfTokenCheck) (*CheckResult, error)
+	CreateSession(context.Context, *CreateSessionRequest) (*CreateSessionResponse, error)
+	GetSessionByID(context.Context, *GetSessionByIDRequest) (*GetSessionByIDResponse, error)
+	DeleteSession(context.Context, *DeleteSessionRequest) (*DeleteSessionResponse, error)
+	CreateCsrfToken(context.Context, *CreateCsrfTokenRequest) (*CreateCsrfTokenResponse, error)
+	CheckCsrfToken(context.Context, *CheckCsrfTokenRequest) (*CheckCsrfTokenResponse, error)
 }
 
 // UnimplementedAuthorizationServiceServer can be embedded to have forward compatible implementations.
 type UnimplementedAuthorizationServiceServer struct {
 }
 
-func (*UnimplementedAuthorizationServiceServer) CreateSession(context.Context, *UserID) (*SessionID, error) {
+func (*UnimplementedAuthorizationServiceServer) CreateSession(context.Context, *CreateSessionRequest) (*CreateSessionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateSession not implemented")
 }
-func (*UnimplementedAuthorizationServiceServer) GetIDBySession(context.Context, *SessionID) (*UserID, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetIDBySession not implemented")
+func (*UnimplementedAuthorizationServiceServer) GetSessionByID(context.Context, *GetSessionByIDRequest) (*GetSessionByIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSessionByID not implemented")
 }
-func (*UnimplementedAuthorizationServiceServer) DeleteSession(context.Context, *SessionID) (*Empty, error) {
+func (*UnimplementedAuthorizationServiceServer) DeleteSession(context.Context, *DeleteSessionRequest) (*DeleteSessionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteSession not implemented")
 }
-func (*UnimplementedAuthorizationServiceServer) CreateCsrfToken(context.Context, *CsrfTokenInput) (*CsrfToken, error) {
+func (*UnimplementedAuthorizationServiceServer) CreateCsrfToken(context.Context, *CreateCsrfTokenRequest) (*CreateCsrfTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateCsrfToken not implemented")
 }
-func (*UnimplementedAuthorizationServiceServer) CheckCsrfToken(context.Context, *CsrfTokenCheck) (*CheckResult, error) {
+func (*UnimplementedAuthorizationServiceServer) CheckCsrfToken(context.Context, *CheckCsrfTokenRequest) (*CheckCsrfTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckCsrfToken not implemented")
 }
 
@@ -677,7 +1284,7 @@ func RegisterAuthorizationServiceServer(s *grpc.Server, srv AuthorizationService
 }
 
 func _AuthorizationService_CreateSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserID)
+	in := new(CreateSessionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -689,31 +1296,31 @@ func _AuthorizationService_CreateSession_Handler(srv interface{}, ctx context.Co
 		FullMethod: "/sessionService.AuthorizationService/CreateSession",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthorizationServiceServer).CreateSession(ctx, req.(*UserID))
+		return srv.(AuthorizationServiceServer).CreateSession(ctx, req.(*CreateSessionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthorizationService_GetIDBySession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SessionID)
+func _AuthorizationService_GetSessionByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSessionByIDRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthorizationServiceServer).GetIDBySession(ctx, in)
+		return srv.(AuthorizationServiceServer).GetSessionByID(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/sessionService.AuthorizationService/GetIDBySession",
+		FullMethod: "/sessionService.AuthorizationService/GetSessionByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthorizationServiceServer).GetIDBySession(ctx, req.(*SessionID))
+		return srv.(AuthorizationServiceServer).GetSessionByID(ctx, req.(*GetSessionByIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _AuthorizationService_DeleteSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SessionID)
+	in := new(DeleteSessionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -725,13 +1332,13 @@ func _AuthorizationService_DeleteSession_Handler(srv interface{}, ctx context.Co
 		FullMethod: "/sessionService.AuthorizationService/DeleteSession",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthorizationServiceServer).DeleteSession(ctx, req.(*SessionID))
+		return srv.(AuthorizationServiceServer).DeleteSession(ctx, req.(*DeleteSessionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _AuthorizationService_CreateCsrfToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CsrfTokenInput)
+	in := new(CreateCsrfTokenRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -743,13 +1350,13 @@ func _AuthorizationService_CreateCsrfToken_Handler(srv interface{}, ctx context.
 		FullMethod: "/sessionService.AuthorizationService/CreateCsrfToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthorizationServiceServer).CreateCsrfToken(ctx, req.(*CsrfTokenInput))
+		return srv.(AuthorizationServiceServer).CreateCsrfToken(ctx, req.(*CreateCsrfTokenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _AuthorizationService_CheckCsrfToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CsrfTokenCheck)
+	in := new(CheckCsrfTokenRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -761,7 +1368,7 @@ func _AuthorizationService_CheckCsrfToken_Handler(srv interface{}, ctx context.C
 		FullMethod: "/sessionService.AuthorizationService/CheckCsrfToken",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthorizationServiceServer).CheckCsrfToken(ctx, req.(*CsrfTokenCheck))
+		return srv.(AuthorizationServiceServer).CheckCsrfToken(ctx, req.(*CheckCsrfTokenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -775,8 +1382,8 @@ var _AuthorizationService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _AuthorizationService_CreateSession_Handler,
 		},
 		{
-			MethodName: "GetIDBySession",
-			Handler:    _AuthorizationService_GetIDBySession_Handler,
+			MethodName: "GetSessionByID",
+			Handler:    _AuthorizationService_GetSessionByID_Handler,
 		},
 		{
 			MethodName: "DeleteSession",

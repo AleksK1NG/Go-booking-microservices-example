@@ -5,11 +5,9 @@ syntax = "proto3";
 package sessionService;
 option go_package = ".;sessionService";
 
-message SessionID {
-  string SessionID = 1;
-}
-message UserID {
-  int64 UserID = 1;
+message Session {
+  string UserID = 1;
+  string SessionID = 2;
 }
 
 message CsrfTokenInput {
@@ -30,14 +28,53 @@ message CheckResult {
   bool Result = 1;
 }
 
-message Empty {
+message Empty {}
+
+message CreateSessionRequest {
+  string UserID = 1;
+}
+
+message CreateSessionResponse {
+  Session Session = 1;
+}
+
+message GetSessionByIDRequest {
+  string SessionID = 1;
+}
+
+message GetSessionByIDResponse {
+  Session Session = 1;
+}
+
+message DeleteSessionRequest {
+  string SessionID = 1;
+}
+
+message DeleteSessionResponse {
+  string SessionID = 1;
+}
+
+message CreateCsrfTokenRequest {
+  CsrfTokenInput CsrfTokenInput = 1;
+}
+
+message CreateCsrfTokenResponse {
+  CsrfToken CsrfToken = 1;
+}
+
+message CheckCsrfTokenRequest {
+  CsrfTokenCheck CsrfTokenCheck = 1;
+}
+
+message CheckCsrfTokenResponse {
+  CheckResult CheckResult = 1;
 }
 
 service AuthorizationService {
-  rpc CreateSession(UserID)     returns (SessionID) {}
-  rpc GetIDBySession(SessionID) returns (UserID)    {}
-  rpc DeleteSession(SessionID)  returns (Empty)     {}
+  rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse) {}
+  rpc GetSessionByID(GetSessionByIDRequest) returns (GetSessionByIDResponse) {}
+  rpc DeleteSession(DeleteSessionRequest) returns (DeleteSessionResponse) {}
 
-  rpc CreateCsrfToken(CsrfTokenInput) returns (CsrfToken) {}
-  rpc CheckCsrfToken(CsrfTokenCheck) returns (CheckResult) {}
+  rpc CreateCsrfToken(CreateCsrfTokenRequest) returns (CreateCsrfTokenResponse) {}
+  rpc CheckCsrfToken(CheckCsrfTokenRequest) returns (CheckCsrfTokenResponse) {}
 }
