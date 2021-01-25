@@ -1,6 +1,6 @@
-grpc:
+GRPCServer:
   AppVersion: 1.0.0
-  Port: ":8079"
+  Port: ":5000"
   CookieLifeTime: 44640
   CsrfExpire: 15
   SessionID: "SessionID"
@@ -8,6 +8,8 @@ grpc:
   Timeout: 15
   ReadTimeout: 5
   WriteTimeout: 5
+  MaxConnectionIdle: 5
+  MaxConnectionAge: 5
 
 logger:
   Development: true
