@@ -42,3 +42,22 @@ clean:
 
 logs-local:
 	docker logs -f $(FILES)
+
+
+# ==============================================================================
+# Go migrate postgresql
+
+user_dbname = user_db
+user_port = 5433
+
+force_user_db:
+	migrate -database postgres://postgres:postgres@localhost:$(user_port)/$(user_dbname)?sslmode=disable -path user/migrations force 1
+
+version_user_db:
+	migrate -database postgres://postgres:postgres@localhost:$(user_port)/$(user_dbname)?sslmode=disable -path user/migrations version
+
+migrate_user_db_up:
+	migrate -database postgres://postgres:postgres@localhost:$(user_port)/$(user_dbname)?sslmode=disable -path user/migrations up 1
+
+migrate_user_db_down:
+	migrate -database postgres://postgres:postgres@localhost:$(user_port)/$(user_dbname)?sslmode=disable -path user/migrations down 1

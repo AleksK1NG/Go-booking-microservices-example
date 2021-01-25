@@ -22,6 +22,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=user_db
+      - POSTGRES_HOST=5433
     command: -p 5433
     volumes:
       - ./user_pgdata:/var/lib/postgresql/data
