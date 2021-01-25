@@ -32,11 +32,6 @@ func main() {
 	)
 	appLogger.Infof("Success parsed config: %#v", cfg.GRPCServer.AppVersion)
 
-	// pgxConn, err := postgres.NewPgxConn(cfg)
-	// if err != nil {
-	// 	appLogger.Fatal("cannot connect postgres", err)
-	// }
-
 	redisClient := redis.NewRedisClient(cfg)
 
 	tracer, closer, err := jaeger.InitJaeger(cfg)

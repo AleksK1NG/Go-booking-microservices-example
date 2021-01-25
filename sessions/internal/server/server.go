@@ -45,7 +45,7 @@ func (s *Server) Run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	im := interceptors.NewInterceptorManager(s.logger, s.cfg)
-	sessionRedisRepo := repository.NewSessionRedisRepo(s.redisConn)
+	sessionRedisRepo := repository.NewSessionRedisRepo(s.redisConn, "session", 1*time.Hour)
 	sessionUseCase := usecase.NewSessionUseCase(sessionRedisRepo)
 
 	router := echo.New()
