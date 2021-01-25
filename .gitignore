@@ -1,0 +1,13 @@
+# Created by .ignore support plugin (hsz.mobi)
+/static
+.idea
+coverage.out
+cover.out
+cover.html
+log.txt
+/sessions/package/*/*
+/*.txt
+/*.outs
+/env
+coverage1.out
+*.env
