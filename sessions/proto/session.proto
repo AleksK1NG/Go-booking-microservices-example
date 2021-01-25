@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+//protoc --go_out=plugins=grpc:. *.proto
+
+package sessionService;
+option go_package = ".;sessionService";
+
+message SessionID {
+  string SessionID = 1;
+}
+message UserID {
+  int64 UserID = 1;
+}
+
+message CsrfTokenInput {
+  string SessionID = 1;
+  int64  TimeStamp = 2;
+}
+
+message CsrfToken {
+  string Token = 1;
+}
+
+message CsrfTokenCheck {
+  string SessionID = 1;
+  string Token = 2;
+}
+
+message CheckResult {
+  bool Result = 1;
+}
+
+message Empty {
+}
+
+service AuthorizationService {
+  rpc CreateSession(UserID)     returns (SessionID) {}
+  rpc GetIDBySession(SessionID) returns (UserID)    {}
+  rpc DeleteSession(SessionID)  returns (Empty)     {}
+
+  rpc CreateCsrfToken(CsrfTokenInput) returns (CsrfToken) {}
+  rpc CheckCsrfToken(CsrfTokenCheck) returns (CheckResult) {}
+}
