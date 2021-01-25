@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/config"
+	"github.com/AleksK1NG/hotels-mocroservices/sessions/pkg/logger"
 )
 
 func main() {
@@ -16,6 +17,15 @@ func main() {
 		log.Fatalf("Loading config: %v", err)
 	}
 
-	log.Printf("%-v", cfg)
+	appLogger := logger.NewApiLogger(cfg)
+	appLogger.InitLogger()
+	appLogger.Infof(
+		"AppVersion: %s, LogLevel: %s, Mode: %s",
+		cfg.GRPCServer.AppVersion,
+		cfg.Logger.Level,
+		cfg.GRPCServer.Mode,
+	)
+	appLogger.Infof("Success parsed config: %#v", cfg.GRPCServer.AppVersion)
 
+	log.Printf("%-v", cfg)
 }
