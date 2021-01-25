@@ -1,8 +1,13 @@
 grpc:
+  AppVersion: 1.0.0
   Port: ":8079"
   CookieLifeTime: 44640
   CsrfExpire: 15
   SessionID: "SessionID"
+  Mode: "Development"
+  Timeout: 15
+  ReadTimeout: 5
+  WriteTimeout: 5
 
 logger:
   Development: true

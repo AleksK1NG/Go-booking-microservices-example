@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"log"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -19,10 +20,15 @@ type Config struct {
 
 // GRPCServer config
 type GRPCServer struct {
+	AppVersion     string
 	Port           string
 	CookieLifeTime int
 	CsrfExpire     int
 	SessionID      string
+	Mode           string
+	Timeout        time.Duration
+	ReadTimeout    time.Duration
+	WriteTimeout   time.Duration
 }
 
 // Logger config
