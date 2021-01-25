@@ -20,15 +20,17 @@ type Config struct {
 
 // GRPCServer config
 type GRPCServer struct {
-	AppVersion     string
-	Port           string
-	CookieLifeTime int
-	CsrfExpire     int
-	SessionID      string
-	Mode           string
-	Timeout        time.Duration
-	ReadTimeout    time.Duration
-	WriteTimeout   time.Duration
+	AppVersion        string
+	Port              string
+	CookieLifeTime    int
+	CsrfExpire        int
+	SessionID         string
+	Mode              string
+	Timeout           time.Duration
+	ReadTimeout       time.Duration
+	WriteTimeout      time.Duration
+	MaxConnectionIdle time.Duration
+	MaxConnectionAge  time.Duration
 }
 
 // Logger config
