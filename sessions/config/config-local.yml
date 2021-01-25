@@ -38,7 +38,7 @@ redis:
 
 metrics:
   Url: 0.0.0.0:7070
-  ServiceName: auth_microservice
+  ServiceName: sessions_microservice
 
 jaeger:
   Host: localhost:6831
