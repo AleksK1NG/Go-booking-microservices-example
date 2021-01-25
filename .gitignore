@@ -11,3 +11,4 @@ log.txt
 /env
 coverage1.out
 *.env
+./user_pgdata
