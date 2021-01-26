@@ -2,11 +2,12 @@
 
 local:
 	echo "Starting local environment"
+	make jaeger
 	docker-compose -f docker-compose.local.yml up --build
 
 linter:
 	echo "Starting linters"
-	cd main && echo 'cool ' && golangci-lint run ./...
+	cd main && golangci-lint run ./...
 	cd ..
 	cd user && golangci-lint run ./...
 	cd ..
@@ -49,15 +50,38 @@ logs-local:
 
 user_dbname = user_db
 user_port = 5433
+user_SSL_MODE = disable
 
 force_user_db:
-	migrate -database postgres://postgres:postgres@localhost:$(user_port)/$(user_dbname)?sslmode=disable -path user/migrations force 1
+	migrate -database postgres://postgres:postgres@localhost:$(user_port)/$(user_dbname)?sslmode=$(user_SSL_MODE) -path user/migrations force 1
 
 version_user_db:
-	migrate -database postgres://postgres:postgres@localhost:$(user_port)/$(user_dbname)?sslmode=disable -path user/migrations version
+	migrate -database postgres://postgres:postgres@localhost:$(user_port)/$(user_dbname)?sslmode=$(user_SSL_MODE) -path user/migrations version
 
 migrate_user_db_up:
-	migrate -database postgres://postgres:postgres@localhost:$(user_port)/$(user_dbname)?sslmode=disable -path user/migrations up 1
+	migrate -database postgres://postgres:postgres@localhost:$(user_port)/$(user_dbname)?sslmode=$(user_SSL_MODE) -path user/migrations up 1
 
 migrate_user_db_down:
-	migrate -database postgres://postgres:postgres@localhost:$(user_port)/$(user_dbname)?sslmode=disable -path user/migrations down 1
+	migrate -database postgres://postgres:postgres@localhost:$(user_port)/$(user_dbname)?sslmode=$(user_SSL_MODE) -path user/migrations down 1
+
+
+# ==============================================================================
+# Modules support
+
+deps-reset:
+	git checkout -- go.mod
+	go mod tidy
+	go mod vendor
+
+tidy:
+	go mod tidy
+	go mod vendor
+
+deps-upgrade:
+	# go get $(go list -f '{{if not (or .Main .Indirect)}}{{.Path}}{{end}}' -m all)
+	go get -u -t -d -v ./...
+	go mod tidy
+	go mod vendor
+
+deps-cleancache:
+	go clean -modcache

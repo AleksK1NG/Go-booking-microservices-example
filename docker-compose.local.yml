@@ -66,20 +66,21 @@ services:
   #      - hotels_network
 
   prometheus:
+    container_name: prometheus_container
     image: prom/prometheus
-    privileged: true
-    restart: always
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - prometheus-data:/prometheus
+      - ./docker/monitoring/prometheus-local.yml:/etc/prometheus/prometheus.yml:Z
     command:
-      - --config.file=/etc/prometheus/prometheus.yml
-    network_mode:
-      host
-    expose:
-      - "9090"
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=20d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
     ports:
       - '9090:9090'
+    networks:
+      - hotels_network
+
 
   node_exporter:
     container_name: node_exporter_container
@@ -100,7 +101,7 @@ services:
 volumes:
   main_pgdata:
   user_pgdata:
-  prometheus-data:
+#  prometheus-data:
 
 networks:
   hotels_network:

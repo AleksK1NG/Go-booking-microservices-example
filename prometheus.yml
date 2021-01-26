@@ -10,7 +10,7 @@ scrape_configs:
 
   - job_name: 'system'
     static_configs:
-      - targets: [ 'localhost:9100' ]
+      - targets: [ 'localhost:9100', 'localhost:9101' ]
 
   - job_name: 'prometheus'
     static_configs:
