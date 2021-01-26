@@ -7,6 +7,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc/status"
 
+	"github.com/AleksK1NG/hotels-mocroservices/sessions/internal/models"
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/internal/session"
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/pkg/grpc_errors"
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/pkg/logger"
@@ -38,16 +39,20 @@ func (s *SessionsService) CreateSession(ctx context.Context, r *sessionService.C
 		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "sessUC.CreateSession: %v", err)
 	}
 
-	return &sessionService.CreateSessionResponse{Session: &sessionService.Session{
-		UserID:    sess.UserID.String(),
-		SessionID: sess.SessionID,
-	}}, nil
+	return &sessionService.CreateSessionResponse{Session: s.sessionJSONToProto(sess)}, nil
 }
 
 func (s *SessionsService) GetSessionByID(ctx context.Context, r *sessionService.GetSessionByIDRequest) (*sessionService.GetSessionByIDResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsService.GetSessionByID")
 	defer span.Finish()
-	return nil, nil
+
+	sess, err := s.sessUC.GetSessionByID(ctx, r.SessionID)
+	if err != nil {
+		s.logger.Errorf("sessUC.GetSessionByID: %v", err)
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "sessUC.GetSessionByID: %v", err)
+	}
+
+	return &sessionService.GetSessionByIDResponse{Session: s.sessionJSONToProto(sess)}, nil
 }
 
 func (s *SessionsService) DeleteSession(ctx context.Context, r *sessionService.DeleteSessionRequest) (*sessionService.DeleteSessionResponse, error) {
@@ -66,4 +71,11 @@ func (s *SessionsService) CheckCsrfToken(ctx context.Context, r *sessionService.
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsService.CheckCsrfToken")
 	defer span.Finish()
 	return nil, nil
+}
+
+func (s *SessionsService) sessionJSONToProto(sess *models.Session) *sessionService.Session {
+	return &sessionService.Session{
+		UserID:    sess.UserID.String(),
+		SessionID: sess.SessionID,
+	}
 }

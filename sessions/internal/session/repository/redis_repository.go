@@ -36,11 +36,11 @@ func (s *SessionRedisRepo) CreateSession(ctx context.Context, userID uuid.UUID) 
 
 	sessBytes, err := json.Marshal(&sess)
 	if err != nil {
-		return nil, errors.WithMessage(err, "sessionRepo.CreateSession.json.Marshal")
+		return nil, errors.Wrap(err, "sessionRepo.CreateSession.json.Marshal")
 	}
 
 	if err := s.redis.SetEX(ctx, s.createKey(sess.SessionID), string(sessBytes), s.expiration).Err(); err != nil {
-		return nil, errors.WithMessage(err, "sessionRepo.CreateSession.redis.SetEX")
+		return nil, errors.Wrap(err, "sessionRepo.CreateSession.redis.SetEX")
 	}
 
 	return sess, nil
@@ -49,7 +49,17 @@ func (s *SessionRedisRepo) CreateSession(ctx context.Context, userID uuid.UUID) 
 func (s *SessionRedisRepo) GetSessionByID(ctx context.Context, sessID string) (*models.Session, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionRedisRepo.GetSessionByID")
 	defer span.Finish()
-	panic("implement me")
+
+	result, err := s.redis.Get(ctx, s.createKey(sessID)).Result()
+	if err != nil {
+		return nil, errors.Wrap(err, "sessionRepo.GetSessionByID.redis.Get")
+	}
+
+	var sess models.Session
+	if err := json.Unmarshal([]byte(result), &sess); err != nil {
+		return nil, errors.Wrap(err, "sessionRepo.GetSessionByID.json.Unmarshal")
+	}
+	return &sess, nil
 }
 
 func (s *SessionRedisRepo) DeleteSession(ctx context.Context, sessID string) error {
