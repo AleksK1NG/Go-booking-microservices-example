@@ -65,7 +65,11 @@ func (s *SessionRedisRepo) GetSessionByID(ctx context.Context, sessID string) (*
 func (s *SessionRedisRepo) DeleteSession(ctx context.Context, sessID string) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionRedisRepo.DeleteSession")
 	defer span.Finish()
-	panic("implement me")
+
+	if err := s.redis.Del(ctx, s.createKey(sessID)).Err(); err != nil {
+		return errors.Wrap(err, "sessionRepo.DeleteSession.redis.Del")
+	}
+	return nil
 }
 
 func (s *SessionRedisRepo) createKey(sessionID string) string {
