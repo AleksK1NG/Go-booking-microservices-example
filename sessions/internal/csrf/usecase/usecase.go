@@ -20,14 +20,12 @@ const (
 
 // CSRF usecase
 type CsrfUseCase struct {
-	csrfRepo       csrf.RedisRepository
-	secretTokenKey string
-	csrfExpire     int
+	csrfRepo csrf.RedisRepository
 }
 
 // NewCsrfUC
-func NewCsrfUseCase(csrfRepo csrf.RedisRepository, secretTokenKey string, csrfExpire int) *CsrfUseCase {
-	return &CsrfUseCase{csrfRepo: csrfRepo, secretTokenKey: secretTokenKey, csrfExpire: csrfExpire}
+func NewCsrfUseCase(csrfRepo csrf.RedisRepository) *CsrfUseCase {
+	return &CsrfUseCase{csrfRepo: csrfRepo}
 }
 
 // Create new CSRF token

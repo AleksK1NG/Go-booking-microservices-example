@@ -47,10 +47,10 @@ func (s *Server) Run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	im := interceptors.NewInterceptorManager(s.logger, s.cfg)
-	sessionRedisRepo := repository.NewSessionRedisRepo(s.redisConn, "session", 1*time.Hour)
+	sessionRedisRepo := repository.NewSessionRedisRepo(s.redisConn, s.cfg.GRPCServer.SessionPrefix, time.Duration(s.cfg.GRPCServer.SessionExpire)*time.Minute)
 	sessionUC := usecase.NewSessionUseCase(sessionRedisRepo)
-	csrfRepository := crfRepository.NewCsrfRepository(s.redisConn, "csrf", 60)
-	csrfUC := csrfUseCase.NewCsrfUseCase(csrfRepository, "secretTokenKey", 60)
+	csrfRepository := crfRepository.NewCsrfRepository(s.redisConn, s.cfg.GRPCServer.CSRFPrefix, time.Duration(s.cfg.GRPCServer.CsrfExpire)*time.Minute)
+	csrfUC := csrfUseCase.NewCsrfUseCase(csrfRepository)
 
 	router := echo.New()
 	router.GET("/api/v1/metrics", echo.WrapHandler(promhttp.Handler()))

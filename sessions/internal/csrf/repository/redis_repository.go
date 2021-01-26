@@ -14,11 +14,11 @@ import (
 type CsrfRepository struct {
 	redis    *redis.Client
 	prefix   string
-	duration int
+	duration time.Duration
 }
 
 // NewRedisRepository
-func NewCsrfRepository(redis *redis.Client, prefix string, duration int) *CsrfRepository {
+func NewCsrfRepository(redis *redis.Client, prefix string, duration time.Duration) *CsrfRepository {
 	return &CsrfRepository{redis: redis, prefix: prefix, duration: duration}
 }
 
@@ -27,7 +27,7 @@ func (r *CsrfRepository) Create(ctx context.Context, token string) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "CsrfRepository.Create")
 	defer span.Finish()
 
-	if err := r.redis.SetEX(ctx, r.createKey(token), token, time.Duration(r.duration)*time.Minute).Err(); err != nil {
+	if err := r.redis.SetEX(ctx, r.createKey(token), token, r.duration).Err(); err != nil {
 		return errors.Wrap(err, "CsrfRepository.Create.redis.SetEX")
 	}
 

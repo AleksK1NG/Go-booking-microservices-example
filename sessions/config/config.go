@@ -25,7 +25,10 @@ type GRPCServer struct {
 	CookieLifeTime    int
 	CsrfExpire        int
 	SessionID         string
+	SessionExpire     int
 	Mode              string
+	SessionPrefix     string
+	CSRFPrefix        string
 	Timeout           time.Duration
 	ReadTimeout       time.Duration
 	WriteTimeout      time.Duration
