@@ -10,11 +10,21 @@ import (
 // App config
 type Config struct {
 	GRPCServer GRPCServer
+	HttpServer HttpServer
 	Postgres   PostgresConfig
 	Redis      RedisConfig
 	Metrics    Metrics
 	Logger     Logger
 	Jaeger     Jaeger
+}
+
+type HttpServer struct {
+	Port           string
+	PprofPort      string
+	Timeout        time.Duration
+	ReadTimeout    time.Duration
+	WriteTimeout   time.Duration
+	CookieLifeTime int
 }
 
 // GRPCServer config
