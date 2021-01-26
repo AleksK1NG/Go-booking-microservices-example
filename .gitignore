@@ -13,3 +13,9 @@ coverage1.out
 *.env
 user_pgdata
 main_pgdata
+user/ssl/ca.crt
+user/ssl/ca.key
+user/ssl/server.crt
+user/ssl/server.csr
+user/ssl/server.key
+user/ssl/server.pem

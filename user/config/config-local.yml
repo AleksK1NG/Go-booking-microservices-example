@@ -1,6 +1,6 @@
 GRPCServer:
   AppVersion: 1.0.0
-  Port: ":5000"
+  Port: ":5001"
   CookieLifeTime: 44640
   CsrfExpire: 15
   SessionExpire: 60
@@ -13,6 +13,14 @@ GRPCServer:
   MaxConnectionAge: 5
   SessionPrefix: "session"
   CSRFPrefix: "csrf"
+
+HttpServer:
+  Port: ":8000"
+  PprofPort: ":8001"
+  Timeout: 15
+  ReadTimeout: 5
+  WriteTimeout: 5
+  CookieLifeTime: 44640
 
 logger:
   Development: true

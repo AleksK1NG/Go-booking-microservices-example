@@ -1,18 +1,12 @@
 .PHONY:
 
+# ==============================================================================
+# Local env
+
 local:
 	echo "Starting local environment"
 	make jaeger
 	docker-compose -f docker-compose.local.yml up --build
-
-linter:
-	echo "Starting linters"
-	cd main && golangci-lint run ./...
-	cd ..
-	cd user && golangci-lint run ./...
-	cd ..
-	cd sessions && golangci-lint run ./...
-	cd ..
 
 jaeger:
 	echo "Starting jaeger containers"
@@ -27,6 +21,24 @@ jaeger:
       -p 14250:14250 \
       -p 9411:9411 \
       jaegertracing/all-in-one:1.21
+
+make_cert:
+	echo "Generating SSL certificates"
+	sh ./user/ssl/instructions.sh
+
+# ==============================================================================
+# Linter
+
+linter:
+	echo "Starting linters"
+	cd main && golangci-lint run ./...
+	cd ..
+	cd user && golangci-lint run ./...
+	cd ..
+	cd sessions && golangci-lint run ./...
+	cd ..
+
+
 
 
 # ==============================================================================
