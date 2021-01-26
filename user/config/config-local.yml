@@ -15,8 +15,8 @@ GRPCServer:
   CSRFPrefix: "csrf"
 
 HttpServer:
-  Port: ":8000"
-  PprofPort: ":8001"
+  Port: ":8081"
+  PprofPort: ":8100"
   Timeout: 15
   ReadTimeout: 5
   WriteTimeout: 5
