@@ -12,7 +12,6 @@ message Session {
 
 message CsrfTokenInput {
   string SessionID = 1;
-  int64  TimeStamp = 2;
 }
 
 message CsrfToken {
