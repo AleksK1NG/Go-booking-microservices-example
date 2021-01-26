@@ -33,6 +33,7 @@ func main() {
 	appLogger.Infof("Success parsed config: %#v", cfg.GRPCServer.AppVersion)
 
 	redisClient := redis.NewRedisClient(cfg)
+	appLogger.Info("Redis connected")
 
 	tracer, closer, err := jaeger.InitJaeger(cfg)
 	if err != nil {

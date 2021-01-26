@@ -11,6 +11,7 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/jaeger"
 	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/logger"
 	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/postgres"
+	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/redis"
 )
 
 func main() {
@@ -38,6 +39,9 @@ func main() {
 	}
 	defer pgxConn.Close()
 
+	redisClient := redis.NewRedisClient(cfg)
+	appLogger.Info("Redis connected")
+
 	tracer, closer, err := jaeger.InitJaeger(cfg)
 	if err != nil {
 		appLogger.Fatal("cannot create tracer", err)
@@ -49,6 +53,7 @@ func main() {
 	appLogger.Info("Opentracing connected")
 
 	log.Printf("%-v", pgxConn.Stat())
+	log.Printf("%-v", redisClient.PoolStats())
 
 	http.ListenAndServe(":5001", nil)
 }
