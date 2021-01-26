@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/opentracing/opentracing-go"
@@ -9,6 +10,7 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/user/config"
 	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/jaeger"
 	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/logger"
+	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/postgres"
 )
 
 func main() {
@@ -30,6 +32,12 @@ func main() {
 	)
 	appLogger.Infof("Success parsed config: %#v", cfg.GRPCServer.AppVersion)
 
+	pgxConn, err := postgres.NewPgxConn(cfg)
+	if err != nil {
+		appLogger.Fatal("cannot connect to postgres", err)
+	}
+	defer pgxConn.Close()
+
 	tracer, closer, err := jaeger.InitJaeger(cfg)
 	if err != nil {
 		appLogger.Fatal("cannot create tracer", err)
@@ -40,5 +48,7 @@ func main() {
 	defer closer.Close()
 	appLogger.Info("Opentracing connected")
 
-	log.Printf("%-v", cfg)
+	log.Printf("%-v", pgxConn.Stat())
+
+	http.ListenAndServe(":5001", nil)
 }
