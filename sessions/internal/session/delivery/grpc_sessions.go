@@ -20,10 +20,12 @@ type SessionsService struct {
 	sessUC session.SessUseCase
 }
 
+// NewSessionsService
 func NewSessionsService(logger logger.Logger, sessUC session.SessUseCase) *SessionsService {
 	return &SessionsService{logger: logger, sessUC: sessUC}
 }
 
+// CreateSession
 func (s *SessionsService) CreateSession(ctx context.Context, r *sessionService.CreateSessionRequest) (*sessionService.CreateSessionResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsService.CreateSession")
 	defer span.Finish()
@@ -42,6 +44,7 @@ func (s *SessionsService) CreateSession(ctx context.Context, r *sessionService.C
 	return &sessionService.CreateSessionResponse{Session: s.sessionJSONToProto(sess)}, nil
 }
 
+// GetSessionByID
 func (s *SessionsService) GetSessionByID(ctx context.Context, r *sessionService.GetSessionByIDRequest) (*sessionService.GetSessionByIDResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsService.GetSessionByID")
 	defer span.Finish()
@@ -55,18 +58,26 @@ func (s *SessionsService) GetSessionByID(ctx context.Context, r *sessionService.
 	return &sessionService.GetSessionByIDResponse{Session: s.sessionJSONToProto(sess)}, nil
 }
 
+// DeleteSession
 func (s *SessionsService) DeleteSession(ctx context.Context, r *sessionService.DeleteSessionRequest) (*sessionService.DeleteSessionResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsService.DeleteSession")
 	defer span.Finish()
-	return nil, nil
+
+	if err := s.sessUC.DeleteSession(ctx, r.SessionID); err != nil {
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "sessUC.DeleteSession: %v", err)
+	}
+
+	return &sessionService.DeleteSessionResponse{SessionID: r.SessionID}, nil
 }
 
+// CreateCsrfToken
 func (s *SessionsService) CreateCsrfToken(ctx context.Context, r *sessionService.CreateCsrfTokenRequest) (*sessionService.CreateCsrfTokenResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsService.CreateCsrfToken")
 	defer span.Finish()
 	return nil, nil
 }
 
+// CheckCsrfToken
 func (s *SessionsService) CheckCsrfToken(ctx context.Context, r *sessionService.CheckCsrfTokenRequest) (*sessionService.CheckCsrfTokenResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsService.CheckCsrfToken")
 	defer span.Finish()
