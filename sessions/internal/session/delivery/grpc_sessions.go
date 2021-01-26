@@ -7,6 +7,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"google.golang.org/grpc/status"
 
+	"github.com/AleksK1NG/hotels-mocroservices/sessions/internal/csrf"
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/internal/models"
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/internal/session"
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/pkg/grpc_errors"
@@ -18,11 +19,12 @@ import (
 type SessionsService struct {
 	logger logger.Logger
 	sessUC session.SessUseCase
+	csrfUC csrf.UseCase
 }
 
 // NewSessionsService
-func NewSessionsService(logger logger.Logger, sessUC session.SessUseCase) *SessionsService {
-	return &SessionsService{logger: logger, sessUC: sessUC}
+func NewSessionsService(logger logger.Logger, sessUC session.SessUseCase, csrfUC csrf.UseCase) *SessionsService {
+	return &SessionsService{logger: logger, sessUC: sessUC, csrfUC: csrfUC}
 }
 
 // CreateSession
@@ -74,14 +76,26 @@ func (s *SessionsService) DeleteSession(ctx context.Context, r *sessionService.D
 func (s *SessionsService) CreateCsrfToken(ctx context.Context, r *sessionService.CreateCsrfTokenRequest) (*sessionService.CreateCsrfTokenResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsService.CreateCsrfToken")
 	defer span.Finish()
-	return nil, nil
+
+	token, err := s.csrfUC.GetCSRFToken(ctx, r.GetCsrfTokenInput().GetSessionID())
+	if err != nil {
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "csrfUC.CreateCsrfToken: %v", err)
+	}
+
+	return &sessionService.CreateCsrfTokenResponse{CsrfToken: &sessionService.CsrfToken{Token: token}}, nil
 }
 
 // CheckCsrfToken
 func (s *SessionsService) CheckCsrfToken(ctx context.Context, r *sessionService.CheckCsrfTokenRequest) (*sessionService.CheckCsrfTokenResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsService.CheckCsrfToken")
 	defer span.Finish()
-	return nil, nil
+
+	isValid, err := s.csrfUC.ValidateCSRFToken(ctx, r.GetCsrfTokenCheck().GetSessionID(), r.GetCsrfTokenCheck().GetToken())
+	if err != nil {
+		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "csrfUC.CheckToken: %v", err)
+	}
+
+	return &sessionService.CheckCsrfTokenResponse{CheckResult: &sessionService.CheckResult{Result: isValid}}, nil
 }
 
 func (s *SessionsService) sessionJSONToProto(sess *models.Session) *sessionService.Session {

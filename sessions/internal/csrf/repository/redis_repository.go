@@ -10,46 +10,43 @@ import (
 	"github.com/pkg/errors"
 )
 
-// RedisRepository
-type RedisRepository struct {
+// CsrfRepository
+type CsrfRepository struct {
 	redis    *redis.Client
 	prefix   string
 	duration int
 }
 
 // NewRedisRepository
-func NewRedisRepository(redis *redis.Client, prefix string, duration int) *RedisRepository {
-	return &RedisRepository{redis: redis, prefix: prefix, duration: duration}
+func NewCsrfRepository(redis *redis.Client, prefix string, duration int) *CsrfRepository {
+	return &CsrfRepository{redis: redis, prefix: prefix, duration: duration}
 }
 
 // Create csrf token
-func (r *RedisRepository) Create(ctx context.Context, token string) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "RedisRepository.Create")
+func (r *CsrfRepository) Create(ctx context.Context, token string) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "CsrfRepository.Create")
 	defer span.Finish()
 
 	if err := r.redis.SetEX(ctx, r.createKey(token), token, time.Duration(r.duration)*time.Minute).Err(); err != nil {
-		return errors.Wrap(err, "RedisRepository.Create.redis.SetEX")
+		return errors.Wrap(err, "CsrfRepository.Create.redis.SetEX")
 	}
 
 	return nil
 }
 
 // Check csrf token
-func (r *RedisRepository) Check(ctx context.Context, token string) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "RedisRepository.Check")
+func (r *CsrfRepository) GetToken(ctx context.Context, token string) (string, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "CsrfRepository.Check")
 	defer span.Finish()
 
-	_, err := r.redis.Get(ctx, r.createKey(token)).Result()
+	token, err := r.redis.Get(ctx, r.createKey(token)).Result()
 	if err != nil {
-		if errors.Is(err, redis.Nil) {
-			return nil
-		}
-		return err
+		return "", err
 	}
 
-	return errors.New("token is not valid")
+	return token, nil
 }
 
-func (r *RedisRepository) createKey(token string) string {
+func (r *CsrfRepository) createKey(token string) string {
 	return fmt.Sprintf("%s: %s", r.prefix, token)
 }

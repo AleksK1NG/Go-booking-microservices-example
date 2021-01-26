@@ -2,118 +2,79 @@ package usecase
 
 import (
 	"context"
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
-	"encoding/json"
 	"io"
-	"time"
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/internal/csrf"
-	"github.com/AleksK1NG/hotels-mocroservices/sessions/internal/models"
+)
+
+const (
+	CSRFHeader = "X-CSRF-Token"
+	// 32 bytes
+	csrfSalt = "KbWaoi5xtDC3GEfBa9ovQdzOzXsuVU9I"
 )
 
 // CSRF usecase
-type CsrfUC struct {
+type CsrfUseCase struct {
 	csrfRepo       csrf.RedisRepository
 	secretTokenKey string
 	csrfExpire     int
 }
 
 // NewCsrfUC
-func NewCsrfUC(csrfRepo csrf.RedisRepository, secretTokenKey string, csrfExpire int) *CsrfUC {
-	return &CsrfUC{csrfRepo: csrfRepo, secretTokenKey: secretTokenKey, csrfExpire: csrfExpire}
+func NewCsrfUseCase(csrfRepo csrf.RedisRepository, secretTokenKey string, csrfExpire int) *CsrfUseCase {
+	return &CsrfUseCase{csrfRepo: csrfRepo, secretTokenKey: secretTokenKey, csrfExpire: csrfExpire}
 }
 
-// CreateToken
-func (c *CsrfUC) CreateToken(ctx context.Context, sesID string, timeStamp int64) (string, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "CsrfUC.CreateToken")
+// Create new CSRF token
+func (c *CsrfUseCase) GetCSRFToken(ctx context.Context, sesID string) (string, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "CsrfUseCase.CreateToken")
 	defer span.Finish()
 
-	block, err := aes.NewCipher([]byte(c.secretTokenKey))
+	token, err := c.makeToken(sesID)
 	if err != nil {
-		return "", errors.Wrap(err, "CsrfUC.CreateToken.aes.NewCipher")
+		return "", errors.Wrap(err, "CsrfUseCase.CreateToken.c.makeToken")
 	}
 
-	aesgcm, err := cipher.NewGCM(block)
-	if err != nil {
-		return "", errors.Wrap(err, "CsrfUC.CreateToken.cipher.NewGCM")
+	if err := c.csrfRepo.Create(ctx, token); err != nil {
+		return "", errors.Wrap(err, "CsrfUseCase.CreateToken.csrfRepo.Create")
 	}
-
-	nonce := make([]byte, aesgcm.NonceSize())
-	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		return "", errors.Wrap(err, "CsrfUC.CreateToken.io.ReadFull")
-	}
-
-	td := &models.CsrfToken{SessionID: sesID, Timestamp: timeStamp}
-	data, err := json.Marshal(td)
-	if err != nil {
-		return "", errors.Wrap(err, "CsrfUC.CreateToken.json.Marshal")
-	}
-	ciphertext := aesgcm.Seal(nil, nonce, data, nil)
-
-	res := append([]byte(nil), nonce...)
-	res = append(res, ciphertext...)
-
-	token := base64.StdEncoding.EncodeToString(res)
 
 	return token, nil
 }
 
-// CheckToken
-func (c *CsrfUC) CheckToken(ctx context.Context, sesID string, token string) (bool, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "CsrfUC.CheckToken")
+// Validate csrf token using session id and token
+func (c *CsrfUseCase) ValidateCSRFToken(ctx context.Context, sesID string, token string) (bool, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "CsrfUseCase.CheckToken")
 	defer span.Finish()
 
-	ciphertext, _ := base64.StdEncoding.DecodeString(token)
-
-	block, err := aes.NewCipher([]byte(c.secretTokenKey))
-	if err != nil {
-		return false, errors.Wrap(err, "CsrfUC.CheckToken.aes.NewCipher")
-	}
-
-	aesgcm, err := cipher.NewGCM(block)
+	existsToken, err := c.csrfRepo.GetToken(ctx, token)
 	if err != nil {
 		return false, err
 	}
 
-	nonceSize := aesgcm.NonceSize()
-	if len(ciphertext) < nonceSize {
-		return false, errors.New("ciphertext < nonceSize")
-	}
+	return c.validateToken(existsToken, sesID), nil
+}
 
-	nonce, ciphertext := ciphertext[:nonceSize], ciphertext[nonceSize:]
-
-	plaintext, err := aesgcm.Open(nil, nonce, ciphertext, nil)
+func (c *CsrfUseCase) makeToken(sessionID string) (string, error) {
+	hash := sha256.New()
+	_, err := io.WriteString(hash, csrfSalt+sessionID)
 	if err != nil {
-		return false, errors.Wrap(err, "CsrfUC.CheckToken.aesgcm.Open")
+		return "", err
 	}
+	token := base64.RawStdEncoding.EncodeToString(hash.Sum(nil))
+	return token, nil
+}
 
-	CsrfTok := models.CsrfToken{}
-	if err := json.Unmarshal(plaintext, &CsrfTok); err != nil {
-		return false, errors.Wrap(err, "CsrfUC.CheckToken.json.Unmarshal")
+// Validate CSRF token
+func (c *CsrfUseCase) validateToken(token string, sessionID string) bool {
+	trueToken, err := c.makeToken(sessionID)
+	if err != nil {
+		return false
 	}
-
-	if time.Now().Unix()-CsrfTok.Timestamp >
-		int64(time.Duration(c.csrfExpire)*time.Minute) {
-		return false, errors.New("token expired")
-	}
-
-	expected := models.CsrfToken{SessionID: sesID, Timestamp: CsrfTok.Timestamp}
-
-	err = c.csrfRepo.Check(ctx, token)
-
-	if CsrfTok != expected || err != nil {
-		return false, errors.New("token expired")
-	}
-
-	if err := c.csrfRepo.Create(ctx, token); err != nil {
-		return false, errors.Wrap(err, "CsrfUC.CheckToken.csrfRepo.Create")
-	}
-
-	return true, nil
+	return token == trueToken
 }

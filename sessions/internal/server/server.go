@@ -21,6 +21,8 @@ import (
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/config"
+	crfRepository "github.com/AleksK1NG/hotels-mocroservices/sessions/internal/csrf/repository"
+	csrfUseCase "github.com/AleksK1NG/hotels-mocroservices/sessions/internal/csrf/usecase"
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/internal/interceptors"
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/internal/session/delivery"
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/internal/session/repository"
@@ -46,7 +48,9 @@ func (s *Server) Run() error {
 
 	im := interceptors.NewInterceptorManager(s.logger, s.cfg)
 	sessionRedisRepo := repository.NewSessionRedisRepo(s.redisConn, "session", 1*time.Hour)
-	sessionUseCase := usecase.NewSessionUseCase(sessionRedisRepo)
+	sessionUC := usecase.NewSessionUseCase(sessionRedisRepo)
+	csrfRepository := crfRepository.NewCsrfRepository(s.redisConn, "csrf", 60)
+	csrfUC := csrfUseCase.NewCsrfUseCase(csrfRepository, "secretTokenKey", 60)
 
 	router := echo.New()
 	router.GET("/api/v1/metrics", echo.WrapHandler(promhttp.Handler()))
@@ -79,7 +83,7 @@ func (s *Server) Run() error {
 		),
 	)
 
-	sessGRPCService := delivery.NewSessionsService(s.logger, sessionUseCase)
+	sessGRPCService := delivery.NewSessionsService(s.logger, sessionUC, csrfUC)
 	sessionService.RegisterAuthorizationServiceServer(server, sessGRPCService)
 	grpc_prometheus.Register(server)
 
