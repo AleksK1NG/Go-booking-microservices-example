@@ -23,6 +23,7 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/AleksK1NG/hotels-mocroservices/user/config"
+	"github.com/AleksK1NG/hotels-mocroservices/user/internal/interceptors"
 	userGRPC "github.com/AleksK1NG/hotels-mocroservices/user/internal/user/delivery/grpc"
 	userHandlers "github.com/AleksK1NG/hotels-mocroservices/user/internal/user/delivery/http"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user/repository"
@@ -60,6 +61,7 @@ func (s *Server) Run() error {
 	v1 := s.echo.Group("/api/v1")
 	usersGroup := v1.Group("/users")
 
+	im := interceptors.NewInterceptorManager(s.logger, s.cfg)
 	userPGRepository := repository.NewUserPGRepository(s.pgxPool)
 	userUseCase := usecase.NewUserUseCase(userPGRepository)
 	uh := userHandlers.NewUserHandlers(usersGroup, userUseCase, s.logger, validate)
@@ -101,7 +103,7 @@ func (s *Server) Run() error {
 		MaxConnectionAge:  s.cfg.GRPCServer.MaxConnectionAge * time.Minute,
 		Time:              s.cfg.GRPCServer.Timeout * time.Minute,
 	}),
-		// grpc.UnaryInterceptor(im.Logger),
+		grpc.UnaryInterceptor(im.Logger),
 		grpc.ChainUnaryInterceptor(
 			grpc_ctxtags.UnaryServerInterceptor(),
 			grpc_prometheus.UnaryServerInterceptor,
