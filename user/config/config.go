@@ -29,20 +29,21 @@ type HttpServer struct {
 
 // GRPCServer config
 type GRPCServer struct {
-	AppVersion        string
-	Port              string
-	CookieLifeTime    int
-	CsrfExpire        int
-	SessionID         string
-	SessionExpire     int
-	Mode              string
-	SessionPrefix     string
-	CSRFPrefix        string
-	Timeout           time.Duration
-	ReadTimeout       time.Duration
-	WriteTimeout      time.Duration
-	MaxConnectionIdle time.Duration
-	MaxConnectionAge  time.Duration
+	AppVersion             string
+	Port                   string
+	CookieLifeTime         int
+	CsrfExpire             int
+	SessionID              string
+	SessionExpire          int
+	Mode                   string
+	SessionPrefix          string
+	CSRFPrefix             string
+	Timeout                time.Duration
+	ReadTimeout            time.Duration
+	WriteTimeout           time.Duration
+	MaxConnectionIdle      time.Duration
+	MaxConnectionAge       time.Duration
+	SessionGrpcServicePort string
 }
 
 // Logger config

@@ -13,6 +13,7 @@ GRPCServer:
   MaxConnectionAge: 5
   SessionPrefix: "session"
   CSRFPrefix: "csrf"
+  SessionGrpcServicePort: ":5000"
 
 HttpServer:
   Port: ":8081"
