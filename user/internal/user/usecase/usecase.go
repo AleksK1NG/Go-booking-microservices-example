@@ -5,6 +5,7 @@ import (
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
+	uuid "github.com/satori/go.uuid"
 
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/models"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user"
@@ -13,6 +14,14 @@ import (
 // UserUseCase
 type UserUseCase struct {
 	userPGRepo user.PGRepository
+}
+
+// GetByID
+func (u *UserUseCase) GetByID(ctx context.Context, userID uuid.UUID) (*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.GetByID")
+	defer span.Finish()
+
+	return u.userPGRepo.GetByID(ctx, userID)
 }
 
 // NewUserUseCase

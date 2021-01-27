@@ -7,8 +7,10 @@ import (
 
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/types"
+	userService "github.com/AleksK1NG/hotels-mocroservices/user/proto/user"
 )
 
 // User
@@ -43,6 +45,10 @@ const (
 	RoleMember Role = "member"
 	RoleAdmin  Role = "admin"
 )
+
+func (e *Role) ToString() string {
+	return string(*e)
+}
 
 func (e *Role) Scan(src interface{}) error {
 	switch s := src.(type) {
@@ -88,4 +94,17 @@ func (u *User) PrepareCreate() error {
 		return err
 	}
 	return nil
+}
+
+func (r *UserResponse) ToProto() *userService.User {
+	return &userService.User{
+		UserID:    r.UserID.String(),
+		FirstName: r.FirstName,
+		LastName:  r.LastName,
+		Email:     r.Email,
+		Avatar:    r.Avatar.String,
+		Role:      r.Role.ToString(),
+		CreatedAt: timestamppb.New(*r.CreatedAt),
+		UpdatedAt: timestamppb.New(*r.UpdatedAt),
+	}
 }

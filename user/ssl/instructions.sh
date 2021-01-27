@@ -7,7 +7,7 @@
 # server.key: Server private key, password protected (this shouldn't be shared)
 # server.csr: Server certificate signing request (this should be shared with the CA owner)
 # server.crt: Server certificate signed by the CA (this would be sent back by the CA owner) - keep on server
-# server.pem: Conversion of server.key into a format gRPC likes (this shouldn't be shared)
+# server.pem: Conversion of server.key into a format grpc likes (this shouldn't be shared)
 
 # Summary
 # Private files: ca.key, server.key, server.pem, server.crt
@@ -29,5 +29,5 @@ openssl req -passin pass:1111 -new -key server.key -out server.csr -subj "/CN=${
 # Step 4: Sign the certificate with the CA we created (it's called self signing) - server.crt
 openssl x509 -req -passin pass:1111 -days 3650 -in server.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out server.crt
 
-# Step 5: Convert the server certificate to .pem format (server.pem) - usable by gRPC
+# Step 5: Convert the server certificate to .pem format (server.pem) - usable by grpc
 openssl pkcs8 -topk8 -nocrypt -passin pass:1111 -in server.key -out server.pem
