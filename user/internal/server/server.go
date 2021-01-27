@@ -16,6 +16,7 @@ import (
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/labstack/echo/v4"
+	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
@@ -38,7 +39,6 @@ const (
 	certFile       = "ssl/server.crt"
 	keyFile        = "ssl/server.pem"
 	maxHeaderBytes = 1 << 20
-	ctxTimeout     = 5
 )
 
 // Server
@@ -48,11 +48,12 @@ type Server struct {
 	cfg       *config.Config
 	redisConn *redis.Client
 	pgxPool   *pgxpool.Pool
+	tracer    opentracing.Tracer
 }
 
 // NewServer
-func NewServer(logger logger.Logger, cfg *config.Config, redisConn *redis.Client, pgxPool *pgxpool.Pool) *Server {
-	return &Server{logger: logger, cfg: cfg, redisConn: redisConn, pgxPool: pgxPool, echo: echo.New()}
+func NewServer(logger logger.Logger, cfg *config.Config, redisConn *redis.Client, pgxPool *pgxpool.Pool, tracer opentracing.Tracer) *Server {
+	return &Server{logger: logger, cfg: cfg, redisConn: redisConn, pgxPool: pgxPool, echo: echo.New(), tracer: tracer}
 }
 
 func (s *Server) Run() error {
@@ -62,7 +63,7 @@ func (s *Server) Run() error {
 	validate := validator.New()
 	v1 := s.echo.Group("/api/v1")
 	usersGroup := v1.Group("/users")
-	im := interceptors.NewInterceptorManager(s.logger, s.cfg)
+	im := interceptors.NewInterceptorManager(s.logger, s.cfg, s.tracer)
 
 	sessGRPCConn, err := grpc_client.NewSessionServiceConn(ctx, s.cfg, im)
 	if err != nil {
