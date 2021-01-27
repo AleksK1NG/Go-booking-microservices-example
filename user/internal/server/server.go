@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"io"
 	"net/http"
 	"os"
 	"os/signal"
@@ -42,22 +41,6 @@ func NewServer(logger logger.Logger, cfg *config.Config, redisConn *redis.Client
 func (s *Server) Run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-
-	file, err := os.Open(certFile)
-	if err != nil {
-		s.logger.Fatal(err)
-	}
-	defer file.Close()
-
-	written, err := io.Copy(os.Stderr, file)
-	if err != nil {
-		s.logger.Fatal(err)
-	}
-
-	dir, _ := os.Getwd()
-
-	s.logger.Infof("DIR IS : %s", dir)
-	s.logger.Infof("DIR IS written: %s", written)
 
 	s.MapRoutes()
 

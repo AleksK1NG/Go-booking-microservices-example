@@ -1,8 +1,12 @@
 package user
 
-import "context"
+import (
+	"context"
+
+	"github.com/AleksK1NG/hotels-mocroservices/user/internal/models"
+)
 
 // PGRepository
 type PGRepository interface {
-	Register(ctx context.Context)
+	Create(ctx context.Context, user *models.User) (*models.UserResponse, error)
 }

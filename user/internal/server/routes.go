@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
@@ -20,12 +21,13 @@ const (
 )
 
 func (s *Server) MapRoutes() {
+	validate := validator.New()
 	v1 := s.echo.Group("/api/v1")
 	usersGroup := v1.Group("/users")
 
 	userPGRepository := repository.NewUserPGRepository(s.pgxPool)
 	userUseCase := usecase.NewUserUseCase(userPGRepository)
-	uh := userHandlers.NewUserHandlers(usersGroup, userUseCase, s.logger)
+	uh := userHandlers.NewUserHandlers(usersGroup, userUseCase, s.logger, validate)
 	uh.MapUserRoutes()
 
 	s.echo.Pre(middleware.HTTPSRedirect())
