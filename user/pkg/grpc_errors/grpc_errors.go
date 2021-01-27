@@ -4,10 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -65,4 +67,9 @@ func MapGRPCErrCodeToHttpStatus(code codes.Code) int {
 		return http.StatusBadRequest
 	}
 	return http.StatusInternalServerError
+}
+
+// GRPC Error response
+func ErrorResponse(err error, msg string) error {
+	return status.Errorf(ParseGRPCErrStatusCode(err), fmt.Sprintf("%s: %v", msg, err))
 }
