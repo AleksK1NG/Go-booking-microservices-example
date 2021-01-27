@@ -1,2 +1,4 @@
 DROP TABLE IF EXISTS users CASCADE;
-DROP TYPE role;
+DROP TYPE IF EXISTS role;
+DROP TRIGGER IF EXISTS user_updated_at_trigger ON users;
+DROP FUNCTION IF EXISTS user_updated;
