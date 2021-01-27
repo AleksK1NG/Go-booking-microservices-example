@@ -5,7 +5,6 @@ import (
 
 	"github.com/opentracing/opentracing-go"
 	uuid "github.com/satori/go.uuid"
-	"google.golang.org/grpc/status"
 
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user"
 	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/grpc_errors"
@@ -32,13 +31,13 @@ func (u *UserService) GetUserByID(ctx context.Context, r *userService.GetByIDReq
 	userUUID, err := uuid.FromString(r.GetUserID())
 	if err != nil {
 		u.logger.Errorf("uuid.FromString: %v", err)
-		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "uuid.FromString: %v", err)
+		return nil, grpc_errors.ErrorResponse(err, "uuid.FromString")
 	}
 
 	foundUser, err := u.userUC.GetByID(ctx, userUUID)
 	if err != nil {
 		u.logger.Errorf("uuid.FromString: %v", err)
-		return nil, status.Errorf(grpc_errors.ParseGRPCErrStatusCode(err), "uuid.FromString: %v", err)
+		return nil, grpc_errors.ErrorResponse(err, "userUC.GetByID")
 	}
 
 	return &userService.GetByIDResponse{User: foundUser.ToProto()}, nil
