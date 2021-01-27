@@ -1,7 +1,7 @@
 GRPCServer:
   AppVersion: 1.0.0
   Port: ":5001"
-  CookieLifeTime: 44640
+  CookieLifeTime: 360
   CsrfExpire: 15
   SessionExpire: 60
   SessionID: "SessionID"

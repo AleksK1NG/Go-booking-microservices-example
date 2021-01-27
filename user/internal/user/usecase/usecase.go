@@ -47,3 +47,16 @@ func (u *UserUseCase) Register(ctx context.Context, user *models.User) (*models.
 
 	return created, err
 }
+
+// CreateSession
+func (u *UserUseCase) CreateSession(ctx context.Context, userID uuid.UUID) (string, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.CreateSession")
+	defer span.Finish()
+
+	session, err := u.sessClient.CreateSession(ctx, &sessionService.CreateSessionRequest{UserID: userID.String()})
+	if err != nil {
+		return "", errors.Wrap(err, "sessClient.CreateSession")
+	}
+
+	return session.GetSession().GetSessionID(), err
+}
