@@ -62,7 +62,7 @@ func (s *Server) Run() error {
 	validate := validator.New()
 	v1 := s.echo.Group("/api/v1")
 	usersGroup := v1.Group("/users")
-	sessGRPCConn, err := grpc_client.NewSessionServiceConn(ctx, s.cfg)
+	sessGRPCConn, err := grpc_client.NewSessionServiceConn(ctx, s.cfg, s.logger)
 	if err != nil {
 		s.logger.Fatalf("Error sessions service connect: ", err)
 	}
@@ -73,7 +73,7 @@ func (s *Server) Run() error {
 	im := interceptors.NewInterceptorManager(s.logger, s.cfg)
 	userPGRepository := repository.NewUserPGRepository(s.pgxPool)
 	userUseCase := usecase.NewUserUseCase(userPGRepository, sessServiceClient)
-	uh := userHandlers.NewUserHandlers(usersGroup, userUseCase, s.logger, validate)
+	uh := userHandlers.NewUserHandlers(usersGroup, userUseCase, s.logger, validate, s.cfg)
 	uh.MapUserRoutes()
 
 	v1.GET("/health", func(c echo.Context) error {
