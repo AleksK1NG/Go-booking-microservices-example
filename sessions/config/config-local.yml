@@ -47,5 +47,5 @@ metrics:
 
 jaeger:
   Host: localhost:6831
-  ServiceName: Sessions_GRPC
+  ServiceName: SessionsSrvice_GRPC
   LogSpans: false

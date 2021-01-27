@@ -55,6 +55,6 @@ func main() {
 	log.Printf("%-v", pgxConn.Stat())
 	log.Printf("%-v", redisClient.PoolStats())
 
-	s := server.NewServer(appLogger, cfg, redisClient, pgxConn)
+	s := server.NewServer(appLogger, cfg, redisClient, pgxConn, tracer)
 	appLogger.Fatal(s.Run())
 }

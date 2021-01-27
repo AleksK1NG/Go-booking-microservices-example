@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
@@ -15,11 +16,12 @@ import (
 type InterceptorManager struct {
 	logger logger.Logger
 	cfg    *config.Config
+	tracer opentracing.Tracer
 }
 
 // InterceptorManager constructor
-func NewInterceptorManager(logger logger.Logger, cfg *config.Config) *InterceptorManager {
-	return &InterceptorManager{logger: logger, cfg: cfg}
+func NewInterceptorManager(logger logger.Logger, cfg *config.Config, tracer opentracing.Tracer) *InterceptorManager {
+	return &InterceptorManager{logger: logger, cfg: cfg, tracer: tracer}
 }
 
 // Logger Interceptor
@@ -57,4 +59,9 @@ func (im *InterceptorManager) GetInterceptor() func(
 			method, req, reply, time.Since(start), err)
 		return err
 	}
+}
+
+// GetTracer
+func (im *InterceptorManager) GetTracer() opentracing.Tracer {
+	return im.tracer
 }
