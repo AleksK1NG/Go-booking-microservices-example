@@ -9,11 +9,18 @@ import (
 
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/models"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user"
+	sessionService "github.com/AleksK1NG/hotels-mocroservices/user/proto/session"
 )
 
 // UserUseCase
 type UserUseCase struct {
 	userPGRepo user.PGRepository
+	sessClient sessionService.AuthorizationServiceClient
+}
+
+// NewUserUseCase
+func NewUserUseCase(userPGRepo user.PGRepository, sessClient sessionService.AuthorizationServiceClient) *UserUseCase {
+	return &UserUseCase{userPGRepo: userPGRepo, sessClient: sessClient}
 }
 
 // GetByID
@@ -22,11 +29,6 @@ func (u *UserUseCase) GetByID(ctx context.Context, userID uuid.UUID) (*models.Us
 	defer span.Finish()
 
 	return u.userPGRepo.GetByID(ctx, userID)
-}
-
-// NewUserUseCase
-func NewUserUseCase(userPGRepo user.PGRepository) *UserUseCase {
-	return &UserUseCase{userPGRepo: userPGRepo}
 }
 
 // Register

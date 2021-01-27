@@ -24,11 +24,13 @@ import (
 
 	"github.com/AleksK1NG/hotels-mocroservices/user/config"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/interceptors"
+	"github.com/AleksK1NG/hotels-mocroservices/user/internal/session/grpc_client"
 	userGRPC "github.com/AleksK1NG/hotels-mocroservices/user/internal/user/delivery/grpc"
 	userHandlers "github.com/AleksK1NG/hotels-mocroservices/user/internal/user/delivery/http"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user/repository"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user/usecase"
 	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/logger"
+	sessionService "github.com/AleksK1NG/hotels-mocroservices/user/proto/session"
 	userGRPCService "github.com/AleksK1NG/hotels-mocroservices/user/proto/user"
 )
 
@@ -60,10 +62,17 @@ func (s *Server) Run() error {
 	validate := validator.New()
 	v1 := s.echo.Group("/api/v1")
 	usersGroup := v1.Group("/users")
+	sessGRPCConn, err := grpc_client.NewSessionServiceConn(ctx, s.cfg)
+	if err != nil {
+		s.logger.Fatalf("Error sessions service connect: ", err)
+	}
+	defer sessGRPCConn.Close()
+
+	sessServiceClient := sessionService.NewAuthorizationServiceClient(sessGRPCConn)
 
 	im := interceptors.NewInterceptorManager(s.logger, s.cfg)
 	userPGRepository := repository.NewUserPGRepository(s.pgxPool)
-	userUseCase := usecase.NewUserUseCase(userPGRepository)
+	userUseCase := usecase.NewUserUseCase(userPGRepository, sessServiceClient)
 	uh := userHandlers.NewUserHandlers(usersGroup, userUseCase, s.logger, validate)
 	uh.MapUserRoutes()
 
