@@ -31,3 +31,30 @@ func (im *InterceptorManager) Logger(ctx context.Context, req interface{}, info 
 
 	return reply, err
 }
+
+// GetInterceptor
+func GetInterceptor(log logger.Logger) func(
+	ctx context.Context,
+	method string,
+	req interface{},
+	reply interface{},
+	cc *grpc.ClientConn,
+	invoker grpc.UnaryInvoker,
+	opts ...grpc.CallOption,
+) error {
+	return func(
+		ctx context.Context,
+		method string,
+		req interface{},
+		reply interface{},
+		cc *grpc.ClientConn,
+		invoker grpc.UnaryInvoker,
+		opts ...grpc.CallOption,
+	) error {
+		start := time.Now()
+		err := invoker(ctx, method, req, reply, cc, opts...)
+		log.Infof("call=%v req=%#v reply=%#v time=%v err=%v",
+			method, req, reply, time.Since(start), err)
+		return err
+	}
+}
