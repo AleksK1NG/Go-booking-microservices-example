@@ -33,7 +33,7 @@ func (im *InterceptorManager) Logger(ctx context.Context, req interface{}, info 
 }
 
 // GetInterceptor
-func GetInterceptor(log logger.Logger) func(
+func (im *InterceptorManager) GetInterceptor() func(
 	ctx context.Context,
 	method string,
 	req interface{},
@@ -53,7 +53,7 @@ func GetInterceptor(log logger.Logger) func(
 	) error {
 		start := time.Now()
 		err := invoker(ctx, method, req, reply, cc, opts...)
-		log.Infof("call=%v req=%#v reply=%#v time=%v err=%v",
+		im.logger.Infof("call=%v req=%#v reply=%#v time=%v err=%v",
 			method, req, reply, time.Since(start), err)
 		return err
 	}
