@@ -19,6 +19,11 @@ type UserService struct {
 	logger logger.Logger
 }
 
+// NewUserService
+func NewUserService(userUC user.UseCase, logger logger.Logger) *UserService {
+	return &UserService{userUC: userUC, logger: logger}
+}
+
 // GetUserByID
 func (u *UserService) GetUserByID(ctx context.Context, r *userService.GetByIDRequest) (*userService.GetByIDResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserService.GetUserByID")

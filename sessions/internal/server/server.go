@@ -110,9 +110,6 @@ func (s *Server) Run() error {
 		s.logger.Errorf("Metrics router.Shutdown: %v", err)
 	}
 
-	if err := router.Shutdown(ctx); err != nil {
-		s.logger.Errorf("Metrics router.Shutdown: %v", err)
-	}
 	server.GracefulStop()
 	s.logger.Info("Server Exited Properly")
 
