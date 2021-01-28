@@ -102,6 +102,12 @@ func (s *Server) Run() error {
 		}
 	}()
 
+	go func() {
+		if err := http.ListenAndServe(":7071", promhttp.Handler()); err != nil {
+			s.logger.Errorf("Metrics error: %v", err)
+		}
+	}()
+
 	l, err := net.Listen("tcp", s.cfg.GRPCServer.Port)
 	if err != nil {
 		return err
@@ -114,11 +120,11 @@ func (s *Server) Run() error {
 		MaxConnectionAge:  s.cfg.GRPCServer.MaxConnectionAge * time.Minute,
 		Time:              s.cfg.GRPCServer.Timeout * time.Minute,
 	}),
-		grpc.UnaryInterceptor(im.Logger),
 		grpc.ChainUnaryInterceptor(
 			grpc_ctxtags.UnaryServerInterceptor(),
 			grpc_prometheus.UnaryServerInterceptor,
 			grpcrecovery.UnaryServerInterceptor(),
+			im.Logger,
 		),
 	)
 

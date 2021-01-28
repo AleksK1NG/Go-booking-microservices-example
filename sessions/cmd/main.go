@@ -47,7 +47,7 @@ func main() {
 
 	log.Printf("%-v", redisClient.PoolStats())
 
-	s := server.NewSessionsServer(appLogger, cfg, redisClient)
+	s := server.NewSessionsServer(appLogger, cfg, redisClient, tracer)
 
 	appLogger.Fatal(s.Run())
 }
