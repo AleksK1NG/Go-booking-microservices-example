@@ -1,4 +1,104 @@
+definitions:
+  models.Login:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.User:
+    properties:
+      avatar:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    type: object
+  models.UserResponse:
+    properties:
+      avatar:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    type: object
 info:
   contact: {}
-paths: {}
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: login user, returns user data and session
+      parameters:
+      - description: email and password
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+      summary: Login user
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: register new user account, returns user data and session
+      parameters:
+      - description: user data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+      summary: Register new user
 swagger: "2.0"
