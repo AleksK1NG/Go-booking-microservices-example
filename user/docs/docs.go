@@ -72,6 +72,26 @@ var doc = `{
                 }
             }
         },
+        "/auth/me": {
+            "get": {
+                "description": "Get current user data, required session cookie",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get current user data",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/register": {
             "post": {
                 "description": "register new user account, returns user data and session",

@@ -10,4 +10,5 @@ type Delivery interface {
 	Update() echo.HandlerFunc
 	Delete() echo.HandlerFunc
 	GetUserByID() echo.HandlerFunc
+	GetMe() echo.HandlerFunc
 }

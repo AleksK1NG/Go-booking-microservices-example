@@ -10,6 +10,7 @@ import (
 	"github.com/opentracing/opentracing-go"
 
 	"github.com/AleksK1NG/hotels-mocroservices/user/config"
+	"github.com/AleksK1NG/hotels-mocroservices/user/internal/middlewares"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/models"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user"
 	httpErrors "github.com/AleksK1NG/hotels-mocroservices/user/pkg/http_errors"
@@ -23,11 +24,19 @@ type UserHandlers struct {
 	userUC   user.UseCase
 	logger   logger.Logger
 	validate *validator.Validate
+	mw       *middlewares.MiddlewareManager
 }
 
 // NewUserHandlers
-func NewUserHandlers(group *echo.Group, userUC user.UseCase, logger logger.Logger, validate *validator.Validate, cfg *config.Config) *UserHandlers {
-	return &UserHandlers{group: group, userUC: userUC, logger: logger, validate: validate, cfg: cfg}
+func NewUserHandlers(
+	group *echo.Group,
+	userUC user.UseCase,
+	logger logger.Logger,
+	validate *validator.Validate,
+	cfg *config.Config,
+	mw *middlewares.MiddlewareManager,
+) *UserHandlers {
+	return &UserHandlers{group: group, userUC: userUC, logger: logger, validate: validate, cfg: cfg, mw: mw}
 }
 
 // Register godoc
@@ -154,6 +163,28 @@ func (h *UserHandlers) Logout() echo.HandlerFunc {
 		}
 
 		return c.NoContent(http.StatusNoContent)
+	}
+}
+
+// GetMe godoc
+// @Summary Get current user data
+// @Description Get current user data, required session cookie
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.UserResponse
+// @Router /auth/me [get]
+func (h *UserHandlers) GetMe() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.GetMe")
+		defer span.Finish()
+
+		userResponse, ok := ctx.Value(middlewares.RequestCtxUser{}).(*models.UserResponse)
+		if !ok {
+			h.logger.Error("invalid middleware user ctx")
+			return c.JSON(http.StatusUnauthorized, httpErrors.NewInternalServerError(httpErrors.ErrWrongCredentials))
+		}
+
+		return c.JSON(http.StatusOK, userResponse)
 	}
 }
 

@@ -76,10 +76,11 @@ func (s *Server) Run() error {
 
 	userPGRepository := repository.NewUserPGRepository(s.pgxPool)
 	userUseCase := usecase.NewUserUseCase(userPGRepository, sessServiceClient)
-	uh := userHandlers.NewUserHandlers(usersGroup, userUseCase, s.logger, validate, s.cfg)
-	uh.MapUserRoutes()
 
-	middlewares.NewMiddlewareManager(s.logger, s.cfg, userUseCase)
+	middlewareManager := middlewares.NewMiddlewareManager(s.logger, s.cfg, userUseCase)
+
+	uh := userHandlers.NewUserHandlers(usersGroup, userUseCase, s.logger, validate, s.cfg, middlewareManager)
+	uh.MapUserRoutes()
 
 	v1.GET("/health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Ok")
