@@ -14,6 +14,13 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/redis"
 )
 
+// @title User service API
+// @version 1.0
+// @description User service REST API documentation
+// @contact.name Alexander Bryksin
+// @contact.url https://github.com/AleksK1NG
+// @contact.email alexander.bryksin@yandex.ru
+// @BasePath /api/v1
 func main() {
 	log.Println("Starting user server")
 

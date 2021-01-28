@@ -5,6 +5,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
+
+	"github.com/AleksK1NG/hotels-mocroservices/user/docs"
 )
 
 const (
@@ -15,6 +18,8 @@ const (
 )
 
 func (s *Server) MapRoutes() {
+	docs.SwaggerInfo.Title = "Go example REST API"
+	s.echo.GET("/swagger/*", echoSwagger.WrapHandler)
 	s.echo.Pre(middleware.HTTPSRedirect())
 	s.echo.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
