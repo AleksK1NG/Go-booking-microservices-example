@@ -24,6 +24,23 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/auth/csrf": {
+            "get": {
+                "description": "Get csrf token, required session",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get csrf token",
+                "responses": {
+                    "204": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "description": "login user, returns user data and session",
