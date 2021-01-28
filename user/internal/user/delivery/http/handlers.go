@@ -1,6 +1,7 @@
 package http
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -66,7 +67,7 @@ func (h *UserHandlers) Register() echo.HandlerFunc {
 		}
 
 		c.SetCookie(&http.Cookie{
-			Name:     "session_token",
+			Name:     h.cfg.HttpServer.SessionCookieName,
 			Value:    sessionID,
 			Path:     "/",
 			HttpOnly: true,
@@ -77,7 +78,7 @@ func (h *UserHandlers) Register() echo.HandlerFunc {
 	}
 }
 
-// Register godoc
+// Login godoc
 // @Summary Login user
 // @Description login user, returns user data and session
 // @Accept json
@@ -87,7 +88,7 @@ func (h *UserHandlers) Register() echo.HandlerFunc {
 // @Router /auth/login [post]
 func (h *UserHandlers) Login() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "auth.Login")
+		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.Login")
 		defer span.Finish()
 
 		var login models.Login
@@ -114,7 +115,7 @@ func (h *UserHandlers) Login() echo.HandlerFunc {
 		}
 
 		c.SetCookie(&http.Cookie{
-			Name:     "session_token",
+			Name:     h.cfg.HttpServer.SessionCookieName,
 			Value:    sessionID,
 			Path:     "/",
 			HttpOnly: true,
@@ -125,8 +126,35 @@ func (h *UserHandlers) Login() echo.HandlerFunc {
 	}
 }
 
+// Logout godoc
+// @Summary Logout user
+// @Description Logout user, return no content
+// @Accept json
+// @Produce json
+// @Success 204 ""
+// @Router /auth/logout [post]
 func (h *UserHandlers) Logout() echo.HandlerFunc {
-	panic("implement me")
+	return func(c echo.Context) error {
+		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.Logout")
+		defer span.Finish()
+
+		cookie, err := c.Cookie(h.cfg.HttpServer.SessionCookieName)
+		if err != nil {
+			if errors.Is(err, http.ErrNoCookie) {
+				h.logger.Errorf("UserHandlers.Logout.http.ErrNoCookie: %v", err)
+				return c.JSON(http.StatusUnauthorized, httpErrors.NewUnauthorizedError(err))
+			}
+			h.logger.Errorf("UserHandlers.Logout.c.Cookie: %v", err)
+			return c.JSON(http.StatusInternalServerError, httpErrors.NewInternalServerError(err))
+		}
+
+		if err := h.userUC.DeleteSession(ctx, cookie.Value); err != nil {
+			h.logger.Errorf("UserHandlers.userUC.DeleteSession: %v", err)
+			return c.JSON(http.StatusInternalServerError, httpErrors.NewInternalServerError(err))
+		}
+
+		return c.NoContent(http.StatusNoContent)
+	}
 }
 
 func (h *UserHandlers) Update() echo.HandlerFunc {

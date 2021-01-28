@@ -14,4 +14,5 @@ type UseCase interface {
 	Login(ctx context.Context, login models.Login) (*models.User, error)
 	GetByID(ctx context.Context, userID uuid.UUID) (*models.UserResponse, error)
 	CreateSession(ctx context.Context, userID uuid.UUID) (string, error)
+	DeleteSession(ctx context.Context, sessionID string) error
 }

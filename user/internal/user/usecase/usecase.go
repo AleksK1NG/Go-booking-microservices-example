@@ -79,3 +79,16 @@ func (u *UserUseCase) CreateSession(ctx context.Context, userID uuid.UUID) (stri
 
 	return session.GetSession().GetSessionID(), err
 }
+
+// DeleteSession
+func (u *UserUseCase) DeleteSession(ctx context.Context, sessionID string) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.DeleteSession")
+	defer span.Finish()
+
+	_, err := u.sessClient.DeleteSession(ctx, &sessionService.DeleteSessionRequest{SessionID: sessionID})
+	if err != nil {
+		return errors.Wrap(err, "sessClient.DeleteSession")
+	}
+
+	return nil
+}

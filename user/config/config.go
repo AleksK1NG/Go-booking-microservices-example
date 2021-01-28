@@ -19,12 +19,13 @@ type Config struct {
 }
 
 type HttpServer struct {
-	Port           string
-	PprofPort      string
-	Timeout        time.Duration
-	ReadTimeout    time.Duration
-	WriteTimeout   time.Duration
-	CookieLifeTime int
+	Port              string
+	PprofPort         string
+	Timeout           time.Duration
+	ReadTimeout       time.Duration
+	WriteTimeout      time.Duration
+	CookieLifeTime    int
+	SessionCookieName string
 }
 
 // GRPCServer config
