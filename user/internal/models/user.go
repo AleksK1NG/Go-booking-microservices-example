@@ -20,7 +20,7 @@ type User struct {
 	LastName  string               `json:"last_name" validate:"required,min=3,max=25"`
 	Email     string               `json:"email" validate:"required,email"`
 	Password  string               `json:"password" validate:"required,min=6,max=250"`
-	Avatar    types.NullJSONString `json:"avatar" validate:"max=250"`
+	Avatar    types.NullJSONString `json:"avatar" validate:"max=250" swaggertype:"string"`
 	Role      *Role                `json:"role"`
 	CreatedAt *time.Time           `json:"created_at"`
 	UpdatedAt *time.Time           `json:"updated_at"`
@@ -33,9 +33,15 @@ type UserResponse struct {
 	LastName  string               `json:"last_name" validate:"required,min=3,max=25"`
 	Email     string               `json:"email" validate:"required,email"`
 	Role      *Role                `json:"role"`
-	Avatar    types.NullJSONString `json:"avatar" validate:"max=250"`
+	Avatar    types.NullJSONString `json:"avatar" validate:"max=250" swaggertype:"string"`
 	CreatedAt *time.Time           `json:"created_at"`
 	UpdatedAt *time.Time           `json:"updated_at"`
+}
+
+// Login
+type Login struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=6,max=250"`
 }
 
 type Role string

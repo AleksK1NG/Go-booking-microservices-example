@@ -42,10 +42,29 @@ func (u *UserUseCase) Register(ctx context.Context, user *models.User) (*models.
 
 	created, err := u.userPGRepo.Create(ctx, user)
 	if err != nil {
-		return nil, errors.Wrap(err, "user.PrepareCreate")
+		return nil, errors.Wrap(err, "userPGRepo.Create")
 	}
 
 	return created, err
+}
+
+// Login
+func (u *UserUseCase) Login(ctx context.Context, login models.Login) (*models.User, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.Login")
+	defer span.Finish()
+
+	userByEmail, err := u.userPGRepo.GetByEmail(ctx, login.Email)
+	if err != nil {
+		return nil, errors.Wrap(err, "userPGRepo.GetByEmail")
+	}
+
+	if err := userByEmail.ComparePasswords(login.Password); err != nil {
+		return nil, errors.Wrap(err, "UserUseCase.ComparePasswords")
+	}
+
+	userByEmail.SanitizePassword()
+
+	return userByEmail, nil
 }
 
 // CreateSession
