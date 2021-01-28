@@ -92,6 +92,19 @@ paths:
         "204":
           description: ""
       summary: Logout user
+  /auth/me:
+    get:
+      consumes:
+      - application/json
+      description: Get current user data, required session cookie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+      summary: Get current user data
   /auth/register:
     post:
       consumes:
