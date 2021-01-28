@@ -97,3 +97,9 @@ deps-upgrade:
 
 deps-cleancache:
 	go clean -modcache
+
+
+swagger_user_api:
+	echo "Starting swagger generating"
+	cd ./user && echo `pwd`
+	cd ./user && swag init -g **/**/*.go
