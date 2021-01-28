@@ -55,6 +55,23 @@ var doc = `{
                 }
             }
         },
+        "/auth/logout": {
+            "post": {
+                "description": "Logout user, return no content",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Logout user",
+                "responses": {
+                    "204": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/auth/register": {
             "post": {
                 "description": "register new user account, returns user data and session",

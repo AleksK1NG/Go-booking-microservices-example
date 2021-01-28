@@ -81,6 +81,17 @@ paths:
           schema:
             $ref: '#/definitions/models.UserResponse'
       summary: Login user
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout user, return no content
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+      summary: Logout user
   /auth/register:
     post:
       consumes:
