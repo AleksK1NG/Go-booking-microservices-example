@@ -25,7 +25,8 @@ import (
 
 	"github.com/AleksK1NG/hotels-mocroservices/user/config"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/interceptors"
-	"github.com/AleksK1NG/hotels-mocroservices/user/internal/session/grpc_client"
+	"github.com/AleksK1NG/hotels-mocroservices/user/internal/middlewares"
+	"github.com/AleksK1NG/hotels-mocroservices/user/internal/session_client/grpc_client"
 	userGRPC "github.com/AleksK1NG/hotels-mocroservices/user/internal/user/delivery/grpc"
 	userHandlers "github.com/AleksK1NG/hotels-mocroservices/user/internal/user/delivery/http"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user/repository"
@@ -77,6 +78,8 @@ func (s *Server) Run() error {
 	userUseCase := usecase.NewUserUseCase(userPGRepository, sessServiceClient)
 	uh := userHandlers.NewUserHandlers(usersGroup, userUseCase, s.logger, validate, s.cfg)
 	uh.MapUserRoutes()
+
+	middlewares.NewMiddlewareManager(s.logger, s.cfg, userUseCase)
 
 	v1.GET("/health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Ok")
