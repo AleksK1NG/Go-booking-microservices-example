@@ -111,3 +111,19 @@ func (u *UserUseCase) GetSessionByID(ctx context.Context, sessionID string) (*mo
 
 	return sess, nil
 }
+
+// GetCSRFToken
+func (u *UserUseCase) GetCSRFToken(ctx context.Context, sessionID string) (string, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.GetCSRFToken")
+	defer span.Finish()
+
+	csrfToken, err := u.sessClient.CreateCsrfToken(
+		ctx,
+		&sessionService.CreateCsrfTokenRequest{CsrfTokenInput: &sessionService.CsrfTokenInput{SessionID: sessionID}},
+	)
+	if err != nil {
+		return "", errors.Wrap(err, "sessClient.CreateCsrfToken")
+	}
+
+	return csrfToken.GetCsrfToken().GetToken(), nil
+}

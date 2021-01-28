@@ -61,6 +61,17 @@ definitions:
 info:
   contact: {}
 paths:
+  /auth/csrf:
+    get:
+      consumes:
+      - application/json
+      description: Get csrf token, required session
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+      summary: Get csrf token
   /auth/login:
     post:
       consumes:

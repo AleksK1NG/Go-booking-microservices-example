@@ -17,6 +17,10 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/logger"
 )
 
+const (
+	csrfHeader = "X-CSRF-Token"
+)
+
 // UserHandlers
 type UserHandlers struct {
 	cfg      *config.Config
@@ -151,16 +155,23 @@ func (h *UserHandlers) Logout() echo.HandlerFunc {
 		if err != nil {
 			if errors.Is(err, http.ErrNoCookie) {
 				h.logger.Errorf("UserHandlers.Logout.http.ErrNoCookie: %v", err)
-				return c.JSON(http.StatusUnauthorized, httpErrors.NewUnauthorizedError(err))
+				return httpErrors.ErrorCtxResponse(c, err)
 			}
 			h.logger.Errorf("UserHandlers.Logout.c.Cookie: %v", err)
-			return c.JSON(http.StatusInternalServerError, httpErrors.NewInternalServerError(err))
+			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		if err := h.userUC.DeleteSession(ctx, cookie.Value); err != nil {
 			h.logger.Errorf("UserHandlers.userUC.DeleteSession: %v", err)
-			return c.JSON(http.StatusInternalServerError, httpErrors.NewInternalServerError(err))
+			return httpErrors.ErrorCtxResponse(c, err)
 		}
+
+		c.SetCookie(&http.Cookie{
+			Name:   h.cfg.HttpServer.SessionCookieName,
+			Value:  "",
+			Path:   "/",
+			MaxAge: -1,
+		})
 
 		return c.NoContent(http.StatusNoContent)
 	}
@@ -181,10 +192,40 @@ func (h *UserHandlers) GetMe() echo.HandlerFunc {
 		userResponse, ok := ctx.Value(middlewares.RequestCtxUser{}).(*models.UserResponse)
 		if !ok {
 			h.logger.Error("invalid middleware user ctx")
-			return c.JSON(http.StatusUnauthorized, httpErrors.NewInternalServerError(httpErrors.ErrWrongCredentials))
+			return httpErrors.ErrorCtxResponse(c, httpErrors.WrongCredentials)
 		}
 
 		return c.JSON(http.StatusOK, userResponse)
+	}
+}
+
+// GetCSRFToken godoc
+// @Summary Get csrf token
+// @Description Get csrf token, required session
+// @Accept json
+// @Produce json
+// @Success 204 ""
+// @Router /auth/csrf [get]
+func (h *UserHandlers) GetCSRFToken() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.GetCSRFToken")
+		defer span.Finish()
+
+		userSession, ok := ctx.Value(middlewares.RequestCtxSession{}).(*models.Session)
+		if !ok {
+			h.logger.Error("invalid middleware session ctx")
+			return httpErrors.ErrorCtxResponse(c, httpErrors.WrongCredentials)
+		}
+
+		csrfToken, err := h.userUC.GetCSRFToken(ctx, userSession.SessionID)
+		if err != nil {
+			h.logger.Error("userUC.GetCSRFToken")
+			return httpErrors.ErrorCtxResponse(c, err)
+		}
+
+		c.Response().Header().Set(csrfHeader, csrfToken)
+
+		return c.NoContent(http.StatusOK)
 	}
 }
 

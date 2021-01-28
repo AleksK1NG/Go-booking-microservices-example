@@ -11,4 +11,5 @@ type Delivery interface {
 	Delete() echo.HandlerFunc
 	GetUserByID() echo.HandlerFunc
 	GetMe() echo.HandlerFunc
+	GetCSRFToken() echo.HandlerFunc
 }
