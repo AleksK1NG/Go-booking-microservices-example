@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/opentracing/opentracing-go"
 
 	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -19,6 +20,7 @@ import (
 	grpcrecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	traceutils "github.com/opentracing-contrib/go-grpc"
 
 	"github.com/AleksK1NG/hotels-mocroservices/sessions/config"
 	crfRepository "github.com/AleksK1NG/hotels-mocroservices/sessions/internal/csrf/repository"
@@ -36,11 +38,12 @@ type Server struct {
 	logger    logger.Logger
 	cfg       *config.Config
 	redisConn *redis.Client
+	tracer    opentracing.Tracer
 }
 
 // NewServer
-func NewSessionsServer(logger logger.Logger, cfg *config.Config, redisConn *redis.Client) *Server {
-	return &Server{logger: logger, cfg: cfg, redisConn: redisConn}
+func NewSessionsServer(logger logger.Logger, cfg *config.Config, redisConn *redis.Client, tracer opentracing.Tracer) *Server {
+	return &Server{logger: logger, cfg: cfg, redisConn: redisConn, tracer: tracer}
 }
 
 func (s *Server) Run() error {
@@ -53,10 +56,10 @@ func (s *Server) Run() error {
 	csrfUC := csrfUseCase.NewCsrfUseCase(csrfRepository)
 
 	router := echo.New()
-	router.GET("/api/v1/metrics", echo.WrapHandler(promhttp.Handler()))
+	router.GET("", echo.WrapHandler(promhttp.Handler()))
 
 	go func() {
-		if err := router.Start(s.cfg.Metrics.URL); err != nil {
+		if err := router.Start(":7070"); err != nil {
 			s.logger.Errorf("router.Start metrics: %v", err)
 			cancel()
 		}
@@ -75,11 +78,12 @@ func (s *Server) Run() error {
 		MaxConnectionAge:  s.cfg.GRPCServer.MaxConnectionAge * time.Minute,
 		Time:              s.cfg.GRPCServer.Timeout * time.Minute,
 	}),
-		grpc.UnaryInterceptor(im.Logger),
 		grpc.ChainUnaryInterceptor(
 			grpc_ctxtags.UnaryServerInterceptor(),
 			grpc_prometheus.UnaryServerInterceptor,
 			grpcrecovery.UnaryServerInterceptor(),
+			traceutils.OpenTracingServerInterceptor(s.tracer),
+			im.Logger,
 		),
 	)
 
