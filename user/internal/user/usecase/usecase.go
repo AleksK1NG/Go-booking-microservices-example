@@ -92,3 +92,22 @@ func (u *UserUseCase) DeleteSession(ctx context.Context, sessionID string) error
 
 	return nil
 }
+
+// GetSessionByID
+func (u *UserUseCase) GetSessionByID(ctx context.Context, sessionID string) (*models.Session, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.GetSessionByID")
+	defer span.Finish()
+
+	sessionByID, err := u.sessClient.GetSessionByID(ctx, &sessionService.GetSessionByIDRequest{SessionID: sessionID})
+	if err != nil {
+		return nil, errors.Wrap(err, "sessClient.GetSessionByID")
+	}
+
+	sess := &models.Session{}
+	sess, err = sess.FromProto(sessionByID.GetSession())
+	if err != nil {
+		return nil, errors.Wrap(err, "sess.FromProto")
+	}
+
+	return sess, nil
+}
