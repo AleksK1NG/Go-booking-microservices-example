@@ -164,6 +164,8 @@ func ParseErrors(err error) RestErr {
 		return NewRestError(http.StatusNotFound, ErrNotFound, nil)
 	case errors.Is(err, context.DeadlineExceeded):
 		return NewRestError(http.StatusRequestTimeout, ErrRequestTimeout, nil)
+	case errors.Is(err, Unauthorized):
+		return NewRestError(http.StatusUnauthorized, ErrUnauthorized, nil)
 	case strings.Contains(strings.ToLower(err.Error()), "sqlstate"):
 		return parseSqlErrors(err)
 	case strings.Contains(strings.ToLower(err.Error()), "field validation"):

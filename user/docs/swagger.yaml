@@ -61,7 +61,26 @@ definitions:
 info:
   contact: {}
 paths:
-  /auth/csrf:
+  /user/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get user data by id
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+      summary: Get user by id
+  /user/csrf:
     get:
       consumes:
       - application/json
@@ -72,7 +91,7 @@ paths:
         "204":
           description: ""
       summary: Get csrf token
-  /auth/login:
+  /user/login:
     post:
       consumes:
       - application/json
@@ -92,7 +111,7 @@ paths:
           schema:
             $ref: '#/definitions/models.UserResponse'
       summary: Login user
-  /auth/logout:
+  /user/logout:
     post:
       consumes:
       - application/json
@@ -103,7 +122,7 @@ paths:
         "204":
           description: ""
       summary: Logout user
-  /auth/me:
+  /user/me:
     get:
       consumes:
       - application/json
@@ -116,7 +135,7 @@ paths:
           schema:
             $ref: '#/definitions/models.UserResponse'
       summary: Get current user data
-  /auth/register:
+  /user/register:
     post:
       consumes:
       - application/json
