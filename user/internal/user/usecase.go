@@ -17,4 +17,5 @@ type UseCase interface {
 	GetSessionByID(ctx context.Context, sessionID string) (*models.Session, error)
 	GetCSRFToken(ctx context.Context, sessionID string) (string, error)
 	DeleteSession(ctx context.Context, sessionID string) error
+	Update(ctx context.Context, user *models.UserUpdate) (*models.UserResponse, error)
 }

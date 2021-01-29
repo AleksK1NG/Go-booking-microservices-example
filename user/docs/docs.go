@@ -153,10 +153,9 @@ var doc = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "user id",
+                        "description": "user uuid",
                         "name": "id",
-                        "in": "path",
-                        "required": true
+                        "in": "path"
                     }
                 ],
                 "responses": {
