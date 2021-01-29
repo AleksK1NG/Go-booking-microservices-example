@@ -6,4 +6,7 @@ const (
 	RETURNING user_id, first_name, last_name, email, avatar, role, updated_at, created_at`
 
 	getUserByIDQuery = `SELECT user_id, first_name, last_name, email, avatar, role, updated_at, created_at FROM users WHERE user_id = $1`
+
+	getUserByEmail = `SELECT user_id, first_name, last_name, email, password, avatar, role, updated_at, created_at 
+	FROM users WHERE email = $1`
 )

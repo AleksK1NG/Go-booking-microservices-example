@@ -7,8 +7,10 @@ import (
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 
+	"github.com/AleksK1NG/hotels-mocroservices/user/internal/middlewares"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/models"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user"
+	httpErrors "github.com/AleksK1NG/hotels-mocroservices/user/pkg/http_errors"
 	sessionService "github.com/AleksK1NG/hotels-mocroservices/user/proto/session"
 )
 
@@ -126,4 +128,26 @@ func (u *UserUseCase) GetCSRFToken(ctx context.Context, sessionID string) (strin
 	}
 
 	return csrfToken.GetCsrfToken().GetToken(), nil
+}
+
+// Update
+func (u *UserUseCase) Update(ctx context.Context, user *models.UserUpdate) (*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.Update")
+	defer span.Finish()
+
+	ctxUser, ok := ctx.Value(middlewares.RequestCtxUser{}).(*models.UserResponse)
+	if !ok {
+		return nil, errors.Wrap(httpErrors.Unauthorized, "ctx.Value user")
+	}
+
+	if ctxUser.UserID != user.UserID || *ctxUser.Role != models.RoleAdmin {
+		return nil, errors.Wrap(httpErrors.WrongCredentials, "user is not owner or admin")
+	}
+
+	userResponse, err := u.userPGRepo.Update(ctx, user)
+	if err != nil {
+		return nil, errors.Wrap(err, "UserUseCase.Update.userPGRepo.Update")
+	}
+
+	return userResponse, nil
 }

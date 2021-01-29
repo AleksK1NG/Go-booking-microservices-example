@@ -166,6 +166,8 @@ func ParseErrors(err error) RestErr {
 		return NewRestError(http.StatusRequestTimeout, ErrRequestTimeout, nil)
 	case errors.Is(err, Unauthorized):
 		return NewRestError(http.StatusUnauthorized, ErrUnauthorized, nil)
+	case errors.Is(err, WrongCredentials):
+		return NewRestError(http.StatusUnauthorized, ErrUnauthorized, nil)
 	case strings.Contains(strings.ToLower(err.Error()), "sqlstate"):
 		return parseSqlErrors(err)
 	case strings.Contains(strings.ToLower(err.Error()), "field validation"):

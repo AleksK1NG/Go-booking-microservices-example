@@ -72,9 +72,6 @@ func (u *UserPGRepository) GetByEmail(ctx context.Context, email string) (*model
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserPGRepository.GetByEmail")
 	defer span.Finish()
 
-	getUserByEmail := `SELECT user_id, first_name, last_name, email, password, avatar, role, updated_at, created_at 
-	FROM users WHERE email = $1`
-
 	var res models.User
 	if err := u.db.QueryRow(ctx, getUserByEmail, email).Scan(
 		&res.UserID,
@@ -87,6 +84,27 @@ func (u *UserPGRepository) GetByEmail(ctx context.Context, email string) (*model
 		&res.UpdatedAt,
 		&res.CreatedAt,
 	); err != nil {
+		return nil, errors.Wrap(err, "Scan")
+	}
+
+	return &res, nil
+}
+
+// Update
+func (u *UserPGRepository) Update(ctx context.Context, user *models.UserUpdate) (*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserPGRepository.Update")
+	defer span.Finish()
+
+	updateUserQuery := `UPDATE users 
+		SET first_name = COALESCE(NULLIF($1, ''), first_name), 
+	    last_name = COALESCE(NULLIF($2, ''), last_name), 
+	    email = COALESCE(NULLIF($3, ''), email), 
+	    role = COALESCE(NULLIF($4, '')::role, role)
+	    RETURNING user_id, first_name, last_name, email, role, avatar, updated_at, created_at`
+
+	var res models.UserResponse
+	if err := u.db.QueryRow(ctx, updateUserQuery, &user.FirstName, &user.LastName, &user.Email, &user.Role).
+		Scan(&res.UserID, &res.FirstName, &res.LastName, &res.Email, &res.Role, &res.Avatar, &res.UpdatedAt, &res.CreatedAt); err != nil {
 		return nil, errors.Wrap(err, "Scan")
 	}
 

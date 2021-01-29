@@ -38,6 +38,16 @@ type UserResponse struct {
 	UpdatedAt *time.Time           `json:"updated_at"`
 }
 
+// User
+type UserUpdate struct {
+	UserID    uuid.UUID `json:"user_id"`
+	FirstName string    `json:"first_name" validate:"omitempty,min=3,max=25" swaggertype:"string"`
+	LastName  string    `json:"last_name" validate:"omitempty,min=3,max=25" swaggertype:"string"`
+	Email     string    `json:"email" validate:"omitempty,email" swaggertype:"string"`
+	Avatar    string    `json:"avatar" validate:"max=250" swaggertype:"string"`
+	Role      *Role     `json:"role"`
+}
+
 // Login
 type Login struct {
 	Email    string `json:"email" validate:"required,email"`

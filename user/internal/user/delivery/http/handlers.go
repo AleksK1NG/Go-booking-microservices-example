@@ -231,7 +231,42 @@ func (h *UserHandlers) GetCSRFToken() echo.HandlerFunc {
 }
 
 func (h *UserHandlers) Update() echo.HandlerFunc {
-	panic("implement me")
+	return func(c echo.Context) error {
+		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.Update")
+		defer span.Finish()
+
+		userID := c.Param("id")
+		if userID == "" {
+			h.logger.Error("invalid user id param")
+			return httpErrors.ErrorCtxResponse(c, httpErrors.BadRequest)
+		}
+
+		userUUID, err := uuid.FromString(userID)
+		if err != nil {
+			h.logger.Error("invalid user uuid")
+			return httpErrors.ErrorCtxResponse(c, err)
+		}
+
+		var updUser models.UserUpdate
+		if err := c.Bind(&updUser); err != nil {
+			h.logger.Errorf("c.Bind: %v", err)
+			return httpErrors.ErrorCtxResponse(c, err)
+		}
+		updUser.UserID = userUUID
+
+		if err := h.validate.StructCtx(ctx, updUser); err != nil {
+			h.logger.Errorf("UserHandlers.validate.StructCtx: %v", err)
+			return httpErrors.ErrorCtxResponse(c, err)
+		}
+
+		userResponse, err := h.userUC.Update(ctx, &updUser)
+		if err != nil {
+			h.logger.Errorf("UserHandlers.userUC.Update: %v", err)
+			return httpErrors.ErrorCtxResponse(c, err)
+		}
+
+		return c.JSON(http.StatusOK, userResponse)
+	}
 }
 
 func (h *UserHandlers) Delete() echo.HandlerFunc {
@@ -243,7 +278,7 @@ func (h *UserHandlers) Delete() echo.HandlerFunc {
 // @Description Get user data by id
 // @Accept json
 // @Produce json
-// @Param id path int true "user id"
+// @Param id path int false "user uuid"
 // @Success 200 {object} models.UserResponse
 // @Router /user/{id} [get]
 func (h *UserHandlers) GetUserByID() echo.HandlerFunc {

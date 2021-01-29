@@ -67,10 +67,9 @@ paths:
       - application/json
       description: Get user data by id
       parameters:
-      - description: user id
+      - description: user uuid
         in: path
         name: id
-        required: true
         type: integer
       produces:
       - application/json
