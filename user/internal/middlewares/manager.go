@@ -51,7 +51,7 @@ func (m *MiddlewareManager) SessionMiddleware(next echo.HandlerFunc) echo.Handle
 		sessionByID, err := m.userUC.GetSessionByID(ctx, cookie.Value)
 		if err != nil {
 			m.logger.Errorf("SessionMiddleware.GetSessionByID: %v", err)
-			return httpErrors.ErrorCtxResponse(c, err)
+			return httpErrors.ErrorCtxResponse(c, httpErrors.Unauthorized)
 		}
 
 		userResponse, err := m.userUC.GetByID(ctx, sessionByID.UserID)

@@ -5,7 +5,7 @@
 
 local:
 	echo "Starting local environment"
-	make jaeger
+	#make jaeger
 	docker-compose -f docker-compose.local.yml up --build
 
 jaeger:

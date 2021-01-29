@@ -24,7 +24,7 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/auth/csrf": {
+        "/user/csrf": {
             "get": {
                 "description": "Get csrf token, required session",
                 "consumes": [
@@ -41,7 +41,7 @@ var doc = `{
                 }
             }
         },
-        "/auth/login": {
+        "/user/login": {
             "post": {
                 "description": "login user, returns user data and session",
                 "consumes": [
@@ -72,7 +72,7 @@ var doc = `{
                 }
             }
         },
-        "/auth/logout": {
+        "/user/logout": {
             "post": {
                 "description": "Logout user, return no content",
                 "consumes": [
@@ -89,7 +89,7 @@ var doc = `{
                 }
             }
         },
-        "/auth/me": {
+        "/user/me": {
             "get": {
                 "description": "Get current user data, required session cookie",
                 "consumes": [
@@ -109,7 +109,7 @@ var doc = `{
                 }
             }
         },
-        "/auth/register": {
+        "/user/register": {
             "post": {
                 "description": "register new user account, returns user data and session",
                 "consumes": [
@@ -133,6 +133,35 @@ var doc = `{
                 "responses": {
                     "201": {
                         "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{id}": {
+            "get": {
+                "description": "Get user data by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get user by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.UserResponse"
                         }

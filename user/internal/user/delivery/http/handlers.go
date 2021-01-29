@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/opentracing/opentracing-go"
+	uuid "github.com/satori/go.uuid"
 
 	"github.com/AleksK1NG/hotels-mocroservices/user/config"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/middlewares"
@@ -50,7 +51,7 @@ func NewUserHandlers(
 // @Produce json
 // @Param data body models.User true "user data"
 // @Success 201 {object} models.UserResponse
-// @Router /auth/register [post]
+// @Router /user/register [post]
 func (h *UserHandlers) Register() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "auth.Register")
@@ -98,7 +99,7 @@ func (h *UserHandlers) Register() echo.HandlerFunc {
 // @Produce json
 // @Param data body models.Login true "email and password"
 // @Success 200 {object} models.UserResponse
-// @Router /auth/login [post]
+// @Router /user/login [post]
 func (h *UserHandlers) Login() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.Login")
@@ -145,7 +146,7 @@ func (h *UserHandlers) Login() echo.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Success 204 ""
-// @Router /auth/logout [post]
+// @Router /user/logout [post]
 func (h *UserHandlers) Logout() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.Logout")
@@ -183,7 +184,7 @@ func (h *UserHandlers) Logout() echo.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Success 200 {object} models.UserResponse
-// @Router /auth/me [get]
+// @Router /user/me [get]
 func (h *UserHandlers) GetMe() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.GetMe")
@@ -205,7 +206,7 @@ func (h *UserHandlers) GetMe() echo.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Success 204 ""
-// @Router /auth/csrf [get]
+// @Router /user/csrf [get]
 func (h *UserHandlers) GetCSRFToken() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.GetCSRFToken")
@@ -237,6 +238,37 @@ func (h *UserHandlers) Delete() echo.HandlerFunc {
 	panic("implement me")
 }
 
+// GetUserByID godoc
+// @Summary Get user by id
+// @Description Get user data by id
+// @Accept json
+// @Produce json
+// @Param id path int true "user id"
+// @Success 200 {object} models.UserResponse
+// @Router /user/{id} [get]
 func (h *UserHandlers) GetUserByID() echo.HandlerFunc {
-	panic("implement me")
+	return func(c echo.Context) error {
+		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.GetUserByID")
+		defer span.Finish()
+
+		userID := c.Param("id")
+		if userID == "" {
+			h.logger.Error("invalid user id param")
+			return httpErrors.ErrorCtxResponse(c, httpErrors.BadRequest)
+		}
+
+		userUUID, err := uuid.FromString(userID)
+		if err != nil {
+			h.logger.Error("invalid user uuid")
+			return httpErrors.ErrorCtxResponse(c, err)
+		}
+
+		userResponse, err := h.userUC.GetByID(ctx, userUUID)
+		if err != nil {
+			h.logger.Error("userUC.GetByID")
+			return httpErrors.ErrorCtxResponse(c, err)
+		}
+
+		return c.JSON(http.StatusOK, userResponse)
+	}
 }
