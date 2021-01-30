@@ -96,7 +96,7 @@ func (u *UserPGRepository) Update(ctx context.Context, user *models.UserUpdate) 
 	defer span.Finish()
 
 	var res models.UserResponse
-	if err := u.db.QueryRow(ctx, updateUserQuery, &user.FirstName, &user.LastName, &user.Email, &user.Role).
+	if err := u.db.QueryRow(ctx, updateUserQuery, &user.FirstName, &user.LastName, &user.Email, &user.Role, &user.UserID).
 		Scan(&res.UserID, &res.FirstName, &res.LastName, &res.Email, &res.Role, &res.Avatar, &res.UpdatedAt, &res.CreatedAt); err != nil {
 		return nil, errors.Wrap(err, "Scan")
 	}

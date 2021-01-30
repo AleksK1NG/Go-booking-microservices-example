@@ -37,9 +37,11 @@ import (
 )
 
 const (
-	certFile       = "ssl/server.crt"
-	keyFile        = "ssl/server.pem"
-	maxHeaderBytes = 1 << 20
+	certFile          = "ssl/server.crt"
+	keyFile           = "ssl/server.pem"
+	maxHeaderBytes    = 1 << 20
+	userCachePrefix   = "users:"
+	userCacheDuration = time.Minute * 15
 )
 
 // Server
@@ -75,7 +77,8 @@ func (s *Server) Run() error {
 	sessServiceClient := sessionService.NewAuthorizationServiceClient(sessGRPCConn)
 
 	userPGRepository := repository.NewUserPGRepository(s.pgxPool)
-	userUseCase := usecase.NewUserUseCase(userPGRepository, sessServiceClient)
+	userRedisRepository := repository.NewUserRedisRepository(s.redisConn, userCachePrefix, userCacheDuration)
+	userUseCase := usecase.NewUserUseCase(userPGRepository, sessServiceClient, userRedisRepository, s.logger)
 
 	middlewareManager := middlewares.NewMiddlewareManager(s.logger, s.cfg, userUseCase)
 
