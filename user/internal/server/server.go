@@ -82,10 +82,10 @@ func (s *Server) Run() error {
 	uh := userHandlers.NewUserHandlers(usersGroup, userUseCase, s.logger, validate, s.cfg, middlewareManager)
 	uh.MapUserRoutes()
 
-	v1.GET("/health", func(c echo.Context) error {
+	s.echo.GET("/health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Ok")
 	})
-	v1.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
+	s.echo.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
 
 	s.MapRoutes()
 
@@ -103,12 +103,6 @@ func (s *Server) Run() error {
 		s.logger.Infof("Starting Debug Server on PORT: %s", s.cfg.HttpServer.PprofPort)
 		if err := http.ListenAndServe(s.cfg.HttpServer.PprofPort, http.DefaultServeMux); err != nil {
 			s.logger.Errorf("Error PPROF ListenAndServe: %s", err)
-		}
-	}()
-
-	go func() {
-		if err := http.ListenAndServe(":7071", promhttp.Handler()); err != nil {
-			s.logger.Errorf("Metrics error: %v", err)
 		}
 	}()
 

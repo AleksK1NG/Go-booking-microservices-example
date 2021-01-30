@@ -56,7 +56,7 @@ func (s *Server) Run() error {
 	csrfUC := csrfUseCase.NewCsrfUseCase(csrfRepository)
 
 	router := echo.New()
-	router.GET("", echo.WrapHandler(promhttp.Handler()))
+	router.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
 
 	go func() {
 		if err := router.Start(":7070"); err != nil {

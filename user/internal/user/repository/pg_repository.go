@@ -95,13 +95,6 @@ func (u *UserPGRepository) Update(ctx context.Context, user *models.UserUpdate) 
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserPGRepository.Update")
 	defer span.Finish()
 
-	updateUserQuery := `UPDATE users 
-		SET first_name = COALESCE(NULLIF($1, ''), first_name), 
-	    last_name = COALESCE(NULLIF($2, ''), last_name), 
-	    email = COALESCE(NULLIF($3, ''), email), 
-	    role = COALESCE(NULLIF($4, '')::role, role)
-	    RETURNING user_id, first_name, last_name, email, role, avatar, updated_at, created_at`
-
 	var res models.UserResponse
 	if err := u.db.QueryRow(ctx, updateUserQuery, &user.FirstName, &user.LastName, &user.Email, &user.Role).
 		Scan(&res.UserID, &res.FirstName, &res.LastName, &res.Email, &res.Role, &res.Avatar, &res.UpdatedAt, &res.CreatedAt); err != nil {

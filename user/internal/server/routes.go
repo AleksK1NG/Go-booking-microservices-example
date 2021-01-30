@@ -20,6 +20,7 @@ const (
 func (s *Server) MapRoutes() {
 	docs.SwaggerInfo.Title = "Go example REST API"
 	s.echo.GET("/swagger/*", echoSwagger.WrapHandler)
+	s.echo.Use(middleware.Logger())
 	s.echo.Pre(middleware.HTTPSRedirect())
 	s.echo.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
