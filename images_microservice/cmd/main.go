@@ -6,7 +6,10 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/opentracing/opentracing-go"
+
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/config"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/jaeger"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/logger"
 )
 
@@ -60,6 +63,16 @@ func main() {
 		cfg.GRPCServer.Mode,
 	)
 	appLogger.Infof("Success parsed config: %#v", cfg.GRPCServer.AppVersion)
+
+	tracer, closer, err := jaeger.InitJaeger(cfg)
+	if err != nil {
+		appLogger.Fatal("cannot create tracer", err)
+	}
+	appLogger.Info("Jaeger connected")
+
+	opentracing.SetGlobalTracer(tracer)
+	defer closer.Close()
+	appLogger.Info("Opentracing connected")
 
 	// http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
 	// 	if err := r.ParseMultipartForm(1024 * 1024 * 10); err != nil {
