@@ -1,16 +1,12 @@
 package main
 
 import (
-	"bytes"
-	"image"
-	"image/jpeg"
-	"image/png"
 	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
 
-	"github.com/disintegration/gift"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/config"
 )
 
 func CheckAvatar(file multipart.File) (string, error) {
@@ -46,97 +42,104 @@ func CheckAvatar(file multipart.File) (string, error) {
 func main() {
 	log.Println("Starting images microservice")
 
-	http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
-		if err := r.ParseMultipartForm(1024 * 1024 * 10); err != nil {
-			log.Printf("ERROR: %v", err)
-			http.Error(w, err.Error(), 500)
-			return
-		}
+	configPath := config.GetConfigPath(os.Getenv("config"))
+	cfg, err := config.GetConfig(configPath)
+	if err != nil {
+		log.Fatalf("Loading config: %v", err)
+	}
 
-		r.Body = http.MaxBytesReader(w, r.Body, 1024*1024*10)
-		defer r.Body.Close()
+	log.Printf("CFG: %-v", cfg)
 
-		file, header, err := r.FormFile("avatar")
-		if err != nil {
-			log.Printf("ERROR: %v", err)
-			http.Error(w, err.Error(), 500)
-			return
-		}
-
-		// log.Printf("HEADER: %-v", header)
-
-		fileType, err := CheckAvatar(file)
-		if err != nil {
-			log.Printf("ERROR: %v", err)
-			http.Error(w, err.Error(), 500)
-			return
-		}
-		log.Printf("fileType: %-v", fileType)
-
-		// fileName := fmt.Sprintf("%s-%s.%s", header.Filename, time.Now().String(), )
-
-		g := gift.New(
-			// gift.Resize(1024, 0, gift.LanczosResampling),
-			gift.Resize(1024, 0, gift.LanczosResampling),
-			gift.Contrast(20),
-			gift.Brightness(7),
-			gift.Gamma(0.5),
-			// gift.CropToSize(1024, 1024, gift.CenterAnchor),
-		)
-
-		src, s, err := image.Decode(file)
-		if err != nil {
-			log.Printf("ERROR: %v", err)
-			http.Error(w, err.Error(), 500)
-			return
-		}
-		log.Printf("image.Decode: %-v", s)
-
-		dst := image.NewNRGBA(g.Bounds(src.Bounds()))
-		g.Draw(dst, src)
-
-		f, err := os.Create(header.Filename)
-		if err != nil {
-			log.Printf("ERROR: %v", err)
-			http.Error(w, err.Error(), 500)
-			return
-		}
-		defer f.Close()
-
-		buf := &bytes.Buffer{}
-		switch fileType {
-		case "image/png":
-			err = png.Encode(buf, dst)
-			if err != nil {
-				log.Printf("ERROR: %v", err)
-				http.Error(w, err.Error(), 500)
-				break
-			}
-			log.Printf("case image/png: %s", fileType)
-		case "image/jpeg":
-			err = jpeg.Encode(buf, dst, nil)
-			if err != nil {
-				log.Printf("ERROR: %v", err)
-				http.Error(w, err.Error(), 500)
-				break
-			}
-			log.Printf("case image/png: %s", fileType)
-		default:
-			http.Error(w, "invalid image", 500)
-			return
-
-		}
-
-		n, err := buf.WriteTo(w)
-		if err != nil {
-			log.Printf("ERROR: %v", err)
-			http.Error(w, err.Error(), 500)
-			return
-		}
-		log.Printf("buff.WriteTo: %v", n)
-		w.WriteHeader(200)
-		w.Write([]byte(""))
-
-	})
+	// http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
+	// 	if err := r.ParseMultipartForm(1024 * 1024 * 10); err != nil {
+	// 		log.Printf("ERROR: %v", err)
+	// 		http.Error(w, err.Error(), 500)
+	// 		return
+	// 	}
+	//
+	// 	r.Body = http.MaxBytesReader(w, r.Body, 1024*1024*10)
+	// 	defer r.Body.Close()
+	//
+	// 	file, header, err := r.FormFile("avatar")
+	// 	if err != nil {
+	// 		log.Printf("ERROR: %v", err)
+	// 		http.Error(w, err.Error(), 500)
+	// 		return
+	// 	}
+	//
+	// 	fileType, err := CheckAvatar(file)
+	// 	if err != nil {
+	// 		log.Printf("ERROR: %v", err)
+	// 		http.Error(w, err.Error(), 500)
+	// 		return
+	// 	}
+	// 	log.Printf("fileType: %-v", fileType)
+	//
+	// 	fileName := fmt.Sprintf("%s-%s", time.Now().String(), header.Filename)
+	// 	log.Printf("fileName: %s", fileName)
+	//
+	// 	pool := sync.Pool{New: func() interface{} {
+	// 		g := gift.New(
+	// 			// gift.Resize(1024, 0, gift.LanczosResampling),
+	// 			gift.Resize(1024, 0, gift.LanczosResampling),
+	// 			gift.Contrast(20),
+	// 			gift.Brightness(7),
+	// 			gift.Gamma(0.5),
+	// 			// gift.CropToSize(1024, 1024, gift.CenterAnchor),
+	// 		)
+	//
+	// 		return g
+	// 	}}
+	//
+	// 	g := pool.Get().(*gift.GIFT)
+	// 	defer pool.Put(g)
+	//
+	// 	src, s, err := image.Decode(file)
+	// 	if err != nil {
+	// 		log.Printf("ERROR: %v", err)
+	// 		http.Error(w, err.Error(), 500)
+	// 		return
+	// 	}
+	// 	log.Printf("image.Decode FORMAT: %-v", s)
+	//
+	// 	dst := image.NewNRGBA(g.Bounds(src.Bounds()))
+	// 	g.Draw(dst, src)
+	//
+	// 	// f, err := os.Create(header.Filename)
+	// 	// if err != nil {
+	// 	// 	log.Printf("ERROR: %v", err)
+	// 	// 	http.Error(w, err.Error(), 500)
+	// 	// 	return
+	// 	// }
+	// 	// defer f.Close()
+	//
+	// 	buf := &bytes.Buffer{}
+	// 	switch fileType {
+	// 	case "image/png":
+	// 		err = png.Encode(buf, dst)
+	// 		if err != nil {
+	// 			log.Printf("ERROR: %v", err)
+	// 			http.Error(w, err.Error(), 500)
+	// 			break
+	// 		}
+	// 		log.Printf("case image/png: %s", fileType)
+	// 	case "image/jpeg":
+	// 		err = jpeg.Encode(buf, dst, nil)
+	// 		if err != nil {
+	// 			log.Printf("ERROR: %v", err)
+	// 			http.Error(w, err.Error(), 500)
+	// 			break
+	// 		}
+	// 		log.Printf("case image/png: %s", fileType)
+	// 	default:
+	// 		http.Error(w, "invalid image", 500)
+	// 		return
+	//
+	// 	}
+	//
+	// 	w.WriteHeader(200)
+	// 	w.Write(buf.Bytes())
+	//
+	// })
 	http.ListenAndServe(":5007", nil)
 }
