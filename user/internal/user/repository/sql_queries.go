@@ -15,5 +15,6 @@ const (
 	    last_name = COALESCE(NULLIF($2, ''), last_name), 
 	    email = COALESCE(NULLIF($3, ''), email), 
 	    role = COALESCE(NULLIF($4, '')::role, role)
+		WHERE user_id = $5
 	    RETURNING user_id, first_name, last_name, email, role, avatar, updated_at, created_at`
 )

@@ -11,6 +11,7 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/models"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user"
 	httpErrors "github.com/AleksK1NG/hotels-mocroservices/user/pkg/http_errors"
+	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/logger"
 	sessionService "github.com/AleksK1NG/hotels-mocroservices/user/proto/session"
 )
 
@@ -18,11 +19,13 @@ import (
 type UserUseCase struct {
 	userPGRepo user.PGRepository
 	sessClient sessionService.AuthorizationServiceClient
+	redisRepo  user.RedisRepository
+	log        logger.Logger
 }
 
 // NewUserUseCase
-func NewUserUseCase(userPGRepo user.PGRepository, sessClient sessionService.AuthorizationServiceClient) *UserUseCase {
-	return &UserUseCase{userPGRepo: userPGRepo, sessClient: sessClient}
+func NewUserUseCase(userPGRepo user.PGRepository, sessClient sessionService.AuthorizationServiceClient, redisRepo user.RedisRepository, log logger.Logger) *UserUseCase {
+	return &UserUseCase{userPGRepo: userPGRepo, sessClient: sessClient, redisRepo: redisRepo, log: log}
 }
 
 // GetByID
@@ -30,7 +33,24 @@ func (u *UserUseCase) GetByID(ctx context.Context, userID uuid.UUID) (*models.Us
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.GetByID")
 	defer span.Finish()
 
-	return u.userPGRepo.GetByID(ctx, userID)
+	cachedUser, err := u.redisRepo.GetUserByID(ctx, userID)
+	if err != nil {
+		u.log.Errorf("redisRepo.GetUserByID: %v", err)
+	}
+	if cachedUser != nil {
+		return cachedUser, nil
+	}
+
+	userResponse, err := u.userPGRepo.GetByID(ctx, userID)
+	if err != nil {
+		return nil, errors.Wrap(err, "UserUseCase.userPGRepo.GetByID")
+	}
+
+	if err := u.redisRepo.SaveUser(ctx, userResponse); err != nil {
+		u.log.Errorf("redisRepo.SaveUser: %v", err)
+	}
+
+	return userResponse, nil
 }
 
 // Register
@@ -147,6 +167,10 @@ func (u *UserUseCase) Update(ctx context.Context, user *models.UserUpdate) (*mod
 	userResponse, err := u.userPGRepo.Update(ctx, user)
 	if err != nil {
 		return nil, errors.Wrap(err, "UserUseCase.Update.userPGRepo.Update")
+	}
+
+	if err := u.redisRepo.SaveUser(ctx, userResponse); err != nil {
+		u.log.Errorf("redisRepo.SaveUser: %v", err)
 	}
 
 	return userResponse, nil

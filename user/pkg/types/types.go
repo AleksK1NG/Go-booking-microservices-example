@@ -26,7 +26,7 @@ func (n *NullJSONString) UnmarshalJSON(bytes []byte) error {
 		return err
 	}
 
-	if s == nil {
+	if s != nil {
 		n.Valid = true
 		n.String = *s
 	} else {
