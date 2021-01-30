@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/config"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/logger"
 )
 
 func CheckAvatar(file multipart.File) (string, error) {
@@ -49,6 +50,16 @@ func main() {
 	}
 
 	log.Printf("CFG: %-v", cfg)
+
+	appLogger := logger.NewApiLogger(cfg)
+	appLogger.InitLogger()
+	appLogger.Infof(
+		"AppVersion: %s, LogLevel: %s, Mode: %s",
+		cfg.GRPCServer.AppVersion,
+		cfg.Logger.Level,
+		cfg.GRPCServer.Mode,
+	)
+	appLogger.Infof("Success parsed config: %#v", cfg.GRPCServer.AppVersion)
 
 	// http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
 	// 	if err := r.ParseMultipartForm(1024 * 1024 * 10); err != nil {
