@@ -9,4 +9,11 @@ const (
 
 	getUserByEmail = `SELECT user_id, first_name, last_name, email, password, avatar, role, updated_at, created_at 
 	FROM users WHERE email = $1`
+
+	updateUserQuery = `UPDATE users 
+		SET first_name = COALESCE(NULLIF($1, ''), first_name), 
+	    last_name = COALESCE(NULLIF($2, ''), last_name), 
+	    email = COALESCE(NULLIF($3, ''), email), 
+	    role = COALESCE(NULLIF($4, '')::role, role)
+	    RETURNING user_id, first_name, last_name, email, role, avatar, updated_at, created_at`
 )

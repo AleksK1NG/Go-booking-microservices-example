@@ -13,8 +13,8 @@ scrape_configs:
 
   - job_name: 'session-microservice'
     static_configs:
-      - targets: [ 'host.docker.internal:7070', 'localhost:7070', '0.0.0.0:7070', 'https://localhost:7070' ]
+      - targets: [ 'host.docker.internal:7070', 'localhost:7070', '0.0.0.0:7070' ]
 
   - job_name: 'user-microservice'
     static_configs:
-      - targets: [ 'host.docker.internal:7071', 'localhost:7071', '0.0.0.0:7071', 'https://localhost:7071' ]
+      - targets: [ 'host.docker.internal:7071', 'localhost:7071', '0.0.0.0:7071' ]
