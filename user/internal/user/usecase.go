@@ -20,4 +20,5 @@ type UseCase interface {
 	DeleteSession(ctx context.Context, sessionID string) error
 	Update(ctx context.Context, user *models.UserUpdate) (*models.UserResponse, error)
 	UpdateUploadedAvatar(ctx context.Context, delivery amqp.Delivery) error
+	UpdateAvatar(ctx context.Context, data *models.UpdateAvatarMsg) error
 }

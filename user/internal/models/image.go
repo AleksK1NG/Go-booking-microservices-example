@@ -14,3 +14,10 @@ type UploadedImageMsg struct {
 	IsUploaded bool      `json:"is_uploaded"`
 	CreatedAt  time.Time `json:"created_at"`
 }
+
+// Event message for upload user avatar
+type UpdateAvatarMsg struct {
+	UserID      uuid.UUID `json:"user_id"`
+	ContentType string    `json:"content_type"`
+	Body        []byte
+}
