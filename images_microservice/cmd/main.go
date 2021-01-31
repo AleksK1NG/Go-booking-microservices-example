@@ -9,8 +9,10 @@ import (
 	"github.com/opentracing/opentracing-go"
 
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/config"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/server"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/jaeger"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/logger"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/rabbitmq"
 )
 
 func CheckAvatar(file multipart.File) (string, error) {
@@ -73,6 +75,15 @@ func main() {
 	opentracing.SetGlobalTracer(tracer)
 	defer closer.Close()
 	appLogger.Info("Opentracing connected")
+
+	amqpConn, err := rabbitmq.NewRabbitMQConn(cfg)
+	if err != nil {
+		appLogger.Fatal(err)
+	}
+	defer amqpConn.Close()
+
+	s := server.NewServer(appLogger, cfg, tracer)
+	appLogger.Fatal(s.Run())
 
 	// http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
 	// 	if err := r.ParseMultipartForm(1024 * 1024 * 10); err != nil {

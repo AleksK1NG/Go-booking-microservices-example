@@ -10,6 +10,6 @@ import (
 type Image struct {
 	ImageID    uuid.UUID `json:"image_id"`
 	ImageURL   string    `json:"image_url"`
-	CreatedAt  time.Time `json:"created_at"`
 	IsUploaded bool      `json:"is_uploaded"`
+	CreatedAt  time.Time `json:"created_at"`
 }

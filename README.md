@@ -10,5 +10,10 @@ http://localhost:9090
 
 http://localhost:3000
 
+### RabbitMQ UI:
+
+http://localhost:15672
+
 ### Swagger UI:
+
 https://localhost:8081/swagger/index.html
