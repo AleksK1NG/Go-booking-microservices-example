@@ -4,6 +4,7 @@ import (
 	"context"
 
 	uuid "github.com/satori/go.uuid"
+	"github.com/streadway/amqp"
 
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/models"
 )
@@ -18,4 +19,5 @@ type UseCase interface {
 	GetCSRFToken(ctx context.Context, sessionID string) (string, error)
 	DeleteSession(ctx context.Context, sessionID string) error
 	Update(ctx context.Context, user *models.UserUpdate) (*models.UserResponse, error)
+	UpdateUploadedAvatar(ctx context.Context, delivery amqp.Delivery) error
 }

@@ -2,10 +2,12 @@ package usecase
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
+	"github.com/streadway/amqp"
 
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/middlewares"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/models"
@@ -174,4 +176,21 @@ func (u *UserUseCase) Update(ctx context.Context, user *models.UserUpdate) (*mod
 	}
 
 	return userResponse, nil
+}
+
+func (u *UserUseCase) UpdateUploadedAvatar(ctx context.Context, delivery amqp.Delivery) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.UpdateUploadedAvatar")
+	defer span.Finish()
+
+	var img models.UploadedImageMsg
+	if err := json.Unmarshal(delivery.Body, &img); err != nil {
+		return errors.Wrap(err, "UserUseCase.UpdateUploadedAvatar.json.Unmarshal")
+	}
+
+	_, err := u.userPGRepo.UpdateAvatar(ctx, img)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

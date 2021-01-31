@@ -16,6 +16,7 @@ type Config struct {
 	Metrics    Metrics
 	Logger     Logger
 	Jaeger     Jaeger
+	RabbitMQ   RabbitMQ
 }
 
 type HttpServer struct {
@@ -26,6 +27,19 @@ type HttpServer struct {
 	WriteTimeout      time.Duration
 	CookieLifeTime    int
 	SessionCookieName string
+}
+
+// RabbitMQ
+type RabbitMQ struct {
+	Host           string
+	Port           string
+	User           string
+	Password       string
+	Exchange       string
+	Queue          string
+	RoutingKey     string
+	ConsumerTag    string
+	WorkerPoolSize int
 }
 
 // GRPCServer config
