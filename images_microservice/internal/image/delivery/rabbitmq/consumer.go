@@ -43,15 +43,15 @@ const (
 
 var (
 	incomingMessages = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "emails_incoming_rabbitmq_messages_total",
+		Name: "rabbitmq_images_incoming_messages_total",
 		Help: "The total number of incoming RabbitMQ messages",
 	})
 	successMessages = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "emails_success_incoming_rabbitmq_messages_total",
+		Name: "rabbitmq_images_success_messages_total",
 		Help: "The total number of success incoming success RabbitMQ messages",
 	})
 	errorMessages = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "emails_error_incoming_rabbitmq_message_total",
+		Name: "rabbitmq_images_error_messages_total",
 		Help: "The total number of error incoming success RabbitMQ messages",
 	})
 )

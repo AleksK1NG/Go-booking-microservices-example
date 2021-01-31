@@ -22,6 +22,7 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/config"
 	imageGrpc "github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image/delivery/grpc"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image/delivery/rabbitmq"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image/publisher"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image/repository"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image/usecase"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/logger"
@@ -42,10 +43,20 @@ func (s *Server) Run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	imagePublisher, err := publisher.NewImagePublisher(s.cfg, s.logger)
+	if err != nil {
+		return errors.Wrap(err, "NewImagePublisher")
+	}
+	uploadedChan, err := imagePublisher.CreateExchangeAndQueue("images", "uploaded", "uploaded")
+	if err != nil {
+		return errors.Wrap(err, "imagePublisher.CreateExchangeAndQueue")
+	}
+	defer uploadedChan.Close()
+
 	// Init repos, usecases, middlewares, interceptors
 	imagePGRepo := repository.NewImagePGRepository()
 	imageAWSRepo := repository.NewImageAWSRepository()
-	imageUC := usecase.NewImageUseCase(imagePGRepo, imageAWSRepo, s.logger)
+	imageUC := usecase.NewImageUseCase(imagePGRepo, imageAWSRepo, s.logger, imagePublisher)
 
 	// Init consumers, publishers, grpc server, metrics
 	imageConsumer := rabbitmq.NewImageConsumer(s.logger, s.cfg, imageUC)

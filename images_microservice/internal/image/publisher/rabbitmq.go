@@ -1,8 +1,10 @@
 package publisher
 
 import (
+	"context"
 	"time"
 
+	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -40,19 +42,20 @@ const (
 )
 
 var (
-	incomingMessages = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "emails_incoming_rabbitmq_messages_total",
-		Help: "The total number of incoming RabbitMQ messages",
-	})
 	successMessages = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "emails_success_incoming_rabbitmq_messages_total",
-		Help: "The total number of success incoming success RabbitMQ messages",
+		Name: "rabbitmq_images_success_publish_messages_total",
+		Help: "The total number of success RabbitMQ published messages",
 	})
 	errorMessages = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "emails_error_incoming_rabbitmq_message_total",
-		Help: "The total number of error incoming success RabbitMQ messages",
+		Name: "rabbitmq_images_error_publish_messages_total",
+		Help: "The total number of error RabbitMQ published messages",
 	})
 )
+
+type Publisher interface {
+	CreateExchangeAndQueue(exchange, queueName, bindingKey string) (*amqp.Channel, error)
+	Publish(exchange, routingKey, contentType string, body []byte) error
+}
 
 type ImagePublisher struct {
 	amqpConn *amqp.Connection
@@ -65,14 +68,10 @@ func NewImagePublisher(cfg *config.Config, logger logger.Logger) (*ImagePublishe
 	if err != nil {
 		return nil, err
 	}
-	// amqpChan, err := mqConn.Channel()
-	// if err != nil {
-	// 	return nil, errors.Wrap(err, "p.amqpConn.Channel")
-	// }
 	return &ImagePublisher{cfg: cfg, logger: logger, amqpConn: amqpConn}, nil
 }
 
-func (p *ImagePublisher) CreateExchangeAndQueue(exchange, queueName, bindingKey, consumerTag string) (*amqp.Channel, error) {
+func (p *ImagePublisher) CreateExchangeAndQueue(exchange, queueName, bindingKey string) (*amqp.Channel, error) {
 	amqpChan, err := p.amqpConn.Channel()
 	if err != nil {
 		return nil, errors.Wrap(err, "p.amqpConn.Channel")
@@ -123,15 +122,14 @@ func (p *ImagePublisher) CreateExchangeAndQueue(exchange, queueName, bindingKey,
 		return nil, errors.Wrap(err, "Error ch.QueueBind")
 	}
 
-	p.logger.Infof(
-		"Queue bound to exchange, starting to consume from queue, consumerTag: %v",
-		consumerTag,
-	)
 	return amqpChan, nil
 }
 
 // Publish message
-func (p *ImagePublisher) Publish(body []byte, contentType string) error {
+func (p *ImagePublisher) Publish(ctx context.Context, exchange, routingKey, contentType string, body []byte) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "ImagePublisher.Publish")
+	defer span.Finish()
+
 	amqpChan, err := p.amqpConn.Channel()
 	if err != nil {
 		return errors.Wrap(err, "p.amqpConn.Channel")
@@ -141,8 +139,8 @@ func (p *ImagePublisher) Publish(body []byte, contentType string) error {
 	p.logger.Infof("Publishing message Exchange: %s, RoutingKey: %s", p.cfg.RabbitMQ.Exchange, p.cfg.RabbitMQ.RoutingKey)
 
 	if err := amqpChan.Publish(
-		p.cfg.RabbitMQ.Exchange,
-		p.cfg.RabbitMQ.RoutingKey,
+		exchange,
+		routingKey,
 		publishMandatory,
 		publishImmediate,
 		amqp.Publishing{
@@ -153,6 +151,7 @@ func (p *ImagePublisher) Publish(body []byte, contentType string) error {
 			Body:         body,
 		},
 	); err != nil {
+		errorMessages.Inc()
 		return errors.Wrap(err, "ch.Publish")
 	}
 
