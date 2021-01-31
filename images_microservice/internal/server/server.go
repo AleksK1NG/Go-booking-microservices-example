@@ -20,11 +20,12 @@ import (
 	traceutils "github.com/opentracing-contrib/go-grpc"
 
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/config"
-	imageGrpc "github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image/delivery/grpc"
-	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image/delivery/rabbitmq"
-	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image/publisher"
-	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image/repository"
-	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image/usecase"
+	grpcImg "github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/images/delivery/grpc"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/images/delivery/rabbitmq"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/images/publisher"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/images/repository"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/images/usecase"
+
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/logger"
 	imageService "github.com/AleksK1NG/hotels-mocroservices/images-microservice/proto/image"
 )
@@ -103,7 +104,7 @@ func (s *Server) Run() error {
 		),
 	)
 
-	imgService := imageGrpc.NewImageService(s.cfg, s.logger)
+	imgService := grpcImg.NewImageService(s.cfg, s.logger)
 	imageService.RegisterImageServiceServer(server, imgService)
 	grpc_prometheus.Register(server)
 
