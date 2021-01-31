@@ -213,8 +213,10 @@ func (u *UserUseCase) UpdateAvatar(ctx context.Context, data *models.UpdateAvata
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.UpdateAvatar")
 	defer span.Finish()
 
-	headers := amqp.Table{}
-	headers["user_id"] = data.UserID.String()
+	headers := make(amqp.Table)
+	headers["user_uuid"] = data.UserID.String()
+
+	u.log.Infof("AMQP headers: %v", headers)
 
 	if err := u.amqpPublisher.Publish(ctx, "images", "resize_image", data.ContentType, headers, data.Body); err != nil {
 		return errors.Wrap(err, "UserUseCase.UpdateUploadedAvatar.amqpPublisher.Publish")
