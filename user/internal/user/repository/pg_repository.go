@@ -97,7 +97,40 @@ func (u *UserPGRepository) Update(ctx context.Context, user *models.UserUpdate) 
 
 	var res models.UserResponse
 	if err := u.db.QueryRow(ctx, updateUserQuery, &user.FirstName, &user.LastName, &user.Email, &user.Role, &user.UserID).
-		Scan(&res.UserID, &res.FirstName, &res.LastName, &res.Email, &res.Role, &res.Avatar, &res.UpdatedAt, &res.CreatedAt); err != nil {
+		Scan(
+			&res.UserID,
+			&res.FirstName,
+			&res.LastName,
+			&res.Email,
+			&res.Role,
+			&res.Avatar,
+			&res.UpdatedAt,
+			&res.CreatedAt,
+		); err != nil {
+		return nil, errors.Wrap(err, "Scan")
+	}
+
+	return &res, nil
+}
+
+func (u *UserPGRepository) UpdateAvatar(ctx context.Context, msg models.UploadedImageMsg) (*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserPGRepository.UpdateUploadedAvatar")
+	defer span.Finish()
+
+	updateAvatarQuery := `UPDATE users SET avatar = $1 WHERE user_id = $2 
+	RETURNING user_id, first_name, last_name, email, role, avatar, updated_at, created_at`
+
+	var res models.UserResponse
+	if err := u.db.QueryRow(ctx, updateAvatarQuery, &msg.ImageURL, &msg.UserID).Scan(
+		&res.UserID,
+		&res.FirstName,
+		&res.LastName,
+		&res.Email,
+		&res.Role,
+		&res.Avatar,
+		&res.UpdatedAt,
+		&res.CreatedAt,
+	); err != nil {
 		return nil, errors.Wrap(err, "Scan")
 	}
 
