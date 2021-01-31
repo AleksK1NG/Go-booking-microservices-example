@@ -65,7 +65,7 @@ func (s *Server) Run() error {
 		return errors.Wrap(err, " imageConsumer.Dial")
 	}
 
-	resizeChan, err := imageConsumer.CreateExchangeAndQueue("images", "resize", "images")
+	resizeChan, err := imageConsumer.CreateExchangeAndQueue("images", "resize", "resize_image")
 	if err != nil {
 		return errors.Wrap(err, "CreateExchangeAndQueue")
 	}

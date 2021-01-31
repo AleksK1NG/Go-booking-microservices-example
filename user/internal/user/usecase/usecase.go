@@ -12,6 +12,7 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/middlewares"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/models"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user"
+	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user/delivery/rabbitmq"
 	httpErrors "github.com/AleksK1NG/hotels-mocroservices/user/pkg/http_errors"
 	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/logger"
 	sessionService "github.com/AleksK1NG/hotels-mocroservices/user/proto/session"
@@ -19,15 +20,28 @@ import (
 
 // UserUseCase
 type UserUseCase struct {
-	userPGRepo user.PGRepository
-	sessClient sessionService.AuthorizationServiceClient
-	redisRepo  user.RedisRepository
-	log        logger.Logger
+	userPGRepo    user.PGRepository
+	sessClient    sessionService.AuthorizationServiceClient
+	redisRepo     user.RedisRepository
+	log           logger.Logger
+	amqpPublisher rabbitmq.Publisher
 }
 
 // NewUserUseCase
-func NewUserUseCase(userPGRepo user.PGRepository, sessClient sessionService.AuthorizationServiceClient, redisRepo user.RedisRepository, log logger.Logger) *UserUseCase {
-	return &UserUseCase{userPGRepo: userPGRepo, sessClient: sessClient, redisRepo: redisRepo, log: log}
+func NewUserUseCase(
+	userPGRepo user.PGRepository,
+	sessClient sessionService.AuthorizationServiceClient,
+	redisRepo user.RedisRepository,
+	log logger.Logger,
+	amqpPublisher rabbitmq.Publisher,
+) *UserUseCase {
+	return &UserUseCase{
+		userPGRepo:    userPGRepo,
+		sessClient:    sessClient,
+		redisRepo:     redisRepo,
+		log:           log,
+		amqpPublisher: amqpPublisher,
+	}
 }
 
 // GetByID
@@ -190,6 +204,20 @@ func (u *UserUseCase) UpdateUploadedAvatar(ctx context.Context, delivery amqp.De
 	_, err := u.userPGRepo.UpdateAvatar(ctx, img)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (u *UserUseCase) UpdateAvatar(ctx context.Context, data *models.UpdateAvatarMsg) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.UpdateAvatar")
+	defer span.Finish()
+
+	headers := amqp.Table{}
+	headers["user_id"] = data.UserID.String()
+
+	if err := u.amqpPublisher.Publish(ctx, "images", "resize_image", data.ContentType, headers, data.Body); err != nil {
+		return errors.Wrap(err, "UserUseCase.UpdateUploadedAvatar.amqpPublisher.Publish")
 	}
 
 	return nil

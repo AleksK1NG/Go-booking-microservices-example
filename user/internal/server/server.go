@@ -29,6 +29,7 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/session_client/grpc_client"
 	userGRPC "github.com/AleksK1NG/hotels-mocroservices/user/internal/user/delivery/grpc"
 	userHandlers "github.com/AleksK1NG/hotels-mocroservices/user/internal/user/delivery/http"
+	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user/delivery/rabbitmq"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user/repository"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user/usecase"
 	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/logger"
@@ -70,20 +71,37 @@ func (s *Server) Run() error {
 
 	sessGRPCConn, err := grpc_client.NewSessionServiceConn(ctx, s.cfg, im)
 	if err != nil {
-		s.logger.Fatalf("Error sessions service connect: ", err)
+		return errors.Wrap(err, "grpc_client.NewSessionServiceConn")
 	}
 	defer sessGRPCConn.Close()
 
 	sessServiceClient := sessionService.NewAuthorizationServiceClient(sessGRPCConn)
 
+	userPublisher, err := rabbitmq.NewUserPublisher(s.cfg, s.logger)
+	if err != nil {
+		return errors.Wrap(err, "rabbitmq.NewUserPublisher")
+	}
+
+	// queue, err := userPublisher.CreateExchangeAndQueue("images", "resize", "images")
+
 	userPGRepository := repository.NewUserPGRepository(s.pgxPool)
 	userRedisRepository := repository.NewUserRedisRepository(s.redisConn, userCachePrefix, userCacheDuration)
-	userUseCase := usecase.NewUserUseCase(userPGRepository, sessServiceClient, userRedisRepository, s.logger)
+	userUseCase := usecase.NewUserUseCase(userPGRepository, sessServiceClient, userRedisRepository, s.logger, userPublisher)
 
 	middlewareManager := middlewares.NewMiddlewareManager(s.logger, s.cfg, userUseCase)
 
 	uh := userHandlers.NewUserHandlers(usersGroup, userUseCase, s.logger, validate, s.cfg, middlewareManager)
 	uh.MapUserRoutes()
+
+	userConsumer := rabbitmq.NewUserConsumer(s.logger, s.cfg, userUseCase)
+	if err := userConsumer.Dial(); err != nil {
+		return errors.Wrap(err, "userConsumer.Dial")
+	}
+	avatarChan, err := userConsumer.CreateExchangeAndQueue("users", "avatar", "update_avatar")
+	if err != nil {
+		return errors.Wrap(err, "userConsumer.CreateExchangeAndQueue")
+	}
+	defer avatarChan.Close()
 
 	s.echo.GET("/health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Ok")
