@@ -54,7 +54,7 @@ var (
 
 type Publisher interface {
 	CreateExchangeAndQueue(exchange, queueName, bindingKey string) (*amqp.Channel, error)
-	Publish(exchange, routingKey, contentType string, body []byte) error
+	Publish(ctx context.Context, exchange, routingKey, contentType string, body []byte) error
 }
 
 type ImagePublisher struct {

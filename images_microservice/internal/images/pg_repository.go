@@ -1,4 +1,4 @@
-package image
+package images
 
 type PgRepository interface {
 	Create()
