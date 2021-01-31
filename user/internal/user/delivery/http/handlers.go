@@ -1,7 +1,10 @@
 package http
 
 import (
+	"bytes"
 	"errors"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"time"
 
@@ -19,7 +22,8 @@ import (
 )
 
 const (
-	csrfHeader = "X-CSRF-Token"
+	csrfHeader  = "X-CSRF-Token"
+	maxFileSize = 1024 * 1024 * 10
 )
 
 // UserHandlers
@@ -306,4 +310,95 @@ func (h *UserHandlers) GetUserByID() echo.HandlerFunc {
 
 		return c.JSON(http.StatusOK, userResponse)
 	}
+}
+
+// UpdateAvatar godoc
+// @Summary Update user avatar
+// @Description Upload user avatar image
+// @Accept json
+// @Produce json
+// @Param id path int false "user uuid"
+// @Success 200 {object} models.UserResponse
+// @Router /user/{id}/avatar [put]
+func (h *UserHandlers) UpdateAvatar() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.UpdateAvatar")
+		defer span.Finish()
+
+		userResponse, ok := ctx.Value(middlewares.RequestCtxUser{}).(*models.UserResponse)
+		if !ok {
+			h.logger.Error("invalid middleware user ctx")
+			return httpErrors.ErrorCtxResponse(c, httpErrors.WrongCredentials)
+		}
+
+		if err := c.Request().ParseMultipartForm(maxFileSize); err != nil {
+			h.logger.Error("c.ParseMultipartForm")
+			return httpErrors.ErrorCtxResponse(c, err)
+		}
+
+		c.Request().Body = http.MaxBytesReader(c.Response(), c.Request().Body, maxFileSize)
+		defer c.Request().Body.Close()
+
+		formFile, header, err := c.Request().FormFile("avatar")
+		if err != nil {
+			h.logger.Error("c.FormFile")
+			return httpErrors.ErrorCtxResponse(c, err)
+		}
+		h.logger.Infof("File header: %-v", header)
+
+		fileType, err := h.checkAvatar(formFile)
+		if err != nil {
+			h.logger.Error("c.FormFile")
+			return httpErrors.ErrorCtxResponse(c, err)
+		}
+
+		buf := bytes.NewBuffer(nil)
+		if _, err := io.Copy(buf, formFile); err != nil {
+			h.logger.Error("io.Copy")
+			return httpErrors.ErrorCtxResponse(c, err)
+		}
+
+		data := &models.UpdateAvatarMsg{
+			UserID:      userResponse.UserID,
+			ContentType: fileType,
+			Body:        buf.Bytes(),
+		}
+
+		if err := h.userUC.UpdateAvatar(ctx, data); err != nil {
+			h.logger.Error("h.userUC.UpdateAvatar")
+			return httpErrors.ErrorCtxResponse(c, err)
+		}
+
+		return c.NoContent(http.StatusOK)
+	}
+}
+
+func (h *UserHandlers) checkAvatar(file multipart.File) (string, error) {
+	fileHeader := make([]byte, maxFileSize)
+	ContentType := ""
+	if _, err := file.Read(fileHeader); err != nil {
+		return ContentType, err
+	}
+
+	if _, err := file.Seek(0, 0); err != nil {
+		return ContentType, err
+	}
+
+	count, err := file.Seek(0, 2)
+	if err != nil {
+		return ContentType, err
+	}
+	if count > maxFileSize {
+		return ContentType, err
+	}
+	if _, err := file.Seek(0, 0); err != nil {
+		return ContentType, err
+	}
+	ContentType = http.DetectContentType(fileHeader)
+
+	if ContentType != "image/jpg" && ContentType != "image/png" && ContentType != "image/jpeg" {
+		return ContentType, err
+	}
+
+	return ContentType, nil
 }

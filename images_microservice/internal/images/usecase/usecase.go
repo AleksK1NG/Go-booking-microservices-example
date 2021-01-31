@@ -107,7 +107,8 @@ func (i *ImageUseCase) validateDeliveryHeaders(delivery amqp.Delivery) (*uuid.UU
 
 	userUUID, ok := delivery.Headers["user_uuid"]
 	if !ok {
-		return nil, errors.Wrap(errors.New("Delivery header user_id is required"), "ImageUseCase.ResizeImage.Publish")
+		i.logger.Infof("HEADERS IMAGE SERVICE: %-v", delivery.Headers)
+		return nil, errors.Wrap(errors.New("Delivery header user_uuid is required"), "ImageUseCase.ResizeImage.Publish")
 	}
 	userID, ok := userUUID.(string)
 	if !ok {

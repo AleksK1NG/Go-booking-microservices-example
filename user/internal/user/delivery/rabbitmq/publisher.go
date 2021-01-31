@@ -111,7 +111,7 @@ func (p *UserPublisher) Publish(ctx context.Context, exchange, routingKey, conte
 	}
 	defer amqpChan.Close()
 
-	p.logger.Infof("Publishing message Exchange: %s, RoutingKey: %s", p.cfg.RabbitMQ.Exchange, p.cfg.RabbitMQ.RoutingKey)
+	p.logger.Infof("Publishing message Exchange: %s, RoutingKey: %s", exchange, routingKey)
 
 	if err := amqpChan.Publish(
 		exchange,

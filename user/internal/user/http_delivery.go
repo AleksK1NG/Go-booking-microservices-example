@@ -8,6 +8,7 @@ type Delivery interface {
 	Login() echo.HandlerFunc
 	Logout() echo.HandlerFunc
 	Update() echo.HandlerFunc
+	UpdateAvatar() echo.HandlerFunc
 	Delete() echo.HandlerFunc
 	GetUserByID() echo.HandlerFunc
 	GetMe() echo.HandlerFunc
