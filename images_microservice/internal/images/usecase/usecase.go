@@ -11,7 +11,6 @@ import (
 	"image/png"
 	"io"
 	"io/ioutil"
-	"log"
 	"sync"
 	"time"
 
@@ -24,12 +23,17 @@ import (
 	img "github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/images"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/images/publisher"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/models"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/image_errors"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/images"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/logger"
 )
 
 const (
-	userUUIDHeader = "user_uuid"
+	userUUIDHeader        = "user_uuid"
+	resizeImageExchange   = "images"
+	resizeImageRoutingKey = "uploaded"
+	resizeWidth           = 1024
+	resizeHeight          = 0
 )
 
 type ImageUseCase struct {
@@ -42,9 +46,8 @@ type ImageUseCase struct {
 
 func NewImageUseCase(pgRepo img.PgRepository, awsRepo img.AWSRepository, logger logger.Logger, publisher publisher.Publisher) *ImageUseCase {
 	resizerPool := &sync.Pool{New: func() interface{} {
-		log.Println("1111111111111111111111111111111111111111")
 		return images.NewImgResizer(
-			gift.Resize(1024, 0, gift.LanczosResampling),
+			gift.Resize(resizeWidth, resizeHeight, gift.LanczosResampling),
 			gift.Contrast(20),
 			gift.Brightness(7),
 			gift.Gamma(0.5),
@@ -88,9 +91,9 @@ func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) 
 
 	if err := i.publisher.Publish(
 		ctx,
-		"images",
-		"uploaded",
-		"image/jpeg",
+		resizeImageExchange,
+		resizeImageRoutingKey,
+		delivery.ContentType,
 		msgBytes,
 	); err != nil {
 		return errors.Wrap(err, "ImageUseCase.ResizeImage.Publish")
@@ -104,19 +107,17 @@ func (i *ImageUseCase) validateDeliveryHeaders(delivery amqp.Delivery) (*uuid.UU
 
 	userUUID, ok := delivery.Headers[userUUIDHeader]
 	if !ok {
-		i.logger.Infof("HEADERS IMAGE SERVICE: %-v", delivery.Headers)
-		return nil, errors.Wrap(errors.New("Delivery header user_uuid is required"), "ImageUseCase.ResizeImage.Publish")
+		return nil, errors.Wrap(image_errors.ErrInvalidDeliveryHeaders, "ImageUseCase.ResizeImage.Publish")
 	}
 	userID, ok := userUUID.(string)
 	if !ok {
-		return nil, errors.Wrap(errors.New("invalid user id"), "ImageUseCase.ResizeImage.Publish")
+		return nil, errors.Wrap(image_errors.ErrInvalidUUID, "ImageUseCase.ResizeImage.Publish")
 	}
 
 	parsedUUID, err := uuid.FromString(userID)
 	if err != nil {
 		return nil, errors.Wrap(err, "ImageUseCase.ResizeImage.uuid.FromString")
 	}
-	i.logger.Infof("parsedUUID: %-v", parsedUUID.String())
 
 	return &parsedUUID, nil
 }
@@ -129,7 +130,7 @@ func (i *ImageUseCase) processImage(img []byte) ([]byte, error) {
 
 	imgResizer, ok := i.resizerPool.Get().(*images.ImgResizer)
 	if !ok {
-		return nil, errors.New("resizerPool.Get casting")
+		return nil, errors.Wrap(image_errors.ErrInternalServerError, "ImageUseCase.ResizeImage.resizerPool.Get")
 	}
 	defer i.resizerPool.Put(imgResizer)
 	imgResizer.Buffer.Reset()
@@ -159,7 +160,7 @@ func (i *ImageUseCase) processImage(img []byte) ([]byte, error) {
 			return nil, err
 		}
 	default:
-		return nil, errors.New("invalid image format")
+		return nil, image_errors.ErrInvalidImageFormat
 	}
 
 	return imgResizer.Buffer.Bytes(), nil
