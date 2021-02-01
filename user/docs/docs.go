@@ -167,6 +167,34 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/user/{id}/avatar": {
+            "put": {
+                "description": "Upload user avatar image",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Update user avatar",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user uuid",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {

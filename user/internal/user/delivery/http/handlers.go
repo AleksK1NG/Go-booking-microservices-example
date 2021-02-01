@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -315,12 +317,16 @@ func (h *UserHandlers) GetUserByID() echo.HandlerFunc {
 // UpdateAvatar godoc
 // @Summary Update user avatar
 // @Description Upload user avatar image
-// @Accept json
+// @Accept mpfd
 // @Produce json
 // @Param id path int false "user uuid"
 // @Success 200 {object} models.UserResponse
 // @Router /user/{id}/avatar [put]
 func (h *UserHandlers) UpdateAvatar() echo.HandlerFunc {
+	bufferPool := &sync.Pool{New: func() interface{} {
+		log.Println("************      SYNC POOL NEW FUNC CALL")
+		return &bytes.Buffer{}
+	}}
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.UpdateAvatar")
 		defer span.Finish()
@@ -339,12 +345,11 @@ func (h *UserHandlers) UpdateAvatar() echo.HandlerFunc {
 		c.Request().Body = http.MaxBytesReader(c.Response(), c.Request().Body, maxFileSize)
 		defer c.Request().Body.Close()
 
-		formFile, header, err := c.Request().FormFile("avatar")
+		formFile, _, err := c.Request().FormFile("avatar")
 		if err != nil {
 			h.logger.Error("c.FormFile")
 			return httpErrors.ErrorCtxResponse(c, err)
 		}
-		h.logger.Infof("File header: %-v", header)
 
 		fileType, err := h.checkAvatar(formFile)
 		if err != nil {
@@ -352,7 +357,14 @@ func (h *UserHandlers) UpdateAvatar() echo.HandlerFunc {
 			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
-		buf := bytes.NewBuffer(nil)
+		buf, ok := bufferPool.Get().(*bytes.Buffer)
+		if !ok {
+			h.logger.Error("bufferPool.Get")
+			return httpErrors.ErrorCtxResponse(c, httpErrors.InternalServerError)
+		}
+		defer bufferPool.Put(buf)
+		buf.Reset()
+
 		if _, err := io.Copy(buf, formFile); err != nil {
 			h.logger.Error("io.Copy")
 			return httpErrors.ErrorCtxResponse(c, err)

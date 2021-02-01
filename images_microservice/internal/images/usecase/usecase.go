@@ -10,7 +10,8 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
-	"os"
+	"io/ioutil"
+	"log"
 	"sync"
 	"time"
 
@@ -27,14 +28,9 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/logger"
 )
 
-// var resizerPool = &sync.Pool{New: func() interface{} {
-// 	return images.NewImgResizer(
-// 		gift.Resize(1024, 0, gift.LanczosResampling),
-// 		gift.Contrast(20),
-// 		gift.Brightness(7),
-// 		gift.Gamma(0.5),
-// 	)
-// }}
+const (
+	userUUIDHeader = "user_uuid"
+)
 
 type ImageUseCase struct {
 	pgRepo      img.PgRepository
@@ -46,6 +42,7 @@ type ImageUseCase struct {
 
 func NewImageUseCase(pgRepo img.PgRepository, awsRepo img.AWSRepository, logger logger.Logger, publisher publisher.Publisher) *ImageUseCase {
 	resizerPool := &sync.Pool{New: func() interface{} {
+		log.Println("1111111111111111111111111111111111111111")
 		return images.NewImgResizer(
 			gift.Resize(1024, 0, gift.LanczosResampling),
 			gift.Contrast(20),
@@ -60,7 +57,7 @@ func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) 
 	span, ctx := opentracing.StartSpanFromContext(ctx, "ImageUseCase.ResizeImage")
 	defer span.Finish()
 
-	i.logger.Infof("amqp.Delivery: %-v", delivery)
+	i.logger.Infof("amqp.Delivery: %-v", delivery.DeliveryTag)
 
 	parsedUUID, err := i.validateDeliveryHeaders(delivery)
 	if err != nil {
@@ -105,7 +102,7 @@ func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) 
 func (i *ImageUseCase) validateDeliveryHeaders(delivery amqp.Delivery) (*uuid.UUID, error) {
 	i.logger.Infof("amqp.Delivery header: %-v", delivery.Headers)
 
-	userUUID, ok := delivery.Headers["user_uuid"]
+	userUUID, ok := delivery.Headers[userUUIDHeader]
 	if !ok {
 		i.logger.Infof("HEADERS IMAGE SERVICE: %-v", delivery.Headers)
 		return nil, errors.Wrap(errors.New("Delivery header user_uuid is required"), "ImageUseCase.ResizeImage.Publish")
@@ -134,6 +131,7 @@ func (i *ImageUseCase) processImage(img []byte) ([]byte, error) {
 	if !ok {
 		return nil, errors.New("resizerPool.Get casting")
 	}
+	defer i.resizerPool.Put(imgResizer)
 	imgResizer.Buffer.Reset()
 
 	dst := image.NewNRGBA(imgResizer.Gift.Bounds(src.Bounds()))
@@ -168,14 +166,14 @@ func (i *ImageUseCase) processImage(img []byte) ([]byte, error) {
 }
 
 func (i *ImageUseCase) uploadToAWS(data []byte) error {
-	file, err := os.Create("image.jpeg")
-	if err != nil {
-		return err
-	}
+	// file, err := os.Create("image.jpeg")
+	// if err != nil {
+	// 	return err
+	// }
 
 	r := bufio.NewReader(bytes.NewReader(data))
 
-	written, err := io.Copy(file, r)
+	written, err := io.Copy(ioutil.Discard, r)
 	if err != nil {
 		return err
 	}

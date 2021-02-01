@@ -79,6 +79,24 @@ paths:
           schema:
             $ref: '#/definitions/models.UserResponse'
       summary: Get user by id
+  /user/{id}/avatar:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Upload user avatar image
+      parameters:
+      - description: user uuid
+        in: path
+        name: id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+      summary: Update user avatar
   /user/csrf:
     get:
       consumes:
