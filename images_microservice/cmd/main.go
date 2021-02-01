@@ -10,6 +10,7 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/server"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/jaeger"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/logger"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/postgres"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/rabbitmq"
 )
 
@@ -33,6 +34,12 @@ func main() {
 		cfg.GRPCServer.Mode,
 	)
 	appLogger.Infof("Success parsed config: %#v", cfg.GRPCServer.AppVersion)
+
+	pgxConn, err := postgres.NewPgxConn(cfg)
+	if err != nil {
+		appLogger.Fatal("cannot connect to postgres", err)
+	}
+	defer pgxConn.Close()
 
 	tracer, closer, err := jaeger.InitJaeger(cfg)
 	if err != nil {
