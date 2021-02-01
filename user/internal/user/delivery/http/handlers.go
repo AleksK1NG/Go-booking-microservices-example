@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"io"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"sync"
@@ -300,7 +299,7 @@ func (h *UserHandlers) GetUserByID() echo.HandlerFunc {
 
 		userUUID, err := uuid.FromString(userID)
 		if err != nil {
-			h.logger.Error("invalid user uuid")
+			h.logger.Error("uuid.FromString")
 			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
@@ -324,7 +323,6 @@ func (h *UserHandlers) GetUserByID() echo.HandlerFunc {
 // @Router /user/{id}/avatar [put]
 func (h *UserHandlers) UpdateAvatar() echo.HandlerFunc {
 	bufferPool := &sync.Pool{New: func() interface{} {
-		log.Println("************      SYNC POOL NEW FUNC CALL")
 		return &bytes.Buffer{}
 	}}
 	return func(c echo.Context) error {
@@ -353,7 +351,7 @@ func (h *UserHandlers) UpdateAvatar() echo.HandlerFunc {
 
 		fileType, err := h.checkAvatar(formFile)
 		if err != nil {
-			h.logger.Error("c.FormFile")
+			h.logger.Error("h.checkAvatar")
 			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
