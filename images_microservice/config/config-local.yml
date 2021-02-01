@@ -36,6 +36,15 @@ HttpServer:
   CookieLifeTime: 44640
   SessionCookieName: "session_token"
 
+postgres:
+  PostgresqlHost: localhost
+  PostgresqlPort: 5434
+  PostgresqlUser: postgres
+  PostgresqlPassword: postgres
+  PostgresqlDbname: images_db
+  PostgresqlSslmode: "disable"
+  PgDriver: pgx
+
 logger:
   Development: true
   DisableCaller: false
@@ -43,14 +52,6 @@ logger:
   Encoding: json
   Level: info
 
-postgres:
-  PostgresqlHost: localhost
-  PostgresqlPort: 5433
-  PostgresqlUser: postgres
-  PostgresqlPassword: postgres
-  PostgresqlDbname: user_db
-  PostgresqlSslmode: "disable"
-  PgDriver: pgx
 
 redis:
   RedisAddr: localhost:6379
