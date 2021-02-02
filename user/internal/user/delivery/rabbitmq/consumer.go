@@ -198,7 +198,7 @@ func (c *UserConsumer) StartImagesConsumer(ctx context.Context, workerPoolSize i
 	}
 
 	chanErr := <-ch.NotifyClose(make(chan *amqp.Error))
-	c.logger.Errorf("ch.NotifyClose: %v", chanErr)
+	c.logger.Errorf("ch.NotifyClose: ********************************* %v", chanErr)
 
 	wg.Wait()
 

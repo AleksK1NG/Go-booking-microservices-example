@@ -8,4 +8,5 @@ import (
 
 type UseCase interface {
 	ResizeImage(ctx context.Context, delivery amqp.Delivery) error
+	Create(ctx context.Context, delivery amqp.Delivery) error
 }

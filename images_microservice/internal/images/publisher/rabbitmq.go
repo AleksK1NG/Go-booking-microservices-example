@@ -54,7 +54,7 @@ var (
 
 type Publisher interface {
 	CreateExchangeAndQueue(exchange, queueName, bindingKey string) (*amqp.Channel, error)
-	Publish(ctx context.Context, exchange, routingKey, contentType string, body []byte) error
+	Publish(ctx context.Context, exchange, routingKey, contentType string, headers amqp.Table, body []byte) error
 }
 
 type ImagePublisher struct {
@@ -126,7 +126,7 @@ func (p *ImagePublisher) CreateExchangeAndQueue(exchange, queueName, bindingKey 
 }
 
 // Publish message
-func (p *ImagePublisher) Publish(ctx context.Context, exchange, routingKey, contentType string, body []byte) error {
+func (p *ImagePublisher) Publish(ctx context.Context, exchange, routingKey, contentType string, headers amqp.Table, body []byte) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "ImagePublisher.Publish")
 	defer span.Finish()
 
@@ -136,7 +136,7 @@ func (p *ImagePublisher) Publish(ctx context.Context, exchange, routingKey, cont
 	}
 	defer amqpChan.Close()
 
-	p.logger.Infof("Publishing message Exchange: %s, RoutingKey: %s", p.cfg.RabbitMQ.Exchange, p.cfg.RabbitMQ.RoutingKey)
+	p.logger.Infof("Publishing message Exchange: %s, RoutingKey: %s", exchange, routingKey)
 
 	if err := amqpChan.Publish(
 		exchange,
@@ -144,6 +144,7 @@ func (p *ImagePublisher) Publish(ctx context.Context, exchange, routingKey, cont
 		publishMandatory,
 		publishImmediate,
 		amqp.Publishing{
+			Headers:      headers,
 			ContentType:  contentType,
 			DeliveryMode: amqp.Persistent,
 			MessageId:    uuid.NewV4().String(),

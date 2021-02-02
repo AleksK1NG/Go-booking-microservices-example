@@ -97,11 +97,19 @@ func (s *Server) Run() error {
 	if err := userConsumer.Dial(); err != nil {
 		return errors.Wrap(err, "userConsumer.Dial")
 	}
-	avatarChan, err := userConsumer.CreateExchangeAndQueue("users", "avatar", "update_avatar")
+	_, err = userConsumer.CreateExchangeAndQueue("users", "avatars_queue", "update_avatar_key")
 	if err != nil {
 		return errors.Wrap(err, "userConsumer.CreateExchangeAndQueue")
 	}
-	defer avatarChan.Close()
+	// defer avatarChan.Close()
+
+	go func() {
+		if err := userConsumer.StartImagesConsumer(ctx, 3, "avatars_queue", "user_avatar_consumer"); err != nil {
+			s.logger.Error("userConsumer.StartImagesConsumer")
+			cancel()
+		}
+
+	}()
 
 	s.echo.GET("/health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Ok")

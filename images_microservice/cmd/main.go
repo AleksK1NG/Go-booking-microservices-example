@@ -57,6 +57,6 @@ func main() {
 	}
 	defer amqpConn.Close()
 
-	s := server.NewServer(appLogger, cfg, tracer)
+	s := server.NewServer(appLogger, cfg, tracer, pgxConn)
 	appLogger.Fatal(s.Run())
 }

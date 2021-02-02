@@ -4,7 +4,6 @@ import (
 	"context"
 	"sync"
 
-	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -141,35 +140,6 @@ func (c *ImageConsumer) CreateExchangeAndQueue(exchangeName, queueName, bindingK
 	return ch, nil
 }
 
-func (c *ImageConsumer) resizeWorker(ctx context.Context, wg *sync.WaitGroup, messages <-chan amqp.Delivery) {
-	defer wg.Done()
-	for delivery := range messages {
-		span, ctx := opentracing.StartSpanFromContext(ctx, "ImageConsumer.resizeWorker")
-
-		c.logger.Infof("processDeliveries deliveryTag% v", delivery.DeliveryTag)
-
-		incomingMessages.Inc()
-
-		err := c.imageUC.ResizeImage(ctx, delivery)
-		if err != nil {
-			if err := delivery.Reject(false); err != nil {
-				c.logger.Errorf("Err delivery.Reject: %v", err)
-			}
-			c.logger.Errorf("Failed to process delivery: %v", err)
-			errorMessages.Inc()
-		} else {
-			err = delivery.Ack(false)
-			if err != nil {
-				c.logger.Errorf("Failed to acknowledge delivery: %v", err)
-			}
-			successMessages.Inc()
-		}
-		span.Finish()
-	}
-
-	c.logger.Info("Deliveries channel closed")
-}
-
 // Start new resize rabbitmq consumer
 func (c *ImageConsumer) StartResizeConsumer(ctx context.Context, workerPoolSize int, queueName, consumerTag string) error {
 	ch, err := c.amqpConn.Channel()
@@ -203,4 +173,65 @@ func (c *ImageConsumer) StartResizeConsumer(ctx context.Context, workerPoolSize 
 	wg.Wait()
 
 	return chanErr
+}
+
+// Start new resize rabbitmq consumer
+func (c *ImageConsumer) StartCreateImageConsumer(ctx context.Context, workerPoolSize int, queueName, consumerTag string) error {
+	ch, err := c.amqpConn.Channel()
+	if err != nil {
+		return errors.Wrap(err, "c.amqpConn.Channel")
+	}
+
+	deliveries, err := ch.Consume(
+		queueName,
+		consumerTag,
+		consumeAutoAck,
+		consumeExclusive,
+		consumeNoLocal,
+		consumeNoWait,
+		nil,
+	)
+	if err != nil {
+		return errors.Wrap(err, "ch.Consume")
+	}
+
+	wg := &sync.WaitGroup{}
+
+	wg.Add(workerPoolSize)
+	for i := 0; i < workerPoolSize; i++ {
+		go c.createImageWorker(ctx, wg, deliveries)
+	}
+
+	chanErr := <-ch.NotifyClose(make(chan *amqp.Error))
+	c.logger.Errorf("ch.NotifyClose: %v", chanErr)
+
+	wg.Wait()
+
+	return chanErr
+}
+
+func (c *ImageConsumer) RunConsumers(ctx context.Context, cancel context.CancelFunc) {
+	go func() {
+		if err := c.StartResizeConsumer(
+			ctx,
+			24,
+			"resize_queue",
+			"resize_consumer",
+		); err != nil {
+			c.logger.Errorf("StartResizeConsumer: %v", err)
+			cancel()
+		}
+	}()
+
+	go func() {
+		if err := c.StartCreateImageConsumer(
+			ctx,
+			12,
+			"create_queue",
+			"create_consumer",
+		); err != nil {
+			c.logger.Errorf("StarCreateConsumer: %v", err)
+			cancel()
+		}
+	}()
 }

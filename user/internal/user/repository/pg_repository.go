@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/opentracing/opentracing-go"
@@ -117,9 +118,7 @@ func (u *UserPGRepository) UpdateAvatar(ctx context.Context, msg models.Uploaded
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserPGRepository.UpdateUploadedAvatar")
 	defer span.Finish()
 
-	updateAvatarQuery := `UPDATE users SET avatar = $1 WHERE user_id = $2 
-	RETURNING user_id, first_name, last_name, email, role, avatar, updated_at, created_at`
-
+	log.Printf("REPO  IMAGE: %v", msg)
 	var res models.UserResponse
 	if err := u.db.QueryRow(ctx, updateAvatarQuery, &msg.ImageURL, &msg.UserID).Scan(
 		&res.UserID,
