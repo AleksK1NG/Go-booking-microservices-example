@@ -12,7 +12,6 @@ import (
 	"io"
 	"io/ioutil"
 	"sync"
-	"time"
 
 	"github.com/disintegration/gift"
 	"github.com/opentracing/opentracing-go"
@@ -30,10 +29,11 @@ import (
 
 const (
 	userUUIDHeader        = "user_uuid"
-	resizeImageExchange   = "images"
+	imagesExchange        = "images"
 	resizeImageRoutingKey = "uploaded"
 	resizeWidth           = 1024
 	resizeHeight          = 0
+	imageCreateRoutingKey = "image_create"
 )
 
 type ImageUseCase struct {
@@ -56,6 +56,50 @@ func NewImageUseCase(pgRepo img.PgRepository, awsRepo img.AWSRepository, logger 
 	return &ImageUseCase{pgRepo: pgRepo, awsRepo: awsRepo, logger: logger, publisher: publisher, resizerPool: resizerPool}
 }
 
+func (i *ImageUseCase) Create(ctx context.Context, delivery amqp.Delivery) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "ImageUseCase.Create")
+	defer span.Finish()
+
+	i.logger.Infof("amqp.Delivery: %-v", delivery.DeliveryTag)
+
+	var msg models.UploadImageMsg
+	if err := json.Unmarshal(delivery.Body, &msg); err != nil {
+		return err
+	}
+
+	createdImage, err := i.pgRepo.Create(ctx, &models.Image{
+		ImageID:    msg.ImageID,
+		ImageURL:   msg.ImageURL,
+		IsUploaded: msg.IsUploaded,
+	})
+	if err != nil {
+		return err
+	}
+
+	msgBytes, err := json.Marshal(createdImage)
+	if err != nil {
+		return errors.Wrap(err, "ImageUseCase.Create.json.Marshal")
+	}
+
+	headers := make(amqp.Table)
+	headers["user_uuid"] = delivery.Headers["user_uuid"]
+
+	i.logger.Infof("Create PUBLISH USER ***************** %-v", headers)
+
+	if err := i.publisher.Publish(
+		ctx,
+		"users",
+		"update_avatar_key",
+		delivery.ContentType,
+		headers,
+		msgBytes,
+	); err != nil {
+		return errors.Wrap(err, "ImageUseCase.Create.Publish")
+	}
+
+	return nil
+}
+
 func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "ImageUseCase.ResizeImage")
 	defer span.Finish()
@@ -76,12 +120,10 @@ func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) 
 		return err
 	}
 
-	msg := &models.UploadedImageMsg{
-		ImageID:    uuid.NewV4(),
+	msg := &models.UploadImageMsg{
 		UserID:     *parsedUUID,
 		ImageURL:   "url",
 		IsUploaded: true,
-		CreatedAt:  time.Now().UTC(),
 	}
 
 	msgBytes, err := json.Marshal(msg)
@@ -89,15 +131,31 @@ func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) 
 		return errors.Wrap(err, "ImageUseCase.ResizeImage.json.Marshal")
 	}
 
+	headers := make(amqp.Table)
+	headers["user_uuid"] = delivery.Headers["user_uuid"]
+
+	i.logger.Infof("PUBLISH USER ***************** %-v", headers)
+
 	if err := i.publisher.Publish(
 		ctx,
-		resizeImageExchange,
-		resizeImageRoutingKey,
+		"images",
+		"create_image_key",
 		delivery.ContentType,
+		headers,
 		msgBytes,
 	); err != nil {
 		return errors.Wrap(err, "ImageUseCase.ResizeImage.Publish")
 	}
+
+	// if err := i.publisher.Publish(
+	// 	ctx,
+	// 	resizeImageExchange,
+	// 	resizeImageRoutingKey,
+	// 	delivery.ContentType,
+	// 	msgBytes,
+	// ); err != nil {
+	// 	return errors.Wrap(err, "ImageUseCase.ResizeImage.Publish")
+	// }
 
 	return nil
 }

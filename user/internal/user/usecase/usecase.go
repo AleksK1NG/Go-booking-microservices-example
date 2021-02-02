@@ -18,6 +18,11 @@ import (
 	sessionService "github.com/AleksK1NG/hotels-mocroservices/user/proto/session"
 )
 
+const (
+	userExchange     = "user"
+	resizeRoutingKey = "resize"
+)
+
 // UserUseCase
 type UserUseCase struct {
 	userPGRepo    user.PGRepository
@@ -196,18 +201,43 @@ func (u *UserUseCase) UpdateUploadedAvatar(ctx context.Context, delivery amqp.De
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.UpdateUploadedAvatar")
 	defer span.Finish()
 
-	var img models.UploadedImageMsg
+	u.log.Infof("USER UPDATE UPLOADED AVATAR **************** : %v", delivery.Body)
+
+	var img models.Image
 	if err := json.Unmarshal(delivery.Body, &img); err != nil {
 		return errors.Wrap(err, "UserUseCase.UpdateUploadedAvatar.json.Unmarshal")
 	}
 
-	_, err := u.userPGRepo.UpdateAvatar(ctx, img)
+	userUUID, ok := delivery.Headers["user_uuid"]
+	if !ok {
+		return errors.Wrap(errors.New("not ok"), "UserUseCase.UpdateUploadedAvatar.json.Unmarshal")
+	}
+
+	uuidDromStr, err := uuid.FromString(userUUID.(string))
+	if err != nil {
+		return errors.Wrap(err, "UserUseCase.UpdateUploadedAvatar.uuid.FromString")
+	}
+
+	u.log.Infof("USER UNMARSHAL **************** : %v", img)
+	created, err := u.userPGRepo.UpdateAvatar(ctx, models.UploadedImageMsg{
+		ImageID:    img.ImageID,
+		UserID:     uuidDromStr,
+		ImageURL:   img.ImageURL,
+		IsUploaded: img.IsUploaded,
+	})
 	if err != nil {
 		return err
 	}
 
+	u.log.Infof("USER CREATED AVATAR WOWOWOWOWO **************** : %v", created)
+
 	return nil
 }
+
+const (
+	imagesExchange = "images"
+	resizeKey      = "resize_image_key"
+)
 
 func (u *UserUseCase) UpdateAvatar(ctx context.Context, data *models.UpdateAvatarMsg) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.UpdateAvatar")
@@ -218,7 +248,8 @@ func (u *UserUseCase) UpdateAvatar(ctx context.Context, data *models.UpdateAvata
 
 	u.log.Infof("AMQP headers: %v", headers)
 
-	if err := u.amqpPublisher.Publish(ctx, "images", "resize_image", data.ContentType, headers, data.Body); err != nil {
+	u.log.Infof("PUBLISH UpdateAvatar USER ***************** %-v", headers)
+	if err := u.amqpPublisher.Publish(ctx, imagesExchange, resizeKey, data.ContentType, headers, data.Body); err != nil {
 		return errors.Wrap(err, "UserUseCase.UpdateUploadedAvatar.amqpPublisher.Publish")
 	}
 

@@ -17,4 +17,7 @@ const (
 	    role = COALESCE(NULLIF($4, '')::role, role)
 		WHERE user_id = $5
 	    RETURNING user_id, first_name, last_name, email, role, avatar, updated_at, created_at`
+
+	updateAvatarQuery = `UPDATE users SET avatar = $1 WHERE user_id = $2 
+	RETURNING user_id, first_name, last_name, email, role, avatar, updated_at, created_at`
 )

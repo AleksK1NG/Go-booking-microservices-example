@@ -11,6 +11,7 @@ import (
 	grpcrecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
@@ -31,13 +32,14 @@ import (
 )
 
 type Server struct {
-	logger logger.Logger
-	cfg    *config.Config
-	tracer opentracing.Tracer
+	logger  logger.Logger
+	cfg     *config.Config
+	tracer  opentracing.Tracer
+	pgxPool *pgxpool.Pool
 }
 
-func NewServer(logger logger.Logger, cfg *config.Config, tracer opentracing.Tracer) *Server {
-	return &Server{logger: logger, cfg: cfg, tracer: tracer}
+func NewServer(logger logger.Logger, cfg *config.Config, tracer opentracing.Tracer, pgxPool *pgxpool.Pool) *Server {
+	return &Server{logger: logger, cfg: cfg, tracer: tracer, pgxPool: pgxPool}
 }
 
 func (s *Server) Run() error {
@@ -55,7 +57,7 @@ func (s *Server) Run() error {
 	defer uploadedChan.Close()
 
 	// Init repos, usecases, middlewares, interceptors
-	imagePGRepo := repository.NewImagePGRepository()
+	imagePGRepo := repository.NewImagePGRepository(s.pgxPool)
 	imageAWSRepo := repository.NewImageAWSRepository()
 	imageUC := usecase.NewImageUseCase(imagePGRepo, imageAWSRepo, s.logger, imagePublisher)
 
@@ -65,22 +67,20 @@ func (s *Server) Run() error {
 		return errors.Wrap(err, " imageConsumer.Dial")
 	}
 
-	resizeChan, err := imageConsumer.CreateExchangeAndQueue("images", "resize", "resize_image")
-	if err != nil {
-		return errors.Wrap(err, "CreateExchangeAndQueue")
-	}
-	defer resizeChan.Close()
+	// resizeChan, err := imageConsumer.CreateExchangeAndQueue("images", "resize_queue", "resize_image_key")
+	// if err != nil {
+	// 	return errors.Wrap(err, "CreateExchangeAndQueue")
+	// }
+	// defer resizeChan.Close()
+	//
+	// createImgChan, err := imageConsumer.CreateExchangeAndQueue("images", "create_queue", "create_image_key")
+	// if err != nil {
+	// 	return errors.Wrap(err, "CreateExchangeAndQueue")
+	// }
+	// defer createImgChan.Close()
 
 	go func() {
-		if err := imageConsumer.StartResizeConsumer(
-			ctx,
-			24,
-			"resize",
-			"resizeConsumer",
-		); err != nil {
-			s.logger.Errorf("StartResizeConsumer: %v", err)
-			cancel()
-		}
+		imageConsumer.RunConsumers(ctx, cancel)
 	}()
 
 	l, err := net.Listen("tcp", s.cfg.GRPCServer.Port)
