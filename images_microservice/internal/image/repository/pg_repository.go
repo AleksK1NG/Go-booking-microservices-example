@@ -22,10 +22,6 @@ func (i *ImagePGRepository) Create(ctx context.Context, msg *models.Image) (*mod
 	span, ctx := opentracing.StartSpanFromContext(ctx, "ImagePGRepository.Create")
 	defer span.Finish()
 
-	createImageQuery := `INSERT INTO images (image_url, is_uploaded) 
-	VALUES ($1, $2) 
-	RETURNING image_id, image_url, is_uploaded, created_at`
-
 	var res models.Image
 	if err := i.pgxPool.QueryRow(
 		ctx,
