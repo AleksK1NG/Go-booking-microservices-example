@@ -21,11 +21,10 @@ import (
 	traceutils "github.com/opentracing-contrib/go-grpc"
 
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/config"
-	grpcImg "github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/images/delivery/grpc"
-	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/images/delivery/rabbitmq"
-	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/images/publisher"
-	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/images/repository"
-	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/images/usecase"
+	grpcImg "github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image/delivery/grpc"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image/delivery/rabbitmq"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image/repository"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image/usecase"
 
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/logger"
 	imageService "github.com/AleksK1NG/hotels-mocroservices/images-microservice/proto/image"
@@ -46,7 +45,7 @@ func (s *Server) Run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	imagePublisher, err := publisher.NewImagePublisher(s.cfg, s.logger)
+	imagePublisher, err := rabbitmq.NewImagePublisher(s.cfg, s.logger)
 	if err != nil {
 		return errors.Wrap(err, "NewImagePublisher")
 	}

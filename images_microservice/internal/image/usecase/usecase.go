@@ -19,8 +19,8 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/streadway/amqp"
 
-	img "github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/images"
-	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/images/publisher"
+	img "github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image/delivery/rabbitmq"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/models"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/image_errors"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/images"
@@ -28,23 +28,24 @@ import (
 )
 
 const (
-	userUUIDHeader        = "user_uuid"
-	imagesExchange        = "images"
-	resizeImageRoutingKey = "uploaded"
-	resizeWidth           = 1024
-	resizeHeight          = 0
-	imageCreateRoutingKey = "image_create"
+	userExchange           = "users"
+	imageExchange          = "images"
+	updateAvatarRoutingKey = "update_avatar_key"
+	createImageRoutingKey  = "create_image_key"
+	userUUIDHeader         = "user_uuid"
+	resizeWidth            = 1024
+	resizeHeight           = 0
 )
 
 type ImageUseCase struct {
 	pgRepo      img.PgRepository
 	awsRepo     img.AWSRepository
 	logger      logger.Logger
-	publisher   publisher.Publisher
+	publisher   rabbitmq.Publisher
 	resizerPool *sync.Pool
 }
 
-func NewImageUseCase(pgRepo img.PgRepository, awsRepo img.AWSRepository, logger logger.Logger, publisher publisher.Publisher) *ImageUseCase {
+func NewImageUseCase(pgRepo img.PgRepository, awsRepo img.AWSRepository, logger logger.Logger, publisher rabbitmq.Publisher) *ImageUseCase {
 	resizerPool := &sync.Pool{New: func() interface{} {
 		return images.NewImgResizer(
 			gift.Resize(resizeWidth, resizeHeight, gift.LanczosResampling),
@@ -88,8 +89,8 @@ func (i *ImageUseCase) Create(ctx context.Context, delivery amqp.Delivery) error
 
 	if err := i.publisher.Publish(
 		ctx,
-		"users",
-		"update_avatar_key",
+		userExchange,
+		updateAvatarRoutingKey,
 		delivery.ContentType,
 		headers,
 		msgBytes,
@@ -138,24 +139,14 @@ func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) 
 
 	if err := i.publisher.Publish(
 		ctx,
-		"images",
-		"create_image_key",
+		imageExchange,
+		createImageRoutingKey,
 		delivery.ContentType,
 		headers,
 		msgBytes,
 	); err != nil {
 		return errors.Wrap(err, "ImageUseCase.ResizeImage.Publish")
 	}
-
-	// if err := i.publisher.Publish(
-	// 	ctx,
-	// 	resizeImageExchange,
-	// 	resizeImageRoutingKey,
-	// 	delivery.ContentType,
-	// 	msgBytes,
-	// ); err != nil {
-	// 	return errors.Wrap(err, "ImageUseCase.ResizeImage.Publish")
-	// }
 
 	return nil
 }
@@ -165,16 +156,16 @@ func (i *ImageUseCase) validateDeliveryHeaders(delivery amqp.Delivery) (*uuid.UU
 
 	userUUID, ok := delivery.Headers[userUUIDHeader]
 	if !ok {
-		return nil, errors.Wrap(image_errors.ErrInvalidDeliveryHeaders, "ImageUseCase.ResizeImage.Publish")
+		return nil, image_errors.ErrInvalidDeliveryHeaders
 	}
 	userID, ok := userUUID.(string)
 	if !ok {
-		return nil, errors.Wrap(image_errors.ErrInvalidUUID, "ImageUseCase.ResizeImage.Publish")
+		return nil, image_errors.ErrInvalidUUID
 	}
 
 	parsedUUID, err := uuid.FromString(userID)
 	if err != nil {
-		return nil, errors.Wrap(err, "ImageUseCase.ResizeImage.uuid.FromString")
+		return nil, errors.Wrap(err, "uuid.FromString")
 	}
 
 	return &parsedUUID, nil
@@ -188,7 +179,7 @@ func (i *ImageUseCase) processImage(img []byte) ([]byte, error) {
 
 	imgResizer, ok := i.resizerPool.Get().(*images.ImgResizer)
 	if !ok {
-		return nil, errors.Wrap(image_errors.ErrInternalServerError, "ImageUseCase.ResizeImage.resizerPool.Get")
+		return nil, image_errors.ErrInternalServerError
 	}
 	defer i.resizerPool.Put(imgResizer)
 	imgResizer.Buffer.Reset()

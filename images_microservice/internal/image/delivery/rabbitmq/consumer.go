@@ -10,7 +10,7 @@ import (
 	"github.com/streadway/amqp"
 
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/config"
-	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/images"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/logger"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/rabbitmq"
 )
@@ -59,10 +59,10 @@ type ImageConsumer struct {
 	amqpConn *amqp.Connection
 	logger   logger.Logger
 	cfg      *config.Config
-	imageUC  images.UseCase
+	imageUC  image.UseCase
 }
 
-func NewImageConsumer(logger logger.Logger, cfg *config.Config, imageUC images.UseCase) *ImageConsumer {
+func NewImageConsumer(logger logger.Logger, cfg *config.Config, imageUC image.UseCase) *ImageConsumer {
 	return &ImageConsumer{logger: logger, cfg: cfg, imageUC: imageUC}
 }
 

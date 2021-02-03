@@ -1,4 +1,4 @@
-package publisher
+package rabbitmq
 
 import (
 	"context"
@@ -6,50 +6,12 @@ import (
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	uuid "github.com/satori/go.uuid"
 	"github.com/streadway/amqp"
 
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/config"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/logger"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/rabbitmq"
-)
-
-const (
-	exchangeKind       = "direct"
-	exchangeDurable    = true
-	exchangeAutoDelete = false
-	exchangeInternal   = false
-	exchangeNoWait     = false
-
-	queueDurable    = true
-	queueAutoDelete = false
-	queueExclusive  = false
-	queueNoWait     = false
-
-	publishMandatory = false
-	publishImmediate = false
-
-	prefetchCount  = 1
-	prefetchSize   = 0
-	prefetchGlobal = false
-
-	consumeAutoAck   = false
-	consumeExclusive = false
-	consumeNoLocal   = false
-	consumeNoWait    = false
-)
-
-var (
-	successMessages = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "rabbitmq_images_success_publish_messages_total",
-		Help: "The total number of success RabbitMQ published messages",
-	})
-	errorMessages = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "rabbitmq_images_error_publish_messages_total",
-		Help: "The total number of error RabbitMQ published messages",
-	})
 )
 
 type Publisher interface {
