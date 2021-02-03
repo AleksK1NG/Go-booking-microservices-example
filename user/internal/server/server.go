@@ -103,19 +103,12 @@ func (s *Server) Run() error {
 	}
 	// defer avatarChan.Close()
 
-	go func() {
-		if err := userConsumer.StartImagesConsumer(ctx, 3, "avatars_queue", "user_avatar_consumer"); err != nil {
-			s.logger.Error("userConsumer.StartImagesConsumer")
-			cancel()
-		}
-
-	}()
+	userConsumer.RunConsumers(ctx, cancel)
 
 	s.echo.GET("/health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Ok")
 	})
 	s.echo.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
-
 	s.MapRoutes()
 
 	go func() {
