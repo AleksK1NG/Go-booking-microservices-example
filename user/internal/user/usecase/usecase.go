@@ -201,7 +201,7 @@ func (u *UserUseCase) UpdateUploadedAvatar(ctx context.Context, delivery amqp.De
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.UpdateUploadedAvatar")
 	defer span.Finish()
 
-	u.log.Infof("USER UPDATE UPLOADED AVATAR **************** : %v", delivery.Body)
+	u.log.Infof("USER UPDATE UPLOADED AVATAR **************** -> : %v", delivery.Headers)
 
 	var img models.Image
 	if err := json.Unmarshal(delivery.Body, &img); err != nil {

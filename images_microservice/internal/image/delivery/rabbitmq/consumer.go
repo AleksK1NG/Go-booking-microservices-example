@@ -5,54 +5,12 @@ import (
 	"sync"
 
 	"github.com/pkg/errors"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/streadway/amqp"
 
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/config"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/image"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/logger"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/rabbitmq"
-)
-
-const (
-	exchangeKind       = "direct"
-	exchangeDurable    = true
-	exchangeAutoDelete = false
-	exchangeInternal   = false
-	exchangeNoWait     = false
-
-	queueDurable    = true
-	queueAutoDelete = false
-	queueExclusive  = false
-	queueNoWait     = false
-
-	publishMandatory = false
-	publishImmediate = false
-
-	prefetchCount  = 1
-	prefetchSize   = 0
-	prefetchGlobal = false
-
-	consumeAutoAck   = false
-	consumeExclusive = false
-	consumeNoLocal   = false
-	consumeNoWait    = false
-)
-
-var (
-	incomingMessages = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "rabbitmq_images_incoming_messages_total",
-		Help: "The total number of incoming RabbitMQ messages",
-	})
-	successMessages = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "rabbitmq_images_success_messages_total",
-		Help: "The total number of success incoming success RabbitMQ messages",
-	})
-	errorMessages = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "rabbitmq_images_error_messages_total",
-		Help: "The total number of error incoming success RabbitMQ messages",
-	})
 )
 
 type ImageConsumer struct {
@@ -140,8 +98,13 @@ func (c *ImageConsumer) CreateExchangeAndQueue(exchangeName, queueName, bindingK
 	return ch, nil
 }
 
-// Start new resize rabbitmq consumer
-func (c *ImageConsumer) StartResizeConsumer(ctx context.Context, workerPoolSize int, queueName, consumerTag string) error {
+func (c *ImageConsumer) startConsume(
+	ctx context.Context,
+	worker func(ctx context.Context, wg *sync.WaitGroup, messages <-chan amqp.Delivery),
+	workerPoolSize int,
+	queueName string,
+	consumerTag string,
+) error {
 	ch, err := c.amqpConn.Channel()
 	if err != nil {
 		return errors.Wrap(err, "c.amqpConn.Channel")
@@ -164,42 +127,7 @@ func (c *ImageConsumer) StartResizeConsumer(ctx context.Context, workerPoolSize 
 
 	wg.Add(workerPoolSize)
 	for i := 0; i < workerPoolSize; i++ {
-		go c.resizeWorker(ctx, wg, deliveries)
-	}
-
-	chanErr := <-ch.NotifyClose(make(chan *amqp.Error))
-	c.logger.Errorf("ch.NotifyClose: %v", chanErr)
-
-	wg.Wait()
-
-	return chanErr
-}
-
-// Start new resize rabbitmq consumer
-func (c *ImageConsumer) StartCreateImageConsumer(ctx context.Context, workerPoolSize int, queueName, consumerTag string) error {
-	ch, err := c.amqpConn.Channel()
-	if err != nil {
-		return errors.Wrap(err, "c.amqpConn.Channel")
-	}
-
-	deliveries, err := ch.Consume(
-		queueName,
-		consumerTag,
-		consumeAutoAck,
-		consumeExclusive,
-		consumeNoLocal,
-		consumeNoWait,
-		nil,
-	)
-	if err != nil {
-		return errors.Wrap(err, "ch.Consume")
-	}
-
-	wg := &sync.WaitGroup{}
-
-	wg.Add(workerPoolSize)
-	for i := 0; i < workerPoolSize; i++ {
-		go c.createImageWorker(ctx, wg, deliveries)
+		go worker(ctx, wg, deliveries)
 	}
 
 	chanErr := <-ch.NotifyClose(make(chan *amqp.Error))
@@ -212,11 +140,12 @@ func (c *ImageConsumer) StartCreateImageConsumer(ctx context.Context, workerPool
 
 func (c *ImageConsumer) RunConsumers(ctx context.Context, cancel context.CancelFunc) {
 	go func() {
-		if err := c.StartResizeConsumer(
+		if err := c.startConsume(
 			ctx,
-			24,
-			"resize_queue",
-			"resize_consumer",
+			c.resizeWorker,
+			resizeWorkers,
+			resizeQueueName,
+			resizeConsumerTag,
 		); err != nil {
 			c.logger.Errorf("StartResizeConsumer: %v", err)
 			cancel()
@@ -224,11 +153,12 @@ func (c *ImageConsumer) RunConsumers(ctx context.Context, cancel context.CancelF
 	}()
 
 	go func() {
-		if err := c.StartCreateImageConsumer(
+		if err := c.startConsume(
 			ctx,
-			12,
-			"create_queue",
-			"create_consumer",
+			c.createImageWorker,
+			createWorkers,
+			createQueueName,
+			createConsumerTag,
 		); err != nil {
 			c.logger.Errorf("StarCreateConsumer: %v", err)
 			cancel()
