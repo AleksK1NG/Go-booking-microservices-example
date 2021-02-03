@@ -6,54 +6,12 @@ import (
 
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/streadway/amqp"
 
 	"github.com/AleksK1NG/hotels-mocroservices/user/config"
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/user"
 	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/logger"
 	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/rabbitmq"
-)
-
-const (
-	exchangeKind       = "direct"
-	exchangeDurable    = true
-	exchangeAutoDelete = false
-	exchangeInternal   = false
-	exchangeNoWait     = false
-
-	queueDurable    = true
-	queueAutoDelete = false
-	queueExclusive  = false
-	queueNoWait     = false
-
-	publishMandatory = false
-	publishImmediate = false
-
-	prefetchCount  = 1
-	prefetchSize   = 0
-	prefetchGlobal = false
-
-	consumeAutoAck   = false
-	consumeExclusive = false
-	consumeNoLocal   = false
-	consumeNoWait    = false
-)
-
-var (
-	incomingMessages = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "rabbitmq_images_incoming_messages_total",
-		Help: "The total number of incoming RabbitMQ messages",
-	})
-	successMessages = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "rabbitmq_images_success_messages_total",
-		Help: "The total number of success incoming success RabbitMQ messages",
-	})
-	errorMessages = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "rabbitmq_images_error_messages_total",
-		Help: "The total number of error incoming success RabbitMQ messages",
-	})
 )
 
 type UserConsumer struct {
@@ -170,8 +128,13 @@ func (c *UserConsumer) imagesWorker(ctx context.Context, wg *sync.WaitGroup, mes
 	c.logger.Info("Deliveries channel closed")
 }
 
-// Start new resize rabbitmq consumer
-func (c *UserConsumer) StartImagesConsumer(ctx context.Context, workerPoolSize int, queueName, consumerTag string) error {
+func (c *UserConsumer) startConsume(
+	ctx context.Context,
+	worker func(ctx context.Context, wg *sync.WaitGroup, messages <-chan amqp.Delivery),
+	workerPoolSize int,
+	queueName string,
+	consumerTag string,
+) error {
 	ch, err := c.amqpConn.Channel()
 	if err != nil {
 		return errors.Wrap(err, "c.amqpConn.Channel")
@@ -194,13 +157,29 @@ func (c *UserConsumer) StartImagesConsumer(ctx context.Context, workerPoolSize i
 
 	wg.Add(workerPoolSize)
 	for i := 0; i < workerPoolSize; i++ {
-		go c.imagesWorker(ctx, wg, deliveries)
+		go worker(ctx, wg, deliveries)
 	}
 
 	chanErr := <-ch.NotifyClose(make(chan *amqp.Error))
-	c.logger.Errorf("ch.NotifyClose: ********************************* %v", chanErr)
+	c.logger.Errorf("ch.NotifyClose: %v", chanErr)
 
 	wg.Wait()
 
 	return chanErr
+}
+
+func (c *UserConsumer) RunConsumers(ctx context.Context, cancel context.CancelFunc) {
+	go func() {
+		if err := c.startConsume(
+			ctx,
+			c.imagesWorker,
+			avatarsWorkers,
+			avatarsQueueName,
+			avatarsConsumerTag,
+		); err != nil {
+			c.logger.Errorf("StartResizeConsumer: %v", err)
+			cancel()
+		}
+	}()
+
 }
