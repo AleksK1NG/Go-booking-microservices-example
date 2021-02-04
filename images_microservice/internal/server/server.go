@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/aws/aws-sdk-go/service/s3"
 	grpcrecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
@@ -35,10 +36,11 @@ type Server struct {
 	cfg     *config.Config
 	tracer  opentracing.Tracer
 	pgxPool *pgxpool.Pool
+	s3      *s3.S3
 }
 
-func NewServer(logger logger.Logger, cfg *config.Config, tracer opentracing.Tracer, pgxPool *pgxpool.Pool) *Server {
-	return &Server{logger: logger, cfg: cfg, tracer: tracer, pgxPool: pgxPool}
+func NewServer(logger logger.Logger, cfg *config.Config, tracer opentracing.Tracer, pgxPool *pgxpool.Pool, s3 *s3.S3) *Server {
+	return &Server{logger: logger, cfg: cfg, tracer: tracer, pgxPool: pgxPool, s3: s3}
 }
 
 func (s *Server) Run() error {
@@ -57,7 +59,7 @@ func (s *Server) Run() error {
 
 	// Init repos, usecases, middlewares, interceptors
 	imagePGRepo := repository.NewImagePGRepository(s.pgxPool)
-	imageAWSRepo := repository.NewImageAWSRepository()
+	imageAWSRepo := repository.NewImageAWSRepository(s.cfg, s.s3)
 	imageUC := usecase.NewImageUseCase(imagePGRepo, imageAWSRepo, s.logger, imagePublisher)
 
 	// Init consumers, publishers, grpc server, metrics

@@ -132,10 +132,10 @@ services:
     image: minio/minio:latest
     ports:
       - '9000:9000'
-    container_name: myminio
+    container_name: minio_aws
     environment:
-      MINIO_ACCESS_KEY: minio
-      MINIO_SECRET_KEY: minio
+      MINIO_ACCESS_KEY: minio123
+      MINIO_SECRET_KEY: minio123
     command: server /data
     networks:
       - hotels_network
@@ -147,10 +147,10 @@ services:
     entrypoint: >
       /bin/sh -c "
       /usr/bin/mc config host rm local;
-      /usr/bin/mc config host add --quiet --api s3v4 local http://myminio:9000 minio minio;
-      /usr/bin/mc rb --force local/somebucketname1/;
-      /usr/bin/mc mb --quiet local/somebucketname1/;
-      /usr/bin/mc policy set public local/somebucketname1;
+      /usr/bin/mc config host add --quiet --api s3v4 local http://myminio:9000 minio123 minio123;
+      /usr/bin/mc rb --force local/images/;
+      /usr/bin/mc mb --quiet local/images/;
+      /usr/bin/mc policy set public local/images;
       "
     networks:
       - hotels_network

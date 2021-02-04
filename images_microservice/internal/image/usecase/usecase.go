@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -9,8 +8,6 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"image/png"
-	"io"
-	"io/ioutil"
 	"sync"
 
 	"github.com/disintegration/gift"
@@ -112,18 +109,22 @@ func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) 
 		return err
 	}
 
-	processedImage, err := i.processImage(delivery.Body)
+	processedImage, fileType, err := i.processImage(delivery.Body)
 	if err != nil {
 		return err
 	}
 
-	if err := i.uploadToAWS(processedImage); err != nil {
+	fileUrl, err := i.awsRepo.PutObject(ctx, processedImage, fileType)
+	if err != nil {
+		i.logger.Errorf("PUT OBJECT ERROR ***************** %-v", err)
 		return err
 	}
 
+	i.logger.Infof("PUT OBJECT URL WWWWW ***************** %-v", fileUrl)
+
 	msg := &models.UploadImageMsg{
 		UserID:     *parsedUUID,
-		ImageURL:   "url",
+		ImageURL:   fileUrl,
 		IsUploaded: true,
 	}
 
@@ -171,15 +172,15 @@ func (i *ImageUseCase) validateDeliveryHeaders(delivery amqp.Delivery) (*uuid.UU
 	return &parsedUUID, nil
 }
 
-func (i *ImageUseCase) processImage(img []byte) ([]byte, error) {
+func (i *ImageUseCase) processImage(img []byte) ([]byte, string, error) {
 	src, imageType, err := image.Decode(bytes.NewReader(img))
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	imgResizer, ok := i.resizerPool.Get().(*images.ImgResizer)
 	if !ok {
-		return nil, image_errors.ErrInternalServerError
+		return nil, "", image_errors.ErrInternalServerError
 	}
 	defer i.resizerPool.Put(imgResizer)
 	imgResizer.Buffer.Reset()
@@ -191,42 +192,42 @@ func (i *ImageUseCase) processImage(img []byte) ([]byte, error) {
 	case "png":
 		err = png.Encode(imgResizer.Buffer, dst)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 	case "jpeg":
 		err = jpeg.Encode(imgResizer.Buffer, dst, nil)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 	case "jpg":
 		err = jpeg.Encode(imgResizer.Buffer, dst, nil)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 	case "gif":
 		err = gif.Encode(imgResizer.Buffer, dst, nil)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 	default:
-		return nil, image_errors.ErrInvalidImageFormat
+		return nil, "", image_errors.ErrInvalidImageFormat
 	}
 
-	return imgResizer.Buffer.Bytes(), nil
+	return imgResizer.Buffer.Bytes(), imageType, nil
 }
 
-func (i *ImageUseCase) uploadToAWS(data []byte) error {
-	// file, err := os.Create("image.jpeg")
-	// if err != nil {
-	// 	return err
-	// }
-
-	r := bufio.NewReader(bytes.NewReader(data))
-
-	written, err := io.Copy(ioutil.Discard, r)
-	if err != nil {
-		return err
-	}
-	i.logger.Infof("written: %v", written)
-	return nil
-}
+// func (i *ImageUseCase) uploadToAWS(ctx context.Context, data []byte, fileType string) (string, error) {
+// 	// file, err := os.Create("image.jpeg")
+// 	// if err != nil {
+// 	// 	return err
+// 	// }
+//
+// 	r := bufio.NewReader(bytes.NewReader(data))
+//
+// 	written, err := io.Copy(ioutil.Discard, r)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	i.logger.Infof("written: %v", written)
+// 	return nil
+// }

@@ -26,6 +26,12 @@ rabbitmq:
   ConsumerTag: emails-consumer
   WorkerPoolSize: 24
 
+AWS:
+  S3Region: "us-east-1"
+  S3EndPointMinio: "http://localhost:9000/minio"
+  S3EndPoint: "http://localhost:9000"
+  DisableSSL: true
+  S3ForcePathStyle: true
 
 HttpServer:
   Port: ":8007"
