@@ -29,13 +29,17 @@ const (
 	consumeNoLocal   = false
 	consumeNoWait    = false
 
-	resizeQueueName   = "resize_queue"
-	resizeConsumerTag = "resize_consumer"
-	resizeWorkers     = 10
+	ImagesExchange = "images"
 
-	createQueueName   = "create_queue"
-	createConsumerTag = "create_consumer"
-	createWorkers     = 5
+	ResizeQueueName   = "resize_queue"
+	ResizeConsumerTag = "resize_consumer"
+	ResizeWorkers     = 10
+	ResizeBindingKey  = "resize_image_key"
+
+	CreateQueueName   = "create_queue"
+	CreateConsumerTag = "create_consumer"
+	CreateWorkers     = 5
+	CreateBindingKey  = "create_image_key"
 )
 
 var (

@@ -143,9 +143,9 @@ func (c *ImageConsumer) RunConsumers(ctx context.Context, cancel context.CancelF
 		if err := c.startConsume(
 			ctx,
 			c.resizeWorker,
-			resizeWorkers,
-			resizeQueueName,
-			resizeConsumerTag,
+			ResizeWorkers,
+			ResizeQueueName,
+			ResizeConsumerTag,
 		); err != nil {
 			c.logger.Errorf("StartResizeConsumer: %v", err)
 			cancel()
@@ -156,9 +156,9 @@ func (c *ImageConsumer) RunConsumers(ctx context.Context, cancel context.CancelF
 		if err := c.startConsume(
 			ctx,
 			c.createImageWorker,
-			createWorkers,
-			createQueueName,
-			createConsumerTag,
+			CreateWorkers,
+			CreateQueueName,
+			CreateConsumerTag,
 		); err != nil {
 			c.logger.Errorf("StarCreateConsumer: %v", err)
 			cancel()
