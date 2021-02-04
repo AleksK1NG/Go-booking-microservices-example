@@ -8,6 +8,7 @@ import (
 
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/config"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/server"
+	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/aws"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/jaeger"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/logger"
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/postgres"
@@ -57,6 +58,9 @@ func main() {
 	}
 	defer amqpConn.Close()
 
-	s := server.NewServer(appLogger, cfg, tracer, pgxConn)
+	s3 := aws.NewS3Session(cfg)
+	appLogger.Infof("AWS S3 Connected : %v", s3.Client.APIVersion)
+
+	s := server.NewServer(appLogger, cfg, tracer, pgxConn, s3)
 	appLogger.Fatal(s.Run())
 }
