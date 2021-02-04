@@ -152,6 +152,18 @@ func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) 
 	return nil
 }
 
+func (i *ImageUseCase) GetImageByID(ctx context.Context, imageID uuid.UUID) (*models.Image, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "ImageUseCase.GetImageByID")
+	defer span.Finish()
+
+	imgByID, err := i.pgRepo.GetImageByID(ctx, imageID)
+	if err != nil {
+		return nil, err
+	}
+
+	return imgByID, nil
+}
+
 func (i *ImageUseCase) validateDeliveryHeaders(delivery amqp.Delivery) (*uuid.UUID, error) {
 	i.logger.Infof("amqp.Delivery header: %-v", delivery.Headers)
 

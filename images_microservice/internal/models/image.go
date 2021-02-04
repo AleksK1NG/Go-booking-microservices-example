@@ -4,6 +4,9 @@ import (
 	"time"
 
 	uuid "github.com/satori/go.uuid"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	imageService "github.com/AleksK1NG/hotels-mocroservices/images-microservice/proto/image"
 )
 
 // Image model
@@ -27,4 +30,13 @@ type UploadImageMsg struct {
 type CreateImageMsg struct {
 	ImageURL   string `json:"image_url"`
 	IsUploaded bool   `json:"is_uploaded"`
+}
+
+func (i *Image) ToProto() *imageService.Image {
+	return &imageService.Image{
+		ImageID:    i.ImageID.String(),
+		ImageURL:   i.ImageURL,
+		IsUploaded: i.IsUploaded,
+		CreatedAt:  timestamppb.New(i.CreatedAt),
+	}
 }

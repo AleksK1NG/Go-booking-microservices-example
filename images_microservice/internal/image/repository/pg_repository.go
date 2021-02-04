@@ -6,6 +6,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
+	uuid "github.com/satori/go.uuid"
 
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/models"
 )
@@ -33,4 +34,23 @@ func (i *ImagePGRepository) Create(ctx context.Context, msg *models.Image) (*mod
 	}
 
 	return &res, nil
+}
+func (i *ImagePGRepository) GetImageByID(ctx context.Context, imageID uuid.UUID) (*models.Image, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "ImagePGRepository.GetImageByID")
+	defer span.Finish()
+
+	getImageByIDQuery := `SELECT image_id, image_url, is_uploaded, created_at, updated_at FROM images WHERE image_id = $1`
+
+	var img models.Image
+	if err := i.pgxPool.QueryRow(ctx, getImageByIDQuery, imageID).Scan(
+		&img.ImageID,
+		&img.ImageURL,
+		&img.IsUploaded,
+		&img.CreatedAt,
+		&img.UpdatedAt,
+	); err != nil {
+		return nil, errors.Wrap(err, "ImagePGRepository.Scan")
+	}
+
+	return &img, nil
 }

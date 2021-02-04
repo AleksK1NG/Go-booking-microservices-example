@@ -105,7 +105,7 @@ func (s *Server) Run() error {
 		),
 	)
 
-	imgService := grpcImg.NewImageService(s.cfg, s.logger)
+	imgService := grpcImg.NewImageService(s.cfg, s.logger, imageUC)
 	imageService.RegisterImageServiceServer(server, imgService)
 	grpc_prometheus.Register(server)
 
