@@ -97,11 +97,11 @@ func (s *Server) Run() error {
 	if err := userConsumer.Dial(); err != nil {
 		return errors.Wrap(err, "userConsumer.Dial")
 	}
-	_, err = userConsumer.CreateExchangeAndQueue("users", "avatars_queue", "update_avatar_key")
+	avatarChan, err := userConsumer.CreateExchangeAndQueue(rabbitmq.UserExchange, rabbitmq.AvatarsQueueName, rabbitmq.AvatarsBindingKey)
 	if err != nil {
 		return errors.Wrap(err, "userConsumer.CreateExchangeAndQueue")
 	}
-	// defer avatarChan.Close()
+	defer avatarChan.Close()
 
 	userConsumer.RunConsumers(ctx, cancel)
 

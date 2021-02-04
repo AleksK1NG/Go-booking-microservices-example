@@ -29,9 +29,12 @@ const (
 	consumeNoLocal   = false
 	consumeNoWait    = false
 
-	avatarsQueueName   = "avatars_queue"
-	avatarsConsumerTag = "user_avatar_consumer"
-	avatarsWorkers     = 5
+	UserExchange = "users"
+
+	AvatarsQueueName   = "avatars_queue"
+	AvatarsConsumerTag = "user_avatar_consumer"
+	AvatarsWorkers     = 5
+	AvatarsBindingKey  = "update_avatar_key"
 )
 
 var (

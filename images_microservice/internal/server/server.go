@@ -66,17 +66,17 @@ func (s *Server) Run() error {
 		return errors.Wrap(err, " imageConsumer.Dial")
 	}
 
-	// resizeChan, err := imageConsumer.CreateExchangeAndQueue("images", "resize_queue", "resize_image_key")
-	// if err != nil {
-	// 	return errors.Wrap(err, "CreateExchangeAndQueue")
-	// }
-	// defer resizeChan.Close()
-	//
-	// createImgChan, err := imageConsumer.CreateExchangeAndQueue("images", "create_queue", "create_image_key")
-	// if err != nil {
-	// 	return errors.Wrap(err, "CreateExchangeAndQueue")
-	// }
-	// defer createImgChan.Close()
+	resizeChan, err := imageConsumer.CreateExchangeAndQueue(rabbitmq.ImagesExchange, rabbitmq.ResizeQueueName, rabbitmq.ResizeBindingKey)
+	if err != nil {
+		return errors.Wrap(err, "CreateExchangeAndQueue")
+	}
+	defer resizeChan.Close()
+
+	createImgChan, err := imageConsumer.CreateExchangeAndQueue(rabbitmq.ImagesExchange, rabbitmq.CreateQueueName, rabbitmq.CreateBindingKey)
+	if err != nil {
+		return errors.Wrap(err, "CreateExchangeAndQueue")
+	}
+	defer createImgChan.Close()
 
 	go func() {
 		imageConsumer.RunConsumers(ctx, cancel)

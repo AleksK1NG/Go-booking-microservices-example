@@ -101,6 +101,7 @@ func (c *UserConsumer) CreateExchangeAndQueue(exchangeName, queueName, bindingKe
 
 func (c *UserConsumer) imagesWorker(ctx context.Context, wg *sync.WaitGroup, messages <-chan amqp.Delivery) {
 	defer wg.Done()
+
 	for delivery := range messages {
 		span, ctx := opentracing.StartSpanFromContext(ctx, "ImageConsumer.resizeWorker")
 
@@ -173,9 +174,9 @@ func (c *UserConsumer) RunConsumers(ctx context.Context, cancel context.CancelFu
 		if err := c.startConsume(
 			ctx,
 			c.imagesWorker,
-			avatarsWorkers,
-			avatarsQueueName,
-			avatarsConsumerTag,
+			AvatarsWorkers,
+			AvatarsQueueName,
+			AvatarsConsumerTag,
 		); err != nil {
 			c.logger.Errorf("StartResizeConsumer: %v", err)
 			cancel()
