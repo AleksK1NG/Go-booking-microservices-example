@@ -101,7 +101,6 @@ func (s *Server) Run() error {
 			grpc_prometheus.UnaryServerInterceptor,
 			grpcrecovery.UnaryServerInterceptor(),
 			traceutils.OpenTracingServerInterceptor(s.tracer),
-			// im.Logger,
 		),
 	)
 

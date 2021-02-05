@@ -47,6 +47,7 @@ var (
 	InvalidJWTClaims      = errors.New("Invalid JWT claims")
 	NotAllowedImageHeader = errors.New("Not allowed image header")
 	NoCookie              = errors.New("not found cookie header")
+	InvalidUUID           = errors.New("invalid uuid")
 )
 
 // Rest error interface
