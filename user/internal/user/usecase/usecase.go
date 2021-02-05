@@ -19,8 +19,9 @@ import (
 )
 
 const (
-	userExchange     = "user"
-	resizeRoutingKey = "resize"
+	imagesExchange = "images"
+	resizeKey      = "resize_image_key"
+	userUUIDHeader = "user_uuid"
 )
 
 // UserUseCase
@@ -201,27 +202,24 @@ func (u *UserUseCase) UpdateUploadedAvatar(ctx context.Context, delivery amqp.De
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.UpdateUploadedAvatar")
 	defer span.Finish()
 
-	u.log.Infof("USER UPDATE UPLOADED AVATAR **************** -> : %v", delivery.Headers)
-
 	var img models.Image
 	if err := json.Unmarshal(delivery.Body, &img); err != nil {
-		return errors.Wrap(err, "UserUseCase.UpdateUploadedAvatar.json.Unmarshal")
+		return errors.Wrap(err, "UpdateUploadedAvatar.json.Unmarshal")
 	}
 
-	userUUID, ok := delivery.Headers["user_uuid"]
+	userUUID, ok := delivery.Headers[userUUIDHeader].(string)
 	if !ok {
-		return errors.Wrap(errors.New("not ok"), "UserUseCase.UpdateUploadedAvatar.json.Unmarshal")
+		return errors.Wrap(httpErrors.InvalidUUID, "delivery.Headers")
 	}
 
-	uuidDromStr, err := uuid.FromString(userUUID.(string))
+	uid, err := uuid.FromString(userUUID)
 	if err != nil {
-		return errors.Wrap(err, "UserUseCase.UpdateUploadedAvatar.uuid.FromString")
+		return errors.Wrap(err, "uuid.FromString")
 	}
 
-	u.log.Infof("USER UNMARSHAL **************** : %v", img)
 	created, err := u.userPGRepo.UpdateAvatar(ctx, models.UploadedImageMsg{
 		ImageID:    img.ImageID,
-		UserID:     uuidDromStr,
+		UserID:     uid,
 		ImageURL:   img.ImageURL,
 		IsUploaded: img.IsUploaded,
 	})
@@ -229,29 +227,28 @@ func (u *UserUseCase) UpdateUploadedAvatar(ctx context.Context, delivery amqp.De
 		return err
 	}
 
-	u.log.Infof("USER CREATED AVATAR WOWOWOWOWO **************** : %v", created)
+	u.log.Infof("UpdateUploadedAvatar: %s", created.Avatar)
 
 	return nil
 }
-
-const (
-	imagesExchange = "images"
-	resizeKey      = "resize_image_key"
-)
 
 func (u *UserUseCase) UpdateAvatar(ctx context.Context, data *models.UpdateAvatarMsg) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.UpdateAvatar")
 	defer span.Finish()
 
-	headers := make(amqp.Table)
-	headers["user_uuid"] = data.UserID.String()
-
-	u.log.Infof("AMQP headers: %v", headers)
-
-	u.log.Infof("PUBLISH UpdateAvatar USER ***************** %-v", headers)
-	if err := u.amqpPublisher.Publish(ctx, imagesExchange, resizeKey, data.ContentType, headers, data.Body); err != nil {
-		return errors.Wrap(err, "UserUseCase.UpdateUploadedAvatar.amqpPublisher.Publish")
+	headers := make(amqp.Table, 1)
+	headers[userUUIDHeader] = data.UserID.String()
+	if err := u.amqpPublisher.Publish(
+		ctx,
+		imagesExchange,
+		resizeKey,
+		data.ContentType,
+		headers,
+		data.Body,
+	); err != nil {
+		return errors.Wrap(err, "UpdateUploadedAvatar.Publish")
 	}
 
+	u.log.Infof("Publish UpdateAvatar %-v", headers)
 	return nil
 }
