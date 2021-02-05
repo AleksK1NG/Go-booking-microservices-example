@@ -81,9 +81,6 @@ func (i *ImageUseCase) Create(ctx context.Context, delivery amqp.Delivery) error
 
 	headers := make(amqp.Table)
 	headers["user_uuid"] = delivery.Headers["user_uuid"]
-
-	i.logger.Infof("Create PUBLISH USER ***************** %-v", headers)
-
 	if err := i.publisher.Publish(
 		ctx,
 		userExchange,
@@ -116,11 +113,9 @@ func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) 
 
 	fileUrl, err := i.awsRepo.PutObject(ctx, processedImage, fileType)
 	if err != nil {
-		i.logger.Errorf("PUT OBJECT ERROR ***************** %-v", err)
+		i.logger.Errorf("awsRepo.PutObject %-v", err)
 		return err
 	}
-
-	i.logger.Infof("PUT OBJECT URL WWWWW ***************** %-v", fileUrl)
 
 	msg := &models.UploadImageMsg{
 		UserID:     *parsedUUID,
@@ -135,9 +130,6 @@ func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) 
 
 	headers := make(amqp.Table)
 	headers["user_uuid"] = delivery.Headers["user_uuid"]
-
-	i.logger.Infof("PUBLISH USER ***************** %-v", headers)
-
 	if err := i.publisher.Publish(
 		ctx,
 		imageExchange,
@@ -227,19 +219,3 @@ func (i *ImageUseCase) processImage(img []byte) ([]byte, string, error) {
 
 	return imgResizer.Buffer.Bytes(), imageType, nil
 }
-
-// func (i *ImageUseCase) uploadToAWS(ctx context.Context, data []byte, fileType string) (string, error) {
-// 	// file, err := os.Create("image.jpeg")
-// 	// if err != nil {
-// 	// 	return err
-// 	// }
-//
-// 	r := bufio.NewReader(bytes.NewReader(data))
-//
-// 	written, err := io.Copy(ioutil.Discard, r)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	i.logger.Infof("written: %v", written)
-// 	return nil
-// }

@@ -35,8 +35,6 @@ func (i *ImageAWSRepository) PutObject(ctx context.Context, data []byte, fileTyp
 	newFilename := uuid.NewV4().String()
 	key := i.getFileKey(newFilename, fileType)
 
-	log.Printf("key : %s", key)
-
 	object, err := i.s3.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Body:   bytes.NewReader(data),
 		Bucket: aws.String(imagesBucket),

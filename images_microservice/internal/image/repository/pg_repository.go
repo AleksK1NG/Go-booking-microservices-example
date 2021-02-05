@@ -39,8 +39,6 @@ func (i *ImagePGRepository) GetImageByID(ctx context.Context, imageID uuid.UUID)
 	span, ctx := opentracing.StartSpanFromContext(ctx, "ImagePGRepository.GetImageByID")
 	defer span.Finish()
 
-	getImageByIDQuery := `SELECT image_id, image_url, is_uploaded, created_at, updated_at FROM images WHERE image_id = $1`
-
 	var img models.Image
 	if err := i.pgxPool.QueryRow(ctx, getImageByIDQuery, imageID).Scan(
 		&img.ImageID,
