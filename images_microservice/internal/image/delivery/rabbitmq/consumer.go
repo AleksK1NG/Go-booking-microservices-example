@@ -13,11 +13,19 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/pkg/rabbitmq"
 )
 
+type Consumer struct {
+	Worker         func(ctx context.Context, wg *sync.WaitGroup, messages <-chan amqp.Delivery)
+	WorkerPoolSize int
+	QueueName      string
+	ConsumerTag    string
+}
+
 type ImageConsumer struct {
-	amqpConn *amqp.Connection
-	logger   logger.Logger
-	cfg      *config.Config
-	imageUC  image.UseCase
+	amqpConn  *amqp.Connection
+	logger    logger.Logger
+	cfg       *config.Config
+	imageUC   image.UseCase
+	consumers []*Consumer
 }
 
 func NewImageConsumer(logger logger.Logger, cfg *config.Config, imageUC image.UseCase) *ImageConsumer {
@@ -138,30 +146,39 @@ func (c *ImageConsumer) startConsume(
 	return chanErr
 }
 
-func (c *ImageConsumer) RunConsumers(ctx context.Context, cancel context.CancelFunc) {
-	go func() {
-		if err := c.startConsume(
-			ctx,
-			c.resizeWorker,
-			ResizeWorkers,
-			ResizeQueueName,
-			ResizeConsumerTag,
-		); err != nil {
-			c.logger.Errorf("StartResizeConsumer: %v", err)
-			cancel()
-		}
-	}()
+func (c *ImageConsumer) AddConsumer(consumer *Consumer) {
+	c.consumers = append(c.consumers, consumer)
+}
 
-	go func() {
-		if err := c.startConsume(
-			ctx,
-			c.createImageWorker,
-			CreateWorkers,
-			CreateQueueName,
-			CreateConsumerTag,
-		); err != nil {
-			c.logger.Errorf("StarCreateConsumer: %v", err)
-			cancel()
-		}
-	}()
+func (c *ImageConsumer) run(ctx context.Context, cancel context.CancelFunc) {
+	for _, cs := range c.consumers {
+		go func(consumer *Consumer) {
+			if err := c.startConsume(
+				ctx,
+				consumer.Worker,
+				consumer.WorkerPoolSize,
+				consumer.QueueName,
+				consumer.ConsumerTag,
+			); err != nil {
+				c.logger.Errorf("StartResizeConsumer: %v", err)
+				cancel()
+			}
+		}(cs)
+	}
+}
+
+func (c *ImageConsumer) RunConsumers(ctx context.Context, cancel context.CancelFunc) {
+	c.AddConsumer(&Consumer{
+		Worker:         c.resizeWorker,
+		WorkerPoolSize: ResizeWorkers,
+		QueueName:      ResizeQueueName,
+		ConsumerTag:    ResizeConsumerTag,
+	})
+	c.AddConsumer(&Consumer{
+		Worker:         c.createImageWorker,
+		WorkerPoolSize: CreateWorkers,
+		QueueName:      CreateQueueName,
+		ConsumerTag:    CreateConsumerTag,
+	})
+	c.run(ctx, cancel)
 }
