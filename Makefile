@@ -58,7 +58,7 @@ logs-local:
 
 
 # ==============================================================================
-# Go migrate postgresql
+# Go migrate postgresql User service
 
 user_dbname = user_db
 user_port = 5433
@@ -78,7 +78,7 @@ migrate_user_db_down:
 
 
 # ==============================================================================
-# Go migrate postgresql
+# Go migrate postgresql Images service
 
 images_dbname = images_db
 images_port = 5434
@@ -95,6 +95,27 @@ migrate_images_db_up:
 
 migrate_images_db_down:
 	migrate -database postgres://postgres:postgres@localhost:$(images_port)/$(images_dbname)?sslmode=$(images_SSL_MODE) -path images_microservice/migrations down 1
+
+
+# ==============================================================================
+# Go migrate postgresql Hotels service
+
+hotels_dbname = hotels_db
+hotels_port = 5435
+hotels_SSL_MODE = disable
+
+force_hotels_db:
+	migrate -database postgres://postgres:postgres@localhost:$(hotels_port)/$(hotels_dbname)?sslmode=$(hotels_SSL_MODE) -path hotels/migrations force 1
+
+version_hotels_db:
+	migrate -database postgres://postgres:postgres@localhost:$(hotels_port)/$(hotels_dbname)?sslmode=$(hotels_SSL_MODE) -path hotels/migrations version
+
+migrate_hotels_db_up:
+	migrate -database postgres://postgres:postgres@localhost:$(hotels_port)/$(hotels_dbname)?sslmode=$(hotels_SSL_MODE) -path hotels/migrations up 1
+
+migrate_hotels_db_down:
+	migrate -database postgres://postgres:postgres@localhost:$(hotels_port)/$(hotels_dbname)?sslmode=$(hotels_SSL_MODE) -path hotels/migrations down 1
+
 
 
 # ==============================================================================
