@@ -6,9 +6,7 @@ import (
 )
 
 // NullString SQL Null JSON string
-type NullString struct {
-	sql.NullString
-}
+type NullString sql.NullString
 
 // MarshalJSON
 func (n *NullString) MarshalJSON() ([]byte, error) {
@@ -36,9 +34,7 @@ func (n *NullString) UnmarshalJSON(bytes []byte) error {
 }
 
 // NullString SQL Null JSON float64
-type NullFloat64 struct {
-	sql.NullFloat64
-}
+type NullFloat64 sql.NullFloat64
 
 // MarshalJSON
 func (n *NullFloat64) MarshalJSON() ([]byte, error) {
