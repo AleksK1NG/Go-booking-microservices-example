@@ -29,6 +29,25 @@ services:
     networks:
       - hotels_network
 
+  postgesql_hotels:
+    image: kartoza/postgis:13.0
+    container_name: hotels_postgesql
+    expose:
+      - "5435"
+    ports:
+      - "5435:5432"
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=hotels_db
+      - POSTGRES_HOST=5435
+    command: -p 5435
+    volumes:
+      - ./hotels_pgdata:/var/lib/postgresql/data
+    networks:
+      - hotels_network
+
   postgesql_main:
     image: kartoza/postgis:13.0
     container_name: main_postgesql

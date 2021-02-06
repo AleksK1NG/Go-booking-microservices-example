@@ -32,10 +32,10 @@ HttpServer:
 
 postgres:
   PostgresqlHost: localhost
-  PostgresqlPort: 5434
+  PostgresqlPort: 5435
   PostgresqlUser: postgres
   PostgresqlPassword: postgres
-  PostgresqlDbname: images_db
+  PostgresqlDbname: hotels_db
   PostgresqlSslmode: "disable"
   PgDriver: pgx
 
