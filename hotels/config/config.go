@@ -121,7 +121,7 @@ func LoadConfig(filename string) (*viper.Viper, error) {
 	v := viper.New()
 
 	v.SetConfigName(filename)
-	v.AddConfigPath("./hotels")
+	v.AddConfigPath(".")
 	v.AutomaticEnv()
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
