@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+//protoc --go_out=plugins=grpc:. *.proto
+
+package hotelsService;
+option go_package = ".;hotelsService";
+
+
+message Hotel {
+  string HotelID = 1;
+  string Name = 2;
+  string Email = 3;
+  string Country = 4;
+  string City = 5;
+  string Description = 6;
+  string Location = 7;
+  double Rating = 8;
+  string Image = 9;
+  repeated string Photos = 10;
+  int64 CommentsCount = 11;
+  double Latitude = 12;
+  double Longitude = 13;
+  google.protobuf.Timestamp CreatedAt = 14;
+  google.protobuf.Timestamp UpdatedAt = 15;
+}
+
+message GetByIDReq {
+  string HotelID = 1;
+}
+
+message GetByIDRes {
+  Hotel Hotel = 1;
+}
+
+message CreateHotelReq {
+  Hotel Hotel = 1;
+}
+
+message CreateHotelRes {
+  Hotel Hotel = 1;
+}
+
+message UpdateHotelReq {
+  Hotel Hotel = 1;
+}
+
+message UpdateHotelRes {
+  Hotel Hotel = 1;
+}
+
+service HotelsService {
+  rpc CreateHotel(CreateHotelReq) returns (CreateHotelRes) {}
+  rpc UpdateHotel(UpdateHotelReq) returns (UpdateHotelRes) {}
+  rpc GetHotelByID(GetByIDReq) returns (GetByIDRes) {}
+}

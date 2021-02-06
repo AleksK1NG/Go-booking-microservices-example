@@ -2,12 +2,12 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/opentracing/opentracing-go"
 
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/config"
+	"github.com/AleksK1NG/hotels-mocroservices/hotels/internal/server"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/jaeger"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/logger"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/postgres"
@@ -57,5 +57,6 @@ func main() {
 	log.Printf("%-v", pgxConn.Stat())
 	log.Printf("%-v", redisClient.PoolStats())
 
-	http.ListenAndServe(":7777", nil)
+	s := server.NewServer(appLogger, cfg, redisClient, pgxConn, tracer)
+	appLogger.Fatal(s.Run())
 }
