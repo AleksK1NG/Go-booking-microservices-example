@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/go-redis/redis/v8"
-	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpcrecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
@@ -19,7 +18,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
-	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
@@ -32,10 +30,10 @@ import (
 	hotelsService "github.com/AleksK1NG/hotels-mocroservices/hotels/proto/hotels"
 )
 
-var (
-	zapLogger  *zap.Logger
-	customFunc grpc_zap.CodeToLevel
-)
+// var (
+// 	zapLogger  *zap.Logger
+// 	customFunc grpc_zap.CodeToLevel
+// )
 
 // Server
 type Server struct {
@@ -85,7 +83,7 @@ func (s *Server) Run() error {
 			grpc_opentracing.UnaryServerInterceptor(),
 			grpc_prometheus.UnaryServerInterceptor,
 			grpcrecovery.UnaryServerInterceptor(),
-			grpc_zap.UnaryServerInterceptor(zapLogger),
+			// grpc_zap.UnaryServerInterceptor(zapLogger),
 			// im.Logger,
 		),
 		// grpc_middleware.WithUnaryServerChain(

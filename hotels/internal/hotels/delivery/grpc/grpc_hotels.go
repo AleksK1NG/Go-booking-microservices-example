@@ -4,9 +4,13 @@ import (
 	"context"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/opentracing/opentracing-go"
 
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/internal/hotels"
+	"github.com/AleksK1NG/hotels-mocroservices/hotels/internal/models"
+	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/grpc_errors"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/logger"
+	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/types"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/proto/hotels"
 )
 
@@ -21,7 +25,41 @@ func NewHotelsService(hotelsUC hotels.UseCase, logger logger.Logger, validate *v
 }
 
 func (h *HotelsService) CreateHotel(ctx context.Context, req *hotelsService.CreateHotelReq) (*hotelsService.CreateHotelRes, error) {
-	panic("implement me")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsService.CreateHotel")
+	defer span.Finish()
+
+	h.logger.Infof("request :%-v", req)
+
+	hotel := &models.Hotel{
+		Name:          req.GetName(),
+		Email:         req.GetEmail(),
+		Country:       req.GetCountry(),
+		City:          req.GetCity(),
+		Description:   req.GetDescription(),
+		Image:         types.NullString{String: req.GetImage(), Valid: true},
+		Photos:        req.Photos,
+		CommentsCount: int(req.CommentsCount),
+		Latitude:      types.NullFloat64{Float64: req.GetLatitude(), Valid: true},
+		Longitude:     types.NullFloat64{Float64: req.GetLongitude(), Valid: true},
+		Location:      req.Location,
+		Rating:        req.GetRating(),
+	}
+
+	if err := h.validate.StructCtx(ctx, hotel); err != nil {
+		h.logger.Errorf("validate.StructCtx: %v", err)
+		return nil, grpc_errors.ErrorResponse(err, err.Error())
+	}
+
+	createdHotel, err := h.hotelsUC.CreateHotel(ctx, hotel)
+	if err != nil {
+		h.logger.Errorf("hotelsUC.CreateHotel: %v", err)
+		return nil, grpc_errors.ErrorResponse(err, "userUC.GetByID")
+	}
+
+	h.logger.Infof("CREATED HOTEL: %-v", createdHotel)
+	h.logger.Infof("CREATED HOTEL createdHotel.ToProto(): %-v", createdHotel.ToProto())
+
+	return &hotelsService.CreateHotelRes{Hotel: createdHotel.ToProto()}, nil
 }
 
 func (h *HotelsService) UpdateHotel(ctx context.Context, req *hotelsService.UpdateHotelReq) (*hotelsService.UpdateHotelRes, error) {
