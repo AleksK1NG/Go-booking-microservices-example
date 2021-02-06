@@ -4,7 +4,10 @@ import (
 	"log"
 	"os"
 
+	"github.com/opentracing/opentracing-go"
+
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/config"
+	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/jaeger"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/logger"
 )
 
@@ -28,4 +31,14 @@ func main() {
 	appLogger.Infof("Success parsed config: %#v", cfg.GRPCServer.AppVersion)
 
 	log.Printf("CFG: %-v", cfg)
+
+	tracer, closer, err := jaeger.InitJaeger(cfg)
+	if err != nil {
+		appLogger.Fatal("cannot create tracer", err)
+	}
+	appLogger.Info("Jaeger connected")
+
+	opentracing.SetGlobalTracer(tracer)
+	defer closer.Close()
+	appLogger.Info("Opentracing connected")
 }
