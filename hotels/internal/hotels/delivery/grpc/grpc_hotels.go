@@ -11,7 +11,6 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/internal/models"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/grpc_errors"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/logger"
-	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/types"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/proto/hotels"
 )
 
@@ -25,6 +24,7 @@ func NewHotelsService(hotelsUC hotels.UseCase, logger logger.Logger, validate *v
 	return &HotelsService{hotelsUC: hotelsUC, logger: logger, validate: validate}
 }
 
+// CreateHotel create new hotel
 func (h *HotelsService) CreateHotel(ctx context.Context, req *hotelsService.CreateHotelReq) (*hotelsService.CreateHotelRes, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsService.CreateHotel")
 	defer span.Finish()
@@ -37,11 +37,11 @@ func (h *HotelsService) CreateHotel(ctx context.Context, req *hotelsService.Crea
 		Country:       req.GetCountry(),
 		City:          req.GetCity(),
 		Description:   req.GetDescription(),
-		Image:         types.NullString{String: req.GetImage(), Valid: true},
+		Image:         &req.Image,
 		Photos:        req.Photos,
 		CommentsCount: int(req.CommentsCount),
-		Latitude:      types.NullFloat64{Float64: req.GetLatitude(), Valid: true},
-		Longitude:     types.NullFloat64{Float64: req.GetLongitude(), Valid: true},
+		Latitude:      &req.Latitude,
+		Longitude:     &req.Longitude,
 		Location:      req.Location,
 		Rating:        req.GetRating(),
 	}
@@ -63,10 +63,43 @@ func (h *HotelsService) CreateHotel(ctx context.Context, req *hotelsService.Crea
 	return &hotelsService.CreateHotelRes{Hotel: createdHotel.ToProto()}, nil
 }
 
+// UpdateHotel update existing hotel
 func (h *HotelsService) UpdateHotel(ctx context.Context, req *hotelsService.UpdateHotelReq) (*hotelsService.UpdateHotelRes, error) {
-	panic("implement me")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsService.UpdateHotel")
+	defer span.Finish()
+
+	h.logger.Infof("request :%-v", req)
+
+	hotel := &models.Hotel{
+		Name:          req.GetName(),
+		Email:         req.GetEmail(),
+		Country:       req.GetCountry(),
+		City:          req.GetCity(),
+		Description:   req.GetDescription(),
+		Image:         &req.Image,
+		Photos:        req.Photos,
+		CommentsCount: int(req.CommentsCount),
+		Latitude:      &req.Latitude,
+		Longitude:     &req.Longitude,
+		Location:      req.Location,
+		Rating:        req.GetRating(),
+	}
+
+	if err := h.validate.StructCtx(ctx, hotel); err != nil {
+		h.logger.Errorf("validate.StructCtx: %v", err)
+		return nil, grpc_errors.ErrorResponse(err, err.Error())
+	}
+
+	updatedHotel, err := h.hotelsUC.UpdateHotel(ctx, hotel)
+	if err != nil {
+		h.logger.Errorf("hotelsUC.UpdateHotel: %v", err)
+		return nil, grpc_errors.ErrorResponse(err, err.Error())
+	}
+
+	return &hotelsService.UpdateHotelRes{Hotel: updatedHotel.ToProto()}, err
 }
 
+// GetHotelByID get hotel by uuid
 func (h *HotelsService) GetHotelByID(ctx context.Context, req *hotelsService.GetByIDReq) (*hotelsService.GetByIDRes, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsService.GetHotelByID")
 	defer span.Finish()
