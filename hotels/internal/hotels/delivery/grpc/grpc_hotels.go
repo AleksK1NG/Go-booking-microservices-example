@@ -70,7 +70,14 @@ func (h *HotelsService) UpdateHotel(ctx context.Context, req *hotelsService.Upda
 
 	h.logger.Infof("request :%-v", req)
 
+	hotelUUID, err := uuid.FromString(req.GetHotelID())
+	if err != nil {
+		h.logger.Errorf("uuid.FromString: %v", err)
+		return nil, grpc_errors.ErrorResponse(err, "uuid.FromString")
+	}
+
 	hotel := &models.Hotel{
+		HotelID:       hotelUUID,
 		Name:          req.GetName(),
 		Email:         req.GetEmail(),
 		Country:       req.GetCountry(),
