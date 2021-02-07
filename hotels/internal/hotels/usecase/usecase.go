@@ -9,6 +9,7 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/internal/hotels"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/internal/models"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/logger"
+	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/utils"
 )
 
 // HotelsUC Hotels usecase
@@ -44,4 +45,11 @@ func (h *HotelsUC) GetHotelByID(ctx context.Context, hotelID uuid.UUID) (*models
 	defer span.Finish()
 
 	return h.hotelsRepo.GetHotelByID(ctx, hotelID)
+}
+
+func (h *HotelsUC) GetHotels(ctx context.Context, query *utils.PaginationQuery) ([]*models.Hotel, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsUC.CreateHotel")
+	defer span.Finish()
+
+	return h.hotelsRepo.GetHotels(ctx, query)
 }

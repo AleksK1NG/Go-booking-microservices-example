@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/opentracing/opentracing-go"
@@ -12,14 +13,17 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/utils"
 )
 
+// HotelsPGRepository
 type HotelsPGRepository struct {
 	db *pgxpool.Pool
 }
 
+// NewHotelsPGRepository
 func NewHotelsPGRepository(db *pgxpool.Pool) *HotelsPGRepository {
 	return &HotelsPGRepository{db: db}
 }
 
+// CreateHotel
 func (h *HotelsPGRepository) CreateHotel(ctx context.Context, hotel *models.Hotel) (*models.Hotel, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsPGRepository.CreateHotel")
 	defer span.Finish()
@@ -119,4 +123,53 @@ func (h *HotelsPGRepository) GetHotelByID(ctx context.Context, hotelID uuid.UUID
 	}
 
 	return &hotel, nil
+}
+
+// GetHotels
+func (h *HotelsPGRepository) GetHotels(ctx context.Context, query *utils.PaginationQuery) ([]*models.Hotel, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsPGRepository.GetHotels")
+	defer span.Finish()
+
+	getHotelsQuery := `SELECT hotel_id, email, name, location, description, comments_count, 
+       	country, city, ((coordinates::POINT)[0])::decimal, ((coordinates::POINT)[1])::decimal, rating, photos, image, created_at, updated_at 
+       	FROM hotels OFFSET $1 LIMIT $2`
+
+	rows, err := h.db.Query(ctx, getHotelsQuery, query.GetOffset(), query.GetLimit())
+	if err != nil {
+		return nil, errors.Wrap(err, "db.Query")
+	}
+	defer rows.Close()
+
+	hotels := make([]*models.Hotel, 0, query.GetLimit())
+	for rows.Next() {
+		var hotel models.Hotel
+		if err := rows.Scan(
+			&hotel.HotelID,
+			&hotel.Email,
+			&hotel.Name,
+			&hotel.Location,
+			&hotel.Description,
+			&hotel.CommentsCount,
+			&hotel.Country,
+			&hotel.City,
+			&hotel.Latitude,
+			&hotel.Longitude,
+			&hotel.Rating,
+			&hotel.Photos,
+			&hotel.Image,
+			&hotel.CreatedAt,
+			&hotel.UpdatedAt,
+		); err != nil {
+			return nil, errors.Wrap(err, "rows.Scan")
+		}
+		hotels = append(hotels, &hotel)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "rows.Err")
+	}
+
+	log.Printf("HOTELS: %-v", hotels)
+
+	return hotels, nil
 }
