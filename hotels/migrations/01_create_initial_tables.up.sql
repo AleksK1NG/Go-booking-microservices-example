@@ -25,8 +25,10 @@ create table hotels
 );
 
 CREATE INDEX if not exists hotels_gist_idx ON hotels USING gist (coordinates);
+
 CREATE INDEX hotels_name_trgm_idx ON hotels
     USING gist (name);
+
 CREATE INDEX hotels_location_trgm_idx ON hotels
     USING gist (location);
 
