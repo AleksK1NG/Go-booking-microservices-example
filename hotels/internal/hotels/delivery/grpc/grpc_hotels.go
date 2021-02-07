@@ -11,9 +11,11 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/internal/models"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/grpc_errors"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/logger"
+	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/utils"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/proto/hotels"
 )
 
+// HotelsService
 type HotelsService struct {
 	hotelsUC hotels.UseCase
 	logger   logger.Logger
@@ -124,4 +126,27 @@ func (h *HotelsService) GetHotelByID(ctx context.Context, req *hotelsService.Get
 	}
 
 	return &hotelsService.GetByIDRes{Hotel: hotel.ToProto()}, nil
+}
+
+// GetHotels
+func (h *HotelsService) GetHotels(ctx context.Context, req *hotelsService.GetHotelsReq) (*hotelsService.GetHotelsRes, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsService.GetHotels")
+	defer span.Finish()
+
+	query := utils.NewPaginationQuery(int(req.GetSize()), int(req.GetPage()))
+
+	hotelsList, err := h.hotelsUC.GetHotels(ctx, query)
+	if err != nil {
+		h.logger.Errorf("hotelsUC.GetHotels: %v", err)
+		return nil, grpc_errors.ErrorResponse(err, "hotelsUC.GetHotels")
+	}
+
+	return &hotelsService.GetHotelsRes{
+		TotalCount: int64(hotelsList.TotalCount),
+		TotalPages: int64(hotelsList.TotalPages),
+		Page:       int64(hotelsList.Page),
+		Size:       int64(hotelsList.Size),
+		HasMore:    hotelsList.HasMore,
+		Hotels:     hotelsList.ToProto(),
+	}, nil
 }

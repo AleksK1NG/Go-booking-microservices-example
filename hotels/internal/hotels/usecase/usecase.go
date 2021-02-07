@@ -47,7 +47,7 @@ func (h *HotelsUC) GetHotelByID(ctx context.Context, hotelID uuid.UUID) (*models
 	return h.hotelsRepo.GetHotelByID(ctx, hotelID)
 }
 
-func (h *HotelsUC) GetHotels(ctx context.Context, query *utils.PaginationQuery) ([]*models.Hotel, error) {
+func (h *HotelsUC) GetHotels(ctx context.Context, query *utils.PaginationQuery) (*models.HotelsList, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsUC.CreateHotel")
 	defer span.Finish()
 
