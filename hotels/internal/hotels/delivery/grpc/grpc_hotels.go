@@ -150,3 +150,10 @@ func (h *HotelsService) GetHotels(ctx context.Context, req *hotelsService.GetHot
 		Hotels:     hotelsList.ToProto(),
 	}, nil
 }
+
+func (h *HotelsService) UploadImage(ctx context.Context, req *hotelsService.UploadImageReq) (*hotelsService.UploadImageRes, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsService.UploadImage")
+	defer span.Finish()
+
+	return nil, nil
+}

@@ -18,6 +18,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
@@ -64,13 +65,16 @@ func (s *Server) Run() error {
 	}
 	defer l.Close()
 
-	// opts := []grpc_zap.Option{
-	// 	grpc_zap.WithLevels(customFunc),
-	// 	grpc_zap.WithDurationField(func(duration time.Duration) zapcore.Field {
-	// 		return zap.Int64("grpc.time_ns", duration.Nanoseconds())
-	// 	}),
-	// }
-	// grpc_zap.ReplaceGrpcLoggerV2(zapLogger)
+	router := echo.New()
+	router.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
+
+	go func() {
+		if err := router.Start(s.cfg.Metrics.URL); err != nil {
+			s.logger.Errorf("router.Start metrics: %v", err)
+			cancel()
+		}
+		s.logger.Infof("Metrics available on: %v", s.cfg.Metrics.URL)
+	}()
 
 	server := grpc.NewServer(grpc.KeepaliveParams(keepalive.ServerParameters{
 		MaxConnectionIdle: s.cfg.GRPCServer.MaxConnectionIdle * time.Minute,
@@ -83,14 +87,7 @@ func (s *Server) Run() error {
 			grpc_opentracing.UnaryServerInterceptor(),
 			grpc_prometheus.UnaryServerInterceptor,
 			grpcrecovery.UnaryServerInterceptor(),
-			// grpc_zap.UnaryServerInterceptor(zapLogger),
-			// im.Logger,
 		),
-		// grpc_middleware.WithUnaryServerChain(
-		// 	grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
-		// 	grpc_zap.UnaryServerInterceptor(zapLogger, opts...),
-		// 	grpc_ctxtags.UnaryServerInterceptor(),
-		// ),
 	)
 
 	hotelsGRPCService := hotelsGrpc.NewHotelsService(hotelsUC, s.logger, validate)

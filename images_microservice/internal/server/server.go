@@ -13,8 +13,10 @@ import (
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/labstack/echo/v4"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
@@ -89,6 +91,17 @@ func (s *Server) Run() error {
 		return errors.Wrap(err, "net.Listen")
 	}
 	defer l.Close()
+
+	router := echo.New()
+	router.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
+
+	go func() {
+		if err := router.Start(s.cfg.Metrics.URL); err != nil {
+			s.logger.Errorf("router.Start metrics: %v", err)
+			cancel()
+		}
+		s.logger.Infof("Metrics available on: %v", s.cfg.Metrics.URL)
+	}()
 
 	server := grpc.NewServer(grpc.KeepaliveParams(keepalive.ServerParameters{
 		MaxConnectionIdle: s.cfg.GRPCServer.MaxConnectionIdle * time.Minute,
