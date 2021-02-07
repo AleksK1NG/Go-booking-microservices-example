@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"log"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/opentracing/opentracing-go"
@@ -51,8 +50,6 @@ func (h *HotelsPGRepository) CreateHotel(ctx context.Context, hotel *models.Hote
 	hotel.CreatedAt = res.CreatedAt
 	hotel.UpdatedAt = res.UpdatedAt
 
-	log.Printf("request :%-v", hotel)
-
 	return hotel, nil
 }
 
@@ -62,7 +59,7 @@ func (h *HotelsPGRepository) UpdateHotel(ctx context.Context, hotel *models.Hote
 	defer span.Finish()
 
 	updateHotelQuery := `UPDATE hotels 
-		SET email = COALESCE(NULLIF('', $1), email), name = $2, location = $3, description = $4, 
+		SET email = COALESCE(NULLIF($1, ''), email), name = $2, location = $3, description = $4, 
 	 	country = $5, city = $6, coordinates = ST_GeomFromEWKT($7)
 		WHERE hotel_id = $8
 	    RETURNING hotel_id, email, name, location, description, comments_count, 
@@ -81,7 +78,8 @@ func (h *HotelsPGRepository) UpdateHotel(ctx context.Context, hotel *models.Hote
 		hotel.City,
 		point,
 		hotel.HotelID,
-	).Scan(&hotel.HotelID,
+	).Scan(
+		&res.HotelID,
 		&res.Email,
 		&res.Name,
 		&res.Location,
@@ -99,8 +97,6 @@ func (h *HotelsPGRepository) UpdateHotel(ctx context.Context, hotel *models.Hote
 	); err != nil {
 		return nil, errors.Wrap(err, "db.QueryRow.Scan")
 	}
-
-	log.Printf("HOTEL BY ID: %v", res)
 
 	return &res, nil
 }
@@ -134,8 +130,6 @@ func (h *HotelsPGRepository) GetHotelByID(ctx context.Context, hotelID uuid.UUID
 	); err != nil {
 		return nil, errors.Wrap(err, "db.QueryRow.Scan")
 	}
-
-	log.Printf("HOTEL BY ID: %v", hotel)
 
 	return &hotel, nil
 }
