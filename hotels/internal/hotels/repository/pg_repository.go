@@ -130,7 +130,6 @@ func (h *HotelsPGRepository) GetHotels(ctx context.Context, query *utils.Paginat
 	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsPGRepository.GetHotels")
 	defer span.Finish()
 
-	getTotalHotelsCountQuery := `SELECT COUNT(*) as total FROM hotels`
 	var total int
 	if err := h.db.QueryRow(ctx, getTotalHotelsCountQuery).Scan(&total); err != nil {
 		return nil, errors.Wrap(err, "db.Query")
@@ -145,10 +144,6 @@ func (h *HotelsPGRepository) GetHotels(ctx context.Context, query *utils.Paginat
 			Hotels:     make([]*models.Hotel, 0),
 		}, nil
 	}
-
-	getHotelsQuery := `SELECT hotel_id, email, name, location, description, comments_count, 
-       	country, city, ((coordinates::POINT)[0])::decimal, ((coordinates::POINT)[1])::decimal, rating, photos, image, created_at, updated_at 
-       	FROM hotels OFFSET $1 LIMIT $2`
 
 	rows, err := h.db.Query(ctx, getHotelsQuery, query.GetOffset(), query.GetLimit())
 	if err != nil {
