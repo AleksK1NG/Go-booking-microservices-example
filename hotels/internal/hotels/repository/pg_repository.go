@@ -61,5 +61,35 @@ func (h *HotelsPGRepository) UpdateHotel(ctx context.Context, hotel *models.Hote
 }
 
 func (h *HotelsPGRepository) GetHotelByID(ctx context.Context, hotelID uuid.UUID) (*models.Hotel, error) {
-	panic("implement me")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsPGRepository.GetHotelByID")
+	defer span.Finish()
+
+	getHotelByIDQuery := `SELECT hotel_id, email, name, location, description, comments_count, 
+       	country, city, ((coordinates::POINT)[0])::decimal, ((coordinates::POINT)[1])::decimal, rating, photos, image, created_at, updated_at 
+		FROM hotels WHERE hotel_id = $1`
+
+	var hotel models.Hotel
+	if err := h.db.QueryRow(ctx, getHotelByIDQuery, hotelID).Scan(
+		&hotel.HotelID,
+		&hotel.Email,
+		&hotel.Name,
+		&hotel.Location,
+		&hotel.Description,
+		&hotel.CommentsCount,
+		&hotel.Country,
+		&hotel.City,
+		&hotel.Latitude,
+		&hotel.Longitude,
+		&hotel.Rating,
+		&hotel.Photos,
+		&hotel.Image,
+		&hotel.CreatedAt,
+		&hotel.UpdatedAt,
+	); err != nil {
+		return nil, errors.Wrap(err, "db.QueryRow.Scan")
+	}
+
+	log.Printf("HOTEL BY ID: %v", hotel)
+
+	return &hotel, nil
 }

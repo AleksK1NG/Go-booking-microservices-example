@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/opentracing/opentracing-go"
+	uuid "github.com/satori/go.uuid"
 
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/internal/hotels"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/internal/models"
@@ -67,5 +68,20 @@ func (h *HotelsService) UpdateHotel(ctx context.Context, req *hotelsService.Upda
 }
 
 func (h *HotelsService) GetHotelByID(ctx context.Context, req *hotelsService.GetByIDReq) (*hotelsService.GetByIDRes, error) {
-	panic("implement me")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsService.GetHotelByID")
+	defer span.Finish()
+
+	hotelUUID, err := uuid.FromString(req.GetHotelID())
+	if err != nil {
+		h.logger.Errorf("uuid.FromString: %v", err)
+		return nil, grpc_errors.ErrorResponse(err, "uuid.FromString")
+	}
+
+	hotel, err := h.hotelsUC.GetHotelByID(ctx, hotelUUID)
+	if err != nil {
+		h.logger.Errorf("hotelsUC.GetHotelByID: %v", err)
+		return nil, grpc_errors.ErrorResponse(err, "hotelsUC.GetHotelByID")
+	}
+
+	return &hotelsService.GetByIDRes{Hotel: hotel.ToProto()}, nil
 }
