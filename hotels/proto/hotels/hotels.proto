@@ -34,6 +34,20 @@ message GetByIDRes {
   Hotel Hotel = 1;
 }
 
+message GetHotelsReq {
+  int64 page = 1;
+  int64 size = 2;
+}
+
+message GetHotelsRes {
+  int64 TotalCount = 1;
+  int64 TotalPages = 2;
+  int64 Page = 3;
+  int64 Size = 4;
+  bool HasMore = 5;
+  repeated Hotel Hotels = 6;
+}
+
 message CreateHotelReq {
   string Name = 1;
   string Email = 2;
@@ -77,4 +91,5 @@ service HotelsService {
   rpc CreateHotel(CreateHotelReq) returns (CreateHotelRes) {}
   rpc UpdateHotel(UpdateHotelReq) returns (UpdateHotelRes) {}
   rpc GetHotelByID(GetByIDReq) returns (GetByIDRes) {}
+  rpc GetHotels(GetHotelsReq) returns (GetHotelsRes) {}
 }

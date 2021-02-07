@@ -19,6 +19,11 @@ type PaginationQuery struct {
 	OrderBy string `json:"orderBy,omitempty"`
 }
 
+// NewPaginationQuery
+func NewPaginationQuery(size int, page int) *PaginationQuery {
+	return &PaginationQuery{Size: size, Page: page}
+}
+
 // Set page size
 func (q *PaginationQuery) SetSize(sizeQuery string) error {
 	if sizeQuery == "" {
@@ -101,12 +106,13 @@ func GetPaginationFromCtx(c echo.Context) (*PaginationQuery, error) {
 }
 
 // Get total pages int
-func (q *PaginationQuery) GetTotalPages(totalCount int, pageSize int) int {
-	d := float64(totalCount) / float64(pageSize)
+func (q *PaginationQuery) GetTotalPages(totalCount int) int {
+	// d := float64(totalCount) / float64(pageSize)
+	d := float64(totalCount) / float64(q.GetSize())
 	return int(math.Ceil(d))
 }
 
 // Get has more
-func (q *PaginationQuery) GetHasMore(currentPage int, totalCount int, pageSize int) bool {
-	return currentPage < totalCount/pageSize
+func (q *PaginationQuery) GetHasMore(totalCount int) bool {
+	return q.GetPage() < totalCount/q.GetSize()
 }

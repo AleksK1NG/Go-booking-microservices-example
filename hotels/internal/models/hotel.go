@@ -46,3 +46,21 @@ func (h *Hotel) ToProto() *hotelsService.Hotel {
 		UpdatedAt:     timestamppb.New(*h.UpdatedAt),
 	}
 }
+
+// All Hotels response with pagination
+type HotelsList struct {
+	TotalCount int      `json:"totalCount"`
+	TotalPages int      `json:"totalPages"`
+	Page       int      `json:"page"`
+	Size       int      `json:"size"`
+	HasMore    bool     `json:"hasMore"`
+	Hotels     []*Hotel `json:"comments"`
+}
+
+func (h *HotelsList) ToProto() []*hotelsService.Hotel {
+	hotelsList := make([]*hotelsService.Hotel, 0, len(h.Hotels))
+	for _, hotel := range h.Hotels {
+		hotelsList = append(hotelsList, hotel.ToProto())
+	}
+	return hotelsList
+}
