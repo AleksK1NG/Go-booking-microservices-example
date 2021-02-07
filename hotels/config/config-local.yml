@@ -59,7 +59,7 @@ redis:
   DB: 0
 
 metrics:
-  Url: 0.0.0.0:7071
+  Url: 0.0.0.0:7075
   ServiceName: hotels_microservice
 
 jaeger:

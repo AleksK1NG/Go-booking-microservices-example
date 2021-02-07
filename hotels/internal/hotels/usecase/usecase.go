@@ -47,9 +47,18 @@ func (h *HotelsUC) GetHotelByID(ctx context.Context, hotelID uuid.UUID) (*models
 	return h.hotelsRepo.GetHotelByID(ctx, hotelID)
 }
 
+// GetHotels
 func (h *HotelsUC) GetHotels(ctx context.Context, query *utils.PaginationQuery) (*models.HotelsList, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsUC.CreateHotel")
 	defer span.Finish()
 
 	return h.hotelsRepo.GetHotels(ctx, query)
+}
+
+// UploadImage
+func (h *HotelsUC) UploadImage(ctx context.Context, hotelID uuid.UUID, data []byte) (*models.Hotel, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsUC.UploadImage")
+	defer span.Finish()
+
+	return nil, nil
 }

@@ -71,10 +71,10 @@ redis:
   DB: 0
 
 metrics:
-  Url: 0.0.0.0:7071
-  ServiceName: user_microservice
+  Url: 0.0.0.0:7074
+  ServiceName: images_microservice
 
 jaeger:
   Host: localhost:6831
-  ServiceName: UserService_GRPC
+  ServiceName: ImagesService_GRPC
   LogSpans: false

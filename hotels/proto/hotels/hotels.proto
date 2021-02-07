@@ -87,9 +87,20 @@ message UpdateHotelRes {
   Hotel Hotel = 1;
 }
 
+message UploadImageReq {
+  string HotelID = 1;
+  bytes Data = 2;
+}
+
+message UploadImageRes {
+  Hotel Hotel = 1;
+}
+
+
 service HotelsService {
   rpc CreateHotel(CreateHotelReq) returns (CreateHotelRes) {}
   rpc UpdateHotel(UpdateHotelReq) returns (UpdateHotelRes) {}
   rpc GetHotelByID(GetByIDReq) returns (GetByIDRes) {}
   rpc GetHotels(GetHotelsReq) returns (GetHotelsRes) {}
+  rpc UploadImage(UploadImageReq) returns (UploadImageRes) {}
 }
