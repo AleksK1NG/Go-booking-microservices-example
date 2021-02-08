@@ -4,6 +4,9 @@ import (
 	"time"
 
 	uuid "github.com/satori/go.uuid"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	commentsService "github.com/AleksK1NG/hotels-mocroservices/comments/proto"
 )
 
 // Comment
@@ -16,4 +19,18 @@ type Comment struct {
 	Rating    float64    `json:"rating" validate:"required,min=0,max=10"`
 	CreatedAt *time.Time `json:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at"`
+}
+
+// ToProto
+func (c *Comment) ToProto() *commentsService.Comment {
+	return &commentsService.Comment{
+		CommentID: c.CommentID.String(),
+		HotelID:   c.HotelID.String(),
+		UserID:    c.UserID.String(),
+		Message:   c.Message,
+		Photos:    c.Photos,
+		Rating:    c.Rating,
+		CreatedAt: timestamppb.New(*c.CreatedAt),
+		UpdatedAt: timestamppb.New(*c.UpdatedAt),
+	}
 }
