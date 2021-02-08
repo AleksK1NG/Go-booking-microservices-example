@@ -63,7 +63,7 @@ services:
       - POSTGRES_HOST=5436
     command: -p 5436
     volumes:
-      - ./hotels_pgdata:/var/lib/postgresql/data
+      - ./comments_pgdata:/var/lib/postgresql/data
     networks:
       - hotels_network
 

@@ -17,6 +17,7 @@ create table comments
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX IF NOT EXISTS hotel_id_idx ON comments (hotel_id);
 
 CREATE OR REPLACE FUNCTION comment_updated() RETURNS TRIGGER AS
 $$
