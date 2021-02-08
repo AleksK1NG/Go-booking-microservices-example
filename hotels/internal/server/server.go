@@ -25,16 +25,12 @@ import (
 
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/config"
 	hotelsGrpc "github.com/AleksK1NG/hotels-mocroservices/hotels/internal/hotels/delivery/grpc"
+	"github.com/AleksK1NG/hotels-mocroservices/hotels/internal/hotels/delivery/rabbitmq"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/internal/hotels/repository"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/internal/hotels/usecase"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/logger"
 	hotelsService "github.com/AleksK1NG/hotels-mocroservices/hotels/proto/hotels"
 )
-
-// var (
-// 	zapLogger  *zap.Logger
-// 	customFunc grpc_zap.CodeToLevel
-// )
 
 // Server
 type Server struct {
@@ -55,18 +51,30 @@ func (s *Server) Run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	hp, err := rabbitmq.NewHotelsPublisher(s.cfg, s.logger)
+	if err != nil {
+		return errors.Wrap(err, "NewHotelsPublisher")
+	}
+
 	validate := validator.New()
 	hotelsPGRepo := repository.NewHotelsPGRepository(s.pgxPool)
-	hotelsUC := usecase.NewHotelsUC(hotelsPGRepo, s.logger)
+	hotelsUC := usecase.NewHotelsUC(hotelsPGRepo, s.logger, hp)
 
 	l, err := net.Listen("tcp", s.cfg.GRPCServer.Port)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "net.Listen")
 	}
 	defer l.Close()
 
 	router := echo.New()
 	router.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
+
+	hotelsConsumer := rabbitmq.NewHotelsConsumer(s.logger, s.cfg, hotelsUC)
+	if err := hotelsConsumer.Initialize(); err != nil {
+		return errors.Wrap(err, "hotelsConsumer.Initialize")
+	}
+	hotelsConsumer.RunConsumers(ctx, cancel)
+	defer hotelsConsumer.CloseChannels()
 
 	go func() {
 		if err := router.Start(s.cfg.Metrics.URL); err != nil {

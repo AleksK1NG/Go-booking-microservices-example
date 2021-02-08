@@ -4,6 +4,7 @@ import (
 	"context"
 
 	uuid "github.com/satori/go.uuid"
+	"github.com/streadway/amqp"
 
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/internal/models"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/utils"
@@ -16,4 +17,5 @@ type UseCase interface {
 	GetHotelByID(ctx context.Context, hotelID uuid.UUID) (*models.Hotel, error)
 	GetHotels(ctx context.Context, query *utils.PaginationQuery) (*models.HotelsList, error)
 	UploadImage(ctx context.Context, hotelID uuid.UUID, data []byte) (*models.Hotel, error)
+	UpdateHotelImage(ctx context.Context, delivery amqp.Delivery) error
 }
