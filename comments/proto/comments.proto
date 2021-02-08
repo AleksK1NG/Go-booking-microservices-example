@@ -10,28 +10,24 @@ option go_package = ".;commentsService";
 
 message Comment {
   string CommentID = 1;
-  string Name = 2;
-  string Email = 3;
-  string Country = 4;
-  string City = 5;
-  string Description = 6;
-  string Location = 7;
-  double Rating = 8;
-  string Image = 9;
-  repeated string Photos = 10;
-  int64 CommentsCount = 11;
-  double Latitude = 12;
-  double Longitude = 13;
-  google.protobuf.Timestamp CreatedAt = 14;
-  google.protobuf.Timestamp UpdatedAt = 15;
+  string HotelID = 2;
+  string UserID = 3;
+  string Message = 4;
+  repeated string Photos = 5;
+  double Rating = 6;
+  google.protobuf.Timestamp CreatedAt = 7;
+  google.protobuf.Timestamp UpdatedAt = 8;
 }
 
-message CreateReq {
-
+message CreateCommentReq {
+  Comment Comment = 1;
 }
 
+message CreateCommentRes {
+  Comment Comment = 1;
+}
 
 
 service commentsService {
-  rpc CreateComment(CreateHotelReq) returns (CreateHotelRes) {}
+  rpc CreateComment(CreateCommentReq) returns (CreateCommentRes) {}
 }
