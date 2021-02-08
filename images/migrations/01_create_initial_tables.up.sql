@@ -3,8 +3,6 @@ DROP TABLE IF EXISTS images CASCADE;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS CITEXT;
 
-
-
 CREATE TABLE images
 (
     image_id    UUID PRIMARY KEY         DEFAULT uuid_generate_v4(),
