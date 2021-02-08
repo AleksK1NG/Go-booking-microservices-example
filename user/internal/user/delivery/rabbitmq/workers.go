@@ -8,16 +8,17 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func (c *HotelsConsumer) updateImageWorker(ctx context.Context, wg *sync.WaitGroup, messages <-chan amqp.Delivery) {
+func (c *UserConsumer) imagesWorker(ctx context.Context, wg *sync.WaitGroup, messages <-chan amqp.Delivery) {
 	defer wg.Done()
+
 	for delivery := range messages {
-		span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsConsumer.uploadImageWorker")
+		span, ctx := opentracing.StartSpanFromContext(ctx, "ImageConsumer.resizeWorker")
 
 		c.logger.Infof("processDeliveries deliveryTag% v", delivery.DeliveryTag)
 
 		incomingMessages.Inc()
 
-		err := c.hotelsUC.UpdateHotelImage(ctx, delivery)
+		err := c.userUC.UpdateUploadedAvatar(ctx, delivery)
 		if err != nil {
 			if err := delivery.Reject(false); err != nil {
 				c.logger.Errorf("Err delivery.Reject: %v", err)

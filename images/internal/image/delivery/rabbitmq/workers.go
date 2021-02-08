@@ -57,6 +57,8 @@ func (c *ImageConsumer) createImageWorker(ctx context.Context, wg *sync.WaitGrou
 			err = delivery.Ack(false)
 			if err != nil {
 				c.logger.Errorf("Failed to acknowledge delivery: %v", err)
+				errorMessages.Inc()
+				continue
 			}
 			successMessages.Inc()
 		}
@@ -86,6 +88,8 @@ func (c *ImageConsumer) processHotelImageWorker(ctx context.Context, wg *sync.Wa
 			err = delivery.Ack(false)
 			if err != nil {
 				c.logger.Errorf("Failed to acknowledge delivery: %v", err)
+				errorMessages.Inc()
+				continue
 			}
 			successMessages.Inc()
 		}
