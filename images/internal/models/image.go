@@ -40,3 +40,9 @@ func (i *Image) ToProto() *imageService.Image {
 		CreatedAt:  timestamppb.New(i.CreatedAt),
 	}
 }
+
+// UpdateHotelImageMsg
+type UpdateHotelImageMsg struct {
+	HotelID uuid.UUID `json:"hotel_id"`
+	Image   string    `json:"image,omitempty"`
+}

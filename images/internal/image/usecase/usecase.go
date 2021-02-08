@@ -32,8 +32,11 @@ const (
 	userUUIDHeader         = "user_uuid"
 	resizeWidth            = 1024
 	resizeHeight           = 0
+
+	hotelsUUIDHeader = "hotel_uuid"
 )
 
+// ImageUseCase
 type ImageUseCase struct {
 	pgRepo      img.PgRepository
 	awsRepo     img.AWSRepository
@@ -42,6 +45,7 @@ type ImageUseCase struct {
 	resizerPool *sync.Pool
 }
 
+// NewImageUseCase
 func NewImageUseCase(pgRepo img.PgRepository, awsRepo img.AWSRepository, logger logger.Logger, publisher rabbitmq.Publisher) *ImageUseCase {
 	resizerPool := &sync.Pool{New: func() interface{} {
 		return images.NewImgResizer(
@@ -54,6 +58,7 @@ func NewImageUseCase(pgRepo img.PgRepository, awsRepo img.AWSRepository, logger 
 	return &ImageUseCase{pgRepo: pgRepo, awsRepo: awsRepo, logger: logger, publisher: publisher, resizerPool: resizerPool}
 }
 
+// Create
 func (i *ImageUseCase) Create(ctx context.Context, delivery amqp.Delivery) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "ImageUseCase.Create")
 	defer span.Finish()
@@ -80,7 +85,7 @@ func (i *ImageUseCase) Create(ctx context.Context, delivery amqp.Delivery) error
 	}
 
 	headers := make(amqp.Table)
-	headers["user_uuid"] = delivery.Headers["user_uuid"]
+	headers[userUUIDHeader] = delivery.Headers[userUUIDHeader]
 	if err := i.publisher.Publish(
 		ctx,
 		userExchange,
@@ -95,6 +100,56 @@ func (i *ImageUseCase) Create(ctx context.Context, delivery amqp.Delivery) error
 	return nil
 }
 
+// ProcessHotelImage
+func (i *ImageUseCase) ProcessHotelImage(ctx context.Context, delivery amqp.Delivery) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "ImageUseCase.Create")
+	defer span.Finish()
+
+	i.logger.Infof("amqp.Delivery: %-v", delivery.DeliveryTag)
+
+	uuidHeader, err := i.extractUUIDHeader(delivery, hotelsUUIDHeader)
+	if err != nil {
+		return err
+	}
+
+	processedImage, fileType, err := i.processImage(delivery.Body)
+	if err != nil {
+		return err
+	}
+
+	fileUrl, err := i.awsRepo.PutObject(ctx, processedImage, fileType)
+	if err != nil {
+		i.logger.Errorf("awsRepo.PutObject %-v", err)
+		return err
+	}
+
+	msg := &models.UpdateHotelImageMsg{
+		HotelID: *uuidHeader,
+		Image:   fileUrl,
+	}
+
+	msgBytes, err := json.Marshal(msg)
+	if err != nil {
+		return errors.Wrap(err, "ProcessHotelImage.json.Marshal")
+	}
+
+	headers := make(amqp.Table)
+	headers[hotelsUUIDHeader] = delivery.Headers[hotelsUUIDHeader]
+	if err := i.publisher.Publish(
+		ctx,
+		imageExchange,
+		createImageRoutingKey,
+		delivery.ContentType,
+		headers,
+		msgBytes,
+	); err != nil {
+		return errors.Wrap(err, "ProcessHotelImage.Publish")
+	}
+
+	return nil
+}
+
+// ResizeImage
 func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) error {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "ImageUseCase.ResizeImage")
 	defer span.Finish()
@@ -129,7 +184,7 @@ func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) 
 	}
 
 	headers := make(amqp.Table)
-	headers["user_uuid"] = delivery.Headers["user_uuid"]
+	headers[userUUIDHeader] = delivery.Headers[userUUIDHeader]
 	if err := i.publisher.Publish(
 		ctx,
 		imageExchange,
@@ -164,6 +219,26 @@ func (i *ImageUseCase) validateDeliveryHeaders(delivery amqp.Delivery) (*uuid.UU
 		return nil, image_errors.ErrInvalidDeliveryHeaders
 	}
 	userID, ok := userUUID.(string)
+	if !ok {
+		return nil, image_errors.ErrInvalidUUID
+	}
+
+	parsedUUID, err := uuid.FromString(userID)
+	if err != nil {
+		return nil, errors.Wrap(err, "uuid.FromString")
+	}
+
+	return &parsedUUID, nil
+}
+
+func (i *ImageUseCase) extractUUIDHeader(delivery amqp.Delivery, key string) (*uuid.UUID, error) {
+	i.logger.Infof("amqp.Delivery header: %-v", delivery.Headers)
+
+	uid, ok := delivery.Headers[key]
+	if !ok {
+		return nil, image_errors.ErrInvalidDeliveryHeaders
+	}
+	userID, ok := uid.(string)
 	if !ok {
 		return nil, image_errors.ErrInvalidUUID
 	}

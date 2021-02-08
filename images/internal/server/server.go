@@ -66,25 +66,30 @@ func (s *Server) Run() error {
 
 	// Init consumers, publishers, grpc server, metrics
 	imageConsumer := rabbitmq.NewImageConsumer(s.logger, s.cfg, imageUC)
-	if err := imageConsumer.Dial(); err != nil {
-		return errors.Wrap(err, " imageConsumer.Dial")
+	if err := imageConsumer.Initialize(); err != nil {
+		return errors.Wrap(err, "imageConsumer.Initialize")
 	}
+	imageConsumer.RunConsumers(ctx, cancel)
+	defer imageConsumer.CloseChannels()
+	// if err := imageConsumer.Dial(); err != nil {
+	// 	return errors.Wrap(err, " imageConsumer.Dial")
+	// }
 
-	resizeChan, err := imageConsumer.CreateExchangeAndQueue(rabbitmq.ImagesExchange, rabbitmq.ResizeQueueName, rabbitmq.ResizeBindingKey)
-	if err != nil {
-		return errors.Wrap(err, "CreateExchangeAndQueue")
-	}
-	defer resizeChan.Close()
+	// resizeChan, err := imageConsumer.CreateExchangeAndQueue(rabbitmq.ImagesExchange, rabbitmq.ResizeQueueName, rabbitmq.ResizeBindingKey)
+	// if err != nil {
+	// 	return errors.Wrap(err, "CreateExchangeAndQueue")
+	// }
+	// defer resizeChan.Close()
+	//
+	// createImgChan, err := imageConsumer.CreateExchangeAndQueue(rabbitmq.ImagesExchange, rabbitmq.CreateQueueName, rabbitmq.CreateBindingKey)
+	// if err != nil {
+	// 	return errors.Wrap(err, "CreateExchangeAndQueue")
+	// }
+	// defer createImgChan.Close()
 
-	createImgChan, err := imageConsumer.CreateExchangeAndQueue(rabbitmq.ImagesExchange, rabbitmq.CreateQueueName, rabbitmq.CreateBindingKey)
-	if err != nil {
-		return errors.Wrap(err, "CreateExchangeAndQueue")
-	}
-	defer createImgChan.Close()
-
-	go func() {
-		imageConsumer.RunConsumers(ctx, cancel)
-	}()
+	// go func() {
+	// 	imageConsumer.RunConsumers(ctx, cancel)
+	// }()
 
 	l, err := net.Listen("tcp", s.cfg.GRPCServer.Port)
 	if err != nil {

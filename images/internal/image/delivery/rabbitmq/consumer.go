@@ -26,6 +26,7 @@ type ImageConsumer struct {
 	cfg       *config.Config
 	imageUC   image.UseCase
 	consumers []*Consumer
+	channels  []*amqp.Channel
 }
 
 func NewImageConsumer(logger logger.Logger, cfg *config.Config, imageUC image.UseCase) *ImageConsumer {
