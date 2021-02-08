@@ -2,10 +2,13 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
 
+	"github.com/opentracing/opentracing-go"
+
 	"github.com/AleksK1NG/hotels-mocroservices/comments/config"
+	"github.com/AleksK1NG/hotels-mocroservices/comments/internal/server"
+	"github.com/AleksK1NG/hotels-mocroservices/comments/pkg/jaeger"
 	"github.com/AleksK1NG/hotels-mocroservices/comments/pkg/logger"
 	"github.com/AleksK1NG/hotels-mocroservices/comments/pkg/postgres"
 )
@@ -39,5 +42,17 @@ func main() {
 
 	appLogger.Infof("%-v", pgxConn.Stat())
 
-	http.ListenAndServe(":5555", nil)
+	tracer, closer, err := jaeger.InitJaeger(cfg)
+	if err != nil {
+		appLogger.Fatal("cannot create tracer", err)
+	}
+	appLogger.Info("Jaeger connected")
+
+	opentracing.SetGlobalTracer(tracer)
+	defer closer.Close()
+	appLogger.Info("Opentracing connected")
+
+	s := server.NewServer(appLogger, cfg, pgxConn, tracer)
+
+	appLogger.Fatal(s.Run())
 }
