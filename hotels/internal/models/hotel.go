@@ -57,10 +57,24 @@ type HotelsList struct {
 	Hotels     []*Hotel `json:"comments"`
 }
 
+// ToProto
 func (h *HotelsList) ToProto() []*hotelsService.Hotel {
 	hotelsList := make([]*hotelsService.Hotel, 0, len(h.Hotels))
 	for _, hotel := range h.Hotels {
 		hotelsList = append(hotelsList, hotel.ToProto())
 	}
 	return hotelsList
+}
+
+// UpdateHotelImageMsg
+type UpdateHotelImageMsg struct {
+	HotelID uuid.UUID `json:"hotel_id"`
+	Image   string    `json:"image,omitempty"`
+}
+
+// UpdateHotelImageMsg
+type UploadHotelImageMsg struct {
+	HotelID     uuid.UUID `json:"hotel_id"`
+	Data        []byte    `json:"date"`
+	ContentType string    `json:"content_type"`
 }

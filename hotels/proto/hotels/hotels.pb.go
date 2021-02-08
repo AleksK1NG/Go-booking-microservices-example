@@ -804,8 +804,9 @@ type UploadImageReq struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	HotelID string `protobuf:"bytes,1,opt,name=HotelID,proto3" json:"HotelID,omitempty"`
-	Data    []byte `protobuf:"bytes,2,opt,name=Data,proto3" json:"Data,omitempty"`
+	HotelID     string `protobuf:"bytes,1,opt,name=HotelID,proto3" json:"HotelID,omitempty"`
+	Data        []byte `protobuf:"bytes,2,opt,name=Data,proto3" json:"Data,omitempty"`
+	ContentType string `protobuf:"bytes,3,opt,name=ContentType,proto3" json:"ContentType,omitempty"`
 }
 
 func (x *UploadImageReq) Reset() {
@@ -854,12 +855,19 @@ func (x *UploadImageReq) GetData() []byte {
 	return nil
 }
 
+func (x *UploadImageReq) GetContentType() string {
+	if x != nil {
+		return x.ContentType
+	}
+	return ""
+}
+
 type UploadImageRes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Hotel *Hotel `protobuf:"bytes,1,opt,name=Hotel,proto3" json:"Hotel,omitempty"`
+	HotelID string `protobuf:"bytes,1,opt,name=HotelID,proto3" json:"HotelID,omitempty"`
 }
 
 func (x *UploadImageRes) Reset() {
@@ -894,11 +902,11 @@ func (*UploadImageRes) Descriptor() ([]byte, []int) {
 	return file_hotels_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *UploadImageRes) GetHotel() *Hotel {
+func (x *UploadImageRes) GetHotelID() string {
 	if x != nil {
-		return x.Hotel
+		return x.HotelID
 	}
-	return nil
+	return ""
 }
 
 var File_hotels_proto protoreflect.FileDescriptor
@@ -1010,14 +1018,15 @@ var file_hotels_proto_rawDesc = []byte{
 	0x65, 0x6c, 0x52, 0x65, 0x73, 0x12, 0x2a, 0x0a, 0x05, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x18, 0x01,
 	0x20, 0x01, 0x28, 0x0b, 0x32, 0x14, 0x2e, 0x68, 0x6f, 0x74, 0x65, 0x6c, 0x73, 0x53, 0x65, 0x72,
 	0x76, 0x69, 0x63, 0x65, 0x2e, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x52, 0x05, 0x48, 0x6f, 0x74, 0x65,
-	0x6c, 0x22, 0x3e, 0x0a, 0x0e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x49, 0x6d, 0x61, 0x67, 0x65,
+	0x6c, 0x22, 0x60, 0x0a, 0x0e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x49, 0x6d, 0x61, 0x67, 0x65,
 	0x52, 0x65, 0x71, 0x12, 0x18, 0x0a, 0x07, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x49, 0x44, 0x18, 0x01,
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x49, 0x44, 0x12, 0x12, 0x0a,
 	0x04, 0x44, 0x61, 0x74, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x44, 0x61, 0x74,
-	0x61, 0x22, 0x3c, 0x0a, 0x0e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x49, 0x6d, 0x61, 0x67, 0x65,
-	0x52, 0x65, 0x73, 0x12, 0x2a, 0x0a, 0x05, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x14, 0x2e, 0x68, 0x6f, 0x74, 0x65, 0x6c, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69,
-	0x63, 0x65, 0x2e, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x52, 0x05, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x32,
+	0x61, 0x12, 0x20, 0x0a, 0x0b, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x54,
+	0x79, 0x70, 0x65, 0x22, 0x2a, 0x0a, 0x0e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x49, 0x6d, 0x61,
+	0x67, 0x65, 0x52, 0x65, 0x73, 0x12, 0x18, 0x0a, 0x07, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x49, 0x44,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x49, 0x44, 0x32,
 	0x8d, 0x03, 0x0a, 0x0d, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63,
 	0x65, 0x12, 0x4d, 0x0a, 0x0b, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x48, 0x6f, 0x74, 0x65, 0x6c,
 	0x12, 0x1d, 0x2e, 0x68, 0x6f, 0x74, 0x65, 0x6c, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
@@ -1081,22 +1090,21 @@ var file_hotels_proto_depIdxs = []int32{
 	0,  // 3: hotelsService.GetHotelsRes.Hotels:type_name -> hotelsService.Hotel
 	0,  // 4: hotelsService.CreateHotelRes.Hotel:type_name -> hotelsService.Hotel
 	0,  // 5: hotelsService.UpdateHotelRes.Hotel:type_name -> hotelsService.Hotel
-	0,  // 6: hotelsService.UploadImageRes.Hotel:type_name -> hotelsService.Hotel
-	5,  // 7: hotelsService.HotelsService.CreateHotel:input_type -> hotelsService.CreateHotelReq
-	7,  // 8: hotelsService.HotelsService.UpdateHotel:input_type -> hotelsService.UpdateHotelReq
-	1,  // 9: hotelsService.HotelsService.GetHotelByID:input_type -> hotelsService.GetByIDReq
-	3,  // 10: hotelsService.HotelsService.GetHotels:input_type -> hotelsService.GetHotelsReq
-	9,  // 11: hotelsService.HotelsService.UploadImage:input_type -> hotelsService.UploadImageReq
-	6,  // 12: hotelsService.HotelsService.CreateHotel:output_type -> hotelsService.CreateHotelRes
-	8,  // 13: hotelsService.HotelsService.UpdateHotel:output_type -> hotelsService.UpdateHotelRes
-	2,  // 14: hotelsService.HotelsService.GetHotelByID:output_type -> hotelsService.GetByIDRes
-	4,  // 15: hotelsService.HotelsService.GetHotels:output_type -> hotelsService.GetHotelsRes
-	10, // 16: hotelsService.HotelsService.UploadImage:output_type -> hotelsService.UploadImageRes
-	12, // [12:17] is the sub-list for method output_type
-	7,  // [7:12] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	5,  // 6: hotelsService.HotelsService.CreateHotel:input_type -> hotelsService.CreateHotelReq
+	7,  // 7: hotelsService.HotelsService.UpdateHotel:input_type -> hotelsService.UpdateHotelReq
+	1,  // 8: hotelsService.HotelsService.GetHotelByID:input_type -> hotelsService.GetByIDReq
+	3,  // 9: hotelsService.HotelsService.GetHotels:input_type -> hotelsService.GetHotelsReq
+	9,  // 10: hotelsService.HotelsService.UploadImage:input_type -> hotelsService.UploadImageReq
+	6,  // 11: hotelsService.HotelsService.CreateHotel:output_type -> hotelsService.CreateHotelRes
+	8,  // 12: hotelsService.HotelsService.UpdateHotel:output_type -> hotelsService.UpdateHotelRes
+	2,  // 13: hotelsService.HotelsService.GetHotelByID:output_type -> hotelsService.GetByIDRes
+	4,  // 14: hotelsService.HotelsService.GetHotels:output_type -> hotelsService.GetHotelsRes
+	10, // 15: hotelsService.HotelsService.UploadImage:output_type -> hotelsService.UploadImageRes
+	11, // [11:16] is the sub-list for method output_type
+	6,  // [6:11] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_hotels_proto_init() }
