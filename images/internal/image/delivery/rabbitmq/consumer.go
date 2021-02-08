@@ -147,6 +147,7 @@ func (c *ImageConsumer) startConsume(
 	return chanErr
 }
 
+// AddConsumer
 func (c *ImageConsumer) AddConsumer(consumer *Consumer) {
 	c.consumers = append(c.consumers, consumer)
 }
@@ -168,6 +169,7 @@ func (c *ImageConsumer) run(ctx context.Context, cancel context.CancelFunc) {
 	}
 }
 
+// RunConsumers
 func (c *ImageConsumer) RunConsumers(ctx context.Context, cancel context.CancelFunc) {
 	c.AddConsumer(&Consumer{
 		Worker:         c.resizeWorker,
@@ -180,6 +182,12 @@ func (c *ImageConsumer) RunConsumers(ctx context.Context, cancel context.CancelF
 		WorkerPoolSize: CreateWorkers,
 		QueueName:      CreateQueueName,
 		ConsumerTag:    CreateConsumerTag,
+	})
+	c.AddConsumer(&Consumer{
+		Worker:         c.processHotelImageWorker,
+		WorkerPoolSize: UploadHotelImageWorkers,
+		QueueName:      UploadHotelImageQueue,
+		ConsumerTag:    UploadHotelImageConsumerTag,
 	})
 	c.run(ctx, cancel)
 }
