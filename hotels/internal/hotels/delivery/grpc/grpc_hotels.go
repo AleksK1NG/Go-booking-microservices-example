@@ -31,8 +31,6 @@ func (h *HotelsService) CreateHotel(ctx context.Context, req *hotelsService.Crea
 	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsService.CreateHotel")
 	defer span.Finish()
 
-	h.logger.Infof("request :%-v", req)
-
 	hotel := &models.Hotel{
 		Name:          req.GetName(),
 		Email:         req.GetEmail(),
@@ -59,9 +57,6 @@ func (h *HotelsService) CreateHotel(ctx context.Context, req *hotelsService.Crea
 		return nil, grpc_errors.ErrorResponse(err, "userUC.GetByID")
 	}
 
-	h.logger.Infof("CREATED HOTEL: %-v", createdHotel)
-	h.logger.Infof("CREATED HOTEL createdHotel.ToProto(): %-v", createdHotel.ToProto())
-
 	return &hotelsService.CreateHotelRes{Hotel: createdHotel.ToProto()}, nil
 }
 
@@ -69,8 +64,6 @@ func (h *HotelsService) CreateHotel(ctx context.Context, req *hotelsService.Crea
 func (h *HotelsService) UpdateHotel(ctx context.Context, req *hotelsService.UpdateHotelReq) (*hotelsService.UpdateHotelRes, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsService.UpdateHotel")
 	defer span.Finish()
-
-	h.logger.Infof("request :%-v", req)
 
 	hotelUUID, err := uuid.FromString(req.GetHotelID())
 	if err != nil {
