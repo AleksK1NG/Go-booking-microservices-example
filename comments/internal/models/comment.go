@@ -44,3 +44,12 @@ type CommentsList struct {
 	HasMore    bool       `json:"hasMore"`
 	Comments   []*Comment `json:"comments"`
 }
+
+// ToProto
+func (h *CommentsList) ToProto() []*commentsService.Comment {
+	commentsList := make([]*commentsService.Comment, 0, len(h.Comments))
+	for _, hotel := range h.Comments {
+		commentsList = append(commentsList, hotel.ToProto())
+	}
+	return commentsList
+}
