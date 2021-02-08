@@ -51,6 +51,7 @@ func NewUserHandlers(
 
 // Register godoc
 // @Summary Register new user
+// @Tags User
 // @Description register new user account, returns user data and session
 // @Accept json
 // @Produce json
@@ -99,6 +100,7 @@ func (h *UserHandlers) Register() echo.HandlerFunc {
 
 // Login godoc
 // @Summary Login user
+// @Tags User
 // @Description login user, returns user data and session
 // @Accept json
 // @Produce json
@@ -147,6 +149,7 @@ func (h *UserHandlers) Login() echo.HandlerFunc {
 
 // Logout godoc
 // @Summary Logout user
+// @Tags User
 // @Description Logout user, return no content
 // @Accept json
 // @Produce json
@@ -185,6 +188,7 @@ func (h *UserHandlers) Logout() echo.HandlerFunc {
 
 // GetMe godoc
 // @Summary Get current user data
+// @Tags User
 // @Description Get current user data, required session cookie
 // @Accept json
 // @Produce json
@@ -207,6 +211,7 @@ func (h *UserHandlers) GetMe() echo.HandlerFunc {
 
 // GetCSRFToken godoc
 // @Summary Get csrf token
+// @Tags User
 // @Description Get csrf token, required session
 // @Accept json
 // @Produce json
@@ -235,6 +240,14 @@ func (h *UserHandlers) GetCSRFToken() echo.HandlerFunc {
 	}
 }
 
+// Update godoc
+// @Summary Update user
+// @Tags User
+// @Description update user profile
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.UserResponse
+// @Router /user/{id} [get]
 func (h *UserHandlers) Update() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.Update")
@@ -280,6 +293,7 @@ func (h *UserHandlers) Delete() echo.HandlerFunc {
 
 // GetUserByID godoc
 // @Summary Get user by id
+// @Tags User
 // @Description Get user data by id
 // @Accept json
 // @Produce json
@@ -315,6 +329,7 @@ func (h *UserHandlers) GetUserByID() echo.HandlerFunc {
 
 // UpdateAvatar godoc
 // @Summary Update user avatar
+// @Tags User
 // @Description Upload user avatar image
 // @Accept mpfd
 // @Produce json

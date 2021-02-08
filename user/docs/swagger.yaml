@@ -79,6 +79,8 @@ paths:
           schema:
             $ref: '#/definitions/models.UserResponse'
       summary: Get user by id
+      tags:
+      - User
   /user/{id}/avatar:
     put:
       consumes:
@@ -97,6 +99,8 @@ paths:
           schema:
             $ref: '#/definitions/models.UserResponse'
       summary: Update user avatar
+      tags:
+      - User
   /user/csrf:
     get:
       consumes:
@@ -108,6 +112,8 @@ paths:
         "204":
           description: ""
       summary: Get csrf token
+      tags:
+      - User
   /user/login:
     post:
       consumes:
@@ -128,6 +134,8 @@ paths:
           schema:
             $ref: '#/definitions/models.UserResponse'
       summary: Login user
+      tags:
+      - User
   /user/logout:
     post:
       consumes:
@@ -139,6 +147,8 @@ paths:
         "204":
           description: ""
       summary: Logout user
+      tags:
+      - User
   /user/me:
     get:
       consumes:
@@ -152,6 +162,8 @@ paths:
           schema:
             $ref: '#/definitions/models.UserResponse'
       summary: Get current user data
+      tags:
+      - User
   /user/register:
     post:
       consumes:
@@ -172,4 +184,6 @@ paths:
           schema:
             $ref: '#/definitions/models.UserResponse'
       summary: Register new user
+      tags:
+      - User
 swagger: "2.0"
