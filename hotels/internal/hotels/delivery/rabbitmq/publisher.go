@@ -38,7 +38,7 @@ type HotelsPublisher struct {
 	logger   logger.Logger
 }
 
-func NewUserPublisher(cfg *config.Config, logger logger.Logger) (*HotelsPublisher, error) {
+func NewHotelsPublisher(cfg *config.Config, logger logger.Logger) (*HotelsPublisher, error) {
 	amqpConn, err := rabbitmq.NewRabbitMQConn(cfg)
 	if err != nil {
 		return nil, err

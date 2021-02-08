@@ -1,8 +1,10 @@
 package rabbitmq
 
 import (
+	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/streadway/amqp"
 )
 
 const (
@@ -29,12 +31,12 @@ const (
 	consumeNoLocal   = false
 	consumeNoWait    = false
 
-	UserExchange = "users"
+	HotelsExchange = "hotels"
 
-	AvatarsQueueName   = "avatars_queue"
-	AvatarsConsumerTag = "user_avatar_consumer"
-	AvatarsWorkers     = 5
-	AvatarsBindingKey  = "update_avatar_key"
+	UpdateImageQueue       = "update_hotel_image"
+	UpdateImageBindingKey  = "update_hotel_image_key"
+	UpdateImageWorkers     = 5
+	UpdateImageConsumerTag = "update_hotel_image_consumer"
 )
 
 var (
@@ -51,3 +53,30 @@ var (
 		Help: "The total number of error incoming success RabbitMQ messages",
 	})
 )
+
+// Initialize consumers
+func (c *HotelsConsumer) Initialize() error {
+	if err := c.Dial(); err != nil {
+		return errors.Wrap(err, "Consumer Dial")
+	}
+
+	updateImageChan, err := c.CreateExchangeAndQueue(HotelsExchange, UpdateImageQueue, UpdateImageBindingKey)
+	if err != nil {
+		return errors.Wrap(err, "CreateExchangeAndQueue")
+	}
+
+	c.channels = append(c.channels, updateImageChan)
+
+	return nil
+}
+
+// CloseChannels close active channels
+func (c *HotelsConsumer) CloseChannels() {
+	for _, channel := range c.channels {
+		go func(ch *amqp.Channel) {
+			if err := ch.Close(); err != nil {
+				c.logger.Errorf("CloseChannels ch.Close error: %v", err)
+			}
+		}(channel)
+	}
+}
