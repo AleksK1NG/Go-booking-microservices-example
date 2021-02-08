@@ -13,6 +13,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "User"
+                ],
                 "summary": "Get csrf token",
                 "responses": {
                     "204": {
@@ -29,6 +32,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "User"
                 ],
                 "summary": "Login user",
                 "parameters": [
@@ -61,6 +67,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "User"
+                ],
                 "summary": "Logout user",
                 "responses": {
                     "204": {
@@ -77,6 +86,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "User"
                 ],
                 "summary": "Get current user data",
                 "responses": {
@@ -97,6 +109,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "User"
                 ],
                 "summary": "Register new user",
                 "parameters": [
@@ -129,6 +144,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "User"
+                ],
                 "summary": "Get user by id",
                 "parameters": [
                     {
@@ -156,6 +174,9 @@
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "User"
                 ],
                 "summary": "Update user avatar",
                 "parameters": [
