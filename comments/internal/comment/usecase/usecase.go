@@ -9,6 +9,7 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/comments/internal/comment"
 	"github.com/AleksK1NG/hotels-mocroservices/comments/internal/models"
 	"github.com/AleksK1NG/hotels-mocroservices/comments/pkg/logger"
+	"github.com/AleksK1NG/hotels-mocroservices/comments/pkg/utils"
 )
 
 // CommUseCase
@@ -44,8 +45,8 @@ func (c *commUseCase) Update(ctx context.Context, comment *models.Comment) (*mod
 }
 
 // GetByHotelID
-func (c *commUseCase) GetByHotelID(ctx context.Context, hotelID uuid.UUID) (*models.CommentsList, error) {
+func (c *commUseCase) GetByHotelID(ctx context.Context, hotelID uuid.UUID, query *utils.Pagination) (*models.CommentsList, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "commUseCase.GetByHotelID")
 	defer span.Finish()
-	panic("implement me")
+	return c.commRepo.GetByHotelID(ctx, hotelID, query)
 }

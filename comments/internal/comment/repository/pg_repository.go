@@ -9,6 +9,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/AleksK1NG/hotels-mocroservices/comments/internal/models"
+	"github.com/AleksK1NG/hotels-mocroservices/comments/pkg/utils"
 )
 
 // CommPGRepo
@@ -104,6 +105,65 @@ func (c *commPGRepo) Update(ctx context.Context, comment *models.Comment) (*mode
 	return &comm, nil
 }
 
-func (c *commPGRepo) GetByHotelID(ctx context.Context, hotelID uuid.UUID) (*models.CommentsList, error) {
-	panic("implement me")
+// GetByHotelID
+func (c *commPGRepo) GetByHotelID(ctx context.Context, hotelID uuid.UUID, query *utils.Pagination) (*models.CommentsList, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "commPGRepo.GetByHotelID")
+	defer span.Finish()
+
+	getTotalCountQuery := `SELECT count(comment_id) as total FROM comments WHERE hotel_id = $1`
+	var totalCount int
+	if err := c.db.QueryRow(ctx, getTotalCountQuery, hotelID).Scan(&totalCount); err != nil {
+		return nil, errors.Wrap(err, "Scan")
+	}
+
+	if totalCount == 0 {
+		return &models.CommentsList{
+			TotalCount: 0,
+			TotalPages: 0,
+			Page:       0,
+			Size:       0,
+			HasMore:    false,
+			Comments:   make([]*models.Comment, 0),
+		}, nil
+	}
+
+	getCommentByHotelIDQuery := `SELECT comment_id, hotel_id, user_id, message, photos, rating, created_at, updated_at FROM comments
+	WHERE hotel_id = $1 OFFSET $2 LIMIT $3`
+
+	var commentsList []*models.Comment
+	rows, err := c.db.Query(ctx, getCommentByHotelIDQuery, hotelID, query.GetOffset(), query.GetLimit())
+	if err != nil {
+		return nil, errors.Wrap(err, "db.Query")
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var comm models.Comment
+		if err := rows.Scan(
+			&comm.CommentID,
+			&comm.HotelID,
+			&comm.UserID,
+			&comm.Message,
+			&comm.Photos,
+			&comm.Rating,
+			&comm.CreatedAt,
+			&comm.UpdatedAt,
+		); err != nil {
+			return nil, errors.Wrap(err, "Scan")
+		}
+		commentsList = append(commentsList, &comm)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, errors.Wrap(err, "rows.Err")
+	}
+
+	return &models.CommentsList{
+		TotalCount: totalCount,
+		TotalPages: query.GetTotalPages(totalCount),
+		Page:       query.GetPage(),
+		Size:       query.GetSize(),
+		HasMore:    query.GetHasMore(totalCount),
+		Comments:   commentsList,
+	}, nil
 }
