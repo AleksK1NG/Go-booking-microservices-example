@@ -48,6 +48,25 @@ services:
     networks:
       - hotels_network
 
+  postgesql_comments:
+    image: kartoza/postgis:13.0
+    container_name: comments_postgesql
+    expose:
+      - "5436"
+    ports:
+      - "5436:5432"
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=comments_db
+      - POSTGRES_HOST=5436
+    command: -p 5436
+    volumes:
+      - ./hotels_pgdata:/var/lib/postgresql/data
+    networks:
+      - hotels_network
+
   postgesql_main:
     image: kartoza/postgis:13.0
     container_name: main_postgesql
@@ -178,7 +197,7 @@ services:
 volumes:
   main_pgdata:
   user_pgdata:
-#  prometheus-data:
+  prometheus-data:
 
 networks:
   hotels_network:
