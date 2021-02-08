@@ -20,7 +20,11 @@ message Comment {
 }
 
 message CreateCommentReq {
-  Comment Comment = 1;
+  string HotelID = 1;
+  string UserID = 2;
+  string Message = 3;
+  repeated string Photos = 4;
+  double Rating = 5;
 }
 
 message CreateCommentRes {
