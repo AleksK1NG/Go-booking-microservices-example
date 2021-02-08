@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+//protoc --go_out=plugins=grpc:. *.proto
+
+package commentsService;
+option go_package = ".;commentsService";
+
+
+message Comment {
+  string CommentID = 1;
+  string Name = 2;
+  string Email = 3;
+  string Country = 4;
+  string City = 5;
+  string Description = 6;
+  string Location = 7;
+  double Rating = 8;
+  string Image = 9;
+  repeated string Photos = 10;
+  int64 CommentsCount = 11;
+  double Latitude = 12;
+  double Longitude = 13;
+  google.protobuf.Timestamp CreatedAt = 14;
+  google.protobuf.Timestamp UpdatedAt = 15;
+}
+
+message CreateReq {
+
+}
+
+
+
+service commentsService {
+  rpc CreateComment(CreateHotelReq) returns (CreateHotelRes) {}
+}

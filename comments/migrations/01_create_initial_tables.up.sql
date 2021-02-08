@@ -16,3 +16,18 @@ create table comments
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+
+CREATE OR REPLACE FUNCTION comment_updated() RETURNS TRIGGER AS
+$$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER comment_updated_at_trigger
+    BEFORE INSERT OR UPDATE
+    ON comments
+    FOR EACH ROW
+EXECUTE PROCEDURE comment_updated();
