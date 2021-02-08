@@ -90,10 +90,11 @@ message UpdateHotelRes {
 message UploadImageReq {
   string HotelID = 1;
   bytes Data = 2;
+  string ContentType = 3;
 }
 
 message UploadImageRes {
-  Hotel Hotel = 1;
+  string HotelID = 1;
 }
 
 

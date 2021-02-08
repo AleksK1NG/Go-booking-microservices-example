@@ -10,6 +10,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/internal/models"
+	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/hotels_errors"
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/utils"
 )
 
@@ -190,4 +191,23 @@ func (h *HotelsPGRepository) GetHotels(ctx context.Context, query *utils.Paginat
 		HasMore:    query.GetHasMore(total),
 		Hotels:     hotels,
 	}, nil
+}
+
+// UpdateHotelImage
+func (h *HotelsPGRepository) UpdateHotelImage(ctx context.Context, hotelID uuid.UUID, imageURL string) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsPGRepository.UpdateHotelImage")
+	defer span.Finish()
+
+	updateHotelImageQuery := `UPDATE hotels SET image = $1 WHERE hotel_id = $2`
+
+	result, err := h.db.Exec(ctx, updateHotelImageQuery, imageURL, hotelID)
+	if err != nil {
+		return errors.Wrap(err, "db.Exec")
+	}
+
+	if result.RowsAffected() == 0 {
+		return errors.Wrap(hotels_errors.ErrHotelNotFound, "RowsAffected")
+	}
+
+	return nil
 }

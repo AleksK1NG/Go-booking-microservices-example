@@ -16,6 +16,6 @@ type UseCase interface {
 	UpdateHotel(ctx context.Context, hotel *models.Hotel) (*models.Hotel, error)
 	GetHotelByID(ctx context.Context, hotelID uuid.UUID) (*models.Hotel, error)
 	GetHotels(ctx context.Context, query *utils.PaginationQuery) (*models.HotelsList, error)
-	UploadImage(ctx context.Context, hotelID uuid.UUID, data []byte) (*models.Hotel, error)
+	UploadImage(ctx context.Context, msg *models.UploadHotelImageMsg) error
 	UpdateHotelImage(ctx context.Context, delivery amqp.Delivery) error
 }

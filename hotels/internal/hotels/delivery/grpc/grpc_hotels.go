@@ -151,9 +151,25 @@ func (h *HotelsService) GetHotels(ctx context.Context, req *hotelsService.GetHot
 	}, nil
 }
 
+// UploadImage
 func (h *HotelsService) UploadImage(ctx context.Context, req *hotelsService.UploadImageReq) (*hotelsService.UploadImageRes, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsService.UploadImage")
 	defer span.Finish()
 
-	return nil, nil
+	hotelUUID, err := uuid.FromString(req.GetHotelID())
+	if err != nil {
+		h.logger.Errorf("uuid.FromString: %v", err)
+		return nil, grpc_errors.ErrorResponse(err, "uuid.FromString")
+	}
+
+	if err := h.hotelsUC.UploadImage(ctx, &models.UploadHotelImageMsg{
+		HotelID:     hotelUUID,
+		Data:        req.GetData(),
+		ContentType: req.GetContentType(),
+	}); err != nil {
+		h.logger.Errorf("hotelsUC.UploadImage: %v", err)
+		return nil, grpc_errors.ErrorResponse(err, "hotelsUC.UploadImage")
+	}
+
+	return &hotelsService.UploadImageRes{HotelID: hotelUUID.String()}, nil
 }
