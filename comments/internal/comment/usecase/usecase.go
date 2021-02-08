@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/opentracing/opentracing-go"
+	uuid "github.com/satori/go.uuid"
 
 	"github.com/AleksK1NG/hotels-mocroservices/comments/internal/comment"
 	"github.com/AleksK1NG/hotels-mocroservices/comments/internal/models"
@@ -26,4 +27,25 @@ func (c *commUseCase) Create(ctx context.Context, comment *models.Comment) (*mod
 	span, ctx := opentracing.StartSpanFromContext(ctx, "commUseCase.Create")
 	defer span.Finish()
 	return c.commRepo.Create(ctx, comment)
+}
+
+// GetByID
+func (c *commUseCase) GetByID(ctx context.Context, commentID uuid.UUID) (*models.Comment, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "commUseCase.GetByID")
+	defer span.Finish()
+	return c.commRepo.GetByID(ctx, commentID)
+}
+
+// Update
+func (c *commUseCase) Update(ctx context.Context, comment *models.Comment) (*models.Comment, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "commUseCase.Update")
+	defer span.Finish()
+	return c.commRepo.Update(ctx, comment)
+}
+
+// GetByHotelID
+func (c *commUseCase) GetByHotelID(ctx context.Context, hotelID uuid.UUID) (*models.CommentsList, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "commUseCase.GetByHotelID")
+	defer span.Finish()
+	panic("implement me")
 }
