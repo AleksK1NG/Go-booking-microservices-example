@@ -55,6 +55,27 @@ func (c *CommentsService) CreateComment(ctx context.Context, req *commentsServic
 	return &commentsService.CreateCommentRes{Comment: createdComm.ToProto()}, nil
 }
 
+// GetCommByID
+func (c *CommentsService) GetCommByID(ctx context.Context, req *commentsService.GetCommByIDReq) (*commentsService.GetCommByIDRes, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "CommentsService.GetCommByID")
+	defer span.Finish()
+	panic("implement me")
+}
+
+// UpdateComment
+func (c *CommentsService) UpdateComment(ctx context.Context, req *commentsService.UpdateCommReq) (*commentsService.UpdateCommRes, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "CommentsService.UpdateComment")
+	defer span.Finish()
+	panic("implement me")
+}
+
+// GetByHotelID
+func (c *CommentsService) GetByHotelID(ctx context.Context, req *commentsService.GetByHotelReq) (*commentsService.GetByHotelRes, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "CommentsService.GetByHotelID")
+	defer span.Finish()
+	panic("implement me")
+}
+
 func (c *CommentsService) protoToModel(req *commentsService.CreateCommentReq) (*models.Comment, error) {
 	hotelUUID, err := uuid.FromString(req.GetHotelID())
 	if err != nil {

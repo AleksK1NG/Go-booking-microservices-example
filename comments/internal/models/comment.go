@@ -34,3 +34,13 @@ func (c *Comment) ToProto() *commentsService.Comment {
 		UpdatedAt: timestamppb.New(*c.UpdatedAt),
 	}
 }
+
+// All Comments response with pagination
+type CommentsList struct {
+	TotalCount int        `json:"totalCount"`
+	TotalPages int        `json:"totalPages"`
+	Page       int        `json:"page"`
+	Size       int        `json:"size"`
+	HasMore    bool       `json:"hasMore"`
+	Comments   []*Comment `json:"comments"`
+}

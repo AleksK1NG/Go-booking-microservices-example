@@ -261,6 +261,416 @@ func (x *CreateCommentRes) GetComment() *Comment {
 	return nil
 }
 
+type GetCommByIDReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	HotelID string   `protobuf:"bytes,1,opt,name=HotelID,proto3" json:"HotelID,omitempty"`
+	UserID  string   `protobuf:"bytes,2,opt,name=UserID,proto3" json:"UserID,omitempty"`
+	Message string   `protobuf:"bytes,3,opt,name=Message,proto3" json:"Message,omitempty"`
+	Photos  []string `protobuf:"bytes,4,rep,name=Photos,proto3" json:"Photos,omitempty"`
+	Rating  float64  `protobuf:"fixed64,5,opt,name=Rating,proto3" json:"Rating,omitempty"`
+}
+
+func (x *GetCommByIDReq) Reset() {
+	*x = GetCommByIDReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_comments_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetCommByIDReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCommByIDReq) ProtoMessage() {}
+
+func (x *GetCommByIDReq) ProtoReflect() protoreflect.Message {
+	mi := &file_comments_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCommByIDReq.ProtoReflect.Descriptor instead.
+func (*GetCommByIDReq) Descriptor() ([]byte, []int) {
+	return file_comments_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetCommByIDReq) GetHotelID() string {
+	if x != nil {
+		return x.HotelID
+	}
+	return ""
+}
+
+func (x *GetCommByIDReq) GetUserID() string {
+	if x != nil {
+		return x.UserID
+	}
+	return ""
+}
+
+func (x *GetCommByIDReq) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetCommByIDReq) GetPhotos() []string {
+	if x != nil {
+		return x.Photos
+	}
+	return nil
+}
+
+func (x *GetCommByIDReq) GetRating() float64 {
+	if x != nil {
+		return x.Rating
+	}
+	return 0
+}
+
+type GetCommByIDRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Comment *Comment `protobuf:"bytes,1,opt,name=Comment,proto3" json:"Comment,omitempty"`
+}
+
+func (x *GetCommByIDRes) Reset() {
+	*x = GetCommByIDRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_comments_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetCommByIDRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCommByIDRes) ProtoMessage() {}
+
+func (x *GetCommByIDRes) ProtoReflect() protoreflect.Message {
+	mi := &file_comments_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCommByIDRes.ProtoReflect.Descriptor instead.
+func (*GetCommByIDRes) Descriptor() ([]byte, []int) {
+	return file_comments_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetCommByIDRes) GetComment() *Comment {
+	if x != nil {
+		return x.Comment
+	}
+	return nil
+}
+
+type UpdateCommReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	CommentID string   `protobuf:"bytes,1,opt,name=CommentID,proto3" json:"CommentID,omitempty"`
+	HotelID   string   `protobuf:"bytes,2,opt,name=HotelID,proto3" json:"HotelID,omitempty"`
+	UserID    string   `protobuf:"bytes,3,opt,name=UserID,proto3" json:"UserID,omitempty"`
+	Message   string   `protobuf:"bytes,4,opt,name=Message,proto3" json:"Message,omitempty"`
+	Photos    []string `protobuf:"bytes,5,rep,name=Photos,proto3" json:"Photos,omitempty"`
+	Rating    float64  `protobuf:"fixed64,6,opt,name=Rating,proto3" json:"Rating,omitempty"`
+}
+
+func (x *UpdateCommReq) Reset() {
+	*x = UpdateCommReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_comments_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateCommReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateCommReq) ProtoMessage() {}
+
+func (x *UpdateCommReq) ProtoReflect() protoreflect.Message {
+	mi := &file_comments_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateCommReq.ProtoReflect.Descriptor instead.
+func (*UpdateCommReq) Descriptor() ([]byte, []int) {
+	return file_comments_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *UpdateCommReq) GetCommentID() string {
+	if x != nil {
+		return x.CommentID
+	}
+	return ""
+}
+
+func (x *UpdateCommReq) GetHotelID() string {
+	if x != nil {
+		return x.HotelID
+	}
+	return ""
+}
+
+func (x *UpdateCommReq) GetUserID() string {
+	if x != nil {
+		return x.UserID
+	}
+	return ""
+}
+
+func (x *UpdateCommReq) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *UpdateCommReq) GetPhotos() []string {
+	if x != nil {
+		return x.Photos
+	}
+	return nil
+}
+
+func (x *UpdateCommReq) GetRating() float64 {
+	if x != nil {
+		return x.Rating
+	}
+	return 0
+}
+
+type UpdateCommRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Comment *Comment `protobuf:"bytes,1,opt,name=Comment,proto3" json:"Comment,omitempty"`
+}
+
+func (x *UpdateCommRes) Reset() {
+	*x = UpdateCommRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_comments_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UpdateCommRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateCommRes) ProtoMessage() {}
+
+func (x *UpdateCommRes) ProtoReflect() protoreflect.Message {
+	mi := &file_comments_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateCommRes.ProtoReflect.Descriptor instead.
+func (*UpdateCommRes) Descriptor() ([]byte, []int) {
+	return file_comments_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *UpdateCommRes) GetComment() *Comment {
+	if x != nil {
+		return x.Comment
+	}
+	return nil
+}
+
+type GetByHotelReq struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	HotelID string `protobuf:"bytes,1,opt,name=HotelID,proto3" json:"HotelID,omitempty"`
+	Page    int64  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
+	Size    int64  `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty"`
+}
+
+func (x *GetByHotelReq) Reset() {
+	*x = GetByHotelReq{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_comments_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetByHotelReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetByHotelReq) ProtoMessage() {}
+
+func (x *GetByHotelReq) ProtoReflect() protoreflect.Message {
+	mi := &file_comments_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetByHotelReq.ProtoReflect.Descriptor instead.
+func (*GetByHotelReq) Descriptor() ([]byte, []int) {
+	return file_comments_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetByHotelReq) GetHotelID() string {
+	if x != nil {
+		return x.HotelID
+	}
+	return ""
+}
+
+func (x *GetByHotelReq) GetPage() int64 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *GetByHotelReq) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+type GetByHotelRes struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TotalCount int64      `protobuf:"varint,1,opt,name=TotalCount,proto3" json:"TotalCount,omitempty"`
+	TotalPages int64      `protobuf:"varint,2,opt,name=TotalPages,proto3" json:"TotalPages,omitempty"`
+	Page       int64      `protobuf:"varint,3,opt,name=Page,proto3" json:"Page,omitempty"`
+	Size       int64      `protobuf:"varint,4,opt,name=Size,proto3" json:"Size,omitempty"`
+	HasMore    bool       `protobuf:"varint,5,opt,name=HasMore,proto3" json:"HasMore,omitempty"`
+	Comments   []*Comment `protobuf:"bytes,6,rep,name=Comments,proto3" json:"Comments,omitempty"`
+}
+
+func (x *GetByHotelRes) Reset() {
+	*x = GetByHotelRes{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_comments_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetByHotelRes) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetByHotelRes) ProtoMessage() {}
+
+func (x *GetByHotelRes) ProtoReflect() protoreflect.Message {
+	mi := &file_comments_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetByHotelRes.ProtoReflect.Descriptor instead.
+func (*GetByHotelRes) Descriptor() ([]byte, []int) {
+	return file_comments_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GetByHotelRes) GetTotalCount() int64 {
+	if x != nil {
+		return x.TotalCount
+	}
+	return 0
+}
+
+func (x *GetByHotelRes) GetTotalPages() int64 {
+	if x != nil {
+		return x.TotalPages
+	}
+	return 0
+}
+
+func (x *GetByHotelRes) GetPage() int64 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *GetByHotelRes) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *GetByHotelRes) GetHasMore() bool {
+	if x != nil {
+		return x.HasMore
+	}
+	return false
+}
+
+func (x *GetByHotelRes) GetComments() []*Comment {
+	if x != nil {
+		return x.Comments
+	}
+	return nil
+}
+
 var File_comments_proto protoreflect.FileDescriptor
 
 var file_comments_proto_rawDesc = []byte{
@@ -299,15 +709,77 @@ var file_comments_proto_rawDesc = []byte{
 	0x73, 0x12, 0x32, 0x0a, 0x07, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01,
 	0x28, 0x0b, 0x32, 0x18, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x53, 0x65, 0x72,
 	0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x07, 0x43, 0x6f,
-	0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x32, 0x6a, 0x0a, 0x0f, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74,
-	0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x57, 0x0a, 0x0d, 0x43, 0x72, 0x65, 0x61,
-	0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x21, 0x2e, 0x63, 0x6f, 0x6d, 0x6d,
-	0x65, 0x6e, 0x74, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x72, 0x65, 0x61,
-	0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x1a, 0x21, 0x2e, 0x63,
-	0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43,
-	0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x22,
-	0x00, 0x42, 0x13, 0x5a, 0x11, 0x2e, 0x3b, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x53,
-	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x22, 0x8c, 0x01, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6d,
+	0x6d, 0x42, 0x79, 0x49, 0x44, 0x52, 0x65, 0x71, 0x12, 0x18, 0x0a, 0x07, 0x48, 0x6f, 0x74, 0x65,
+	0x6c, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x48, 0x6f, 0x74, 0x65, 0x6c,
+	0x49, 0x44, 0x12, 0x16, 0x0a, 0x06, 0x55, 0x73, 0x65, 0x72, 0x49, 0x44, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x06, 0x55, 0x73, 0x65, 0x72, 0x49, 0x44, 0x12, 0x18, 0x0a, 0x07, 0x4d, 0x65,
+	0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x4d, 0x65, 0x73,
+	0x73, 0x61, 0x67, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x50, 0x68, 0x6f, 0x74, 0x6f, 0x73, 0x18, 0x04,
+	0x20, 0x03, 0x28, 0x09, 0x52, 0x06, 0x50, 0x68, 0x6f, 0x74, 0x6f, 0x73, 0x12, 0x16, 0x0a, 0x06,
+	0x52, 0x61, 0x74, 0x69, 0x6e, 0x67, 0x18, 0x05, 0x20, 0x01, 0x28, 0x01, 0x52, 0x06, 0x52, 0x61,
+	0x74, 0x69, 0x6e, 0x67, 0x22, 0x44, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6d, 0x6d, 0x42,
+	0x79, 0x49, 0x44, 0x52, 0x65, 0x73, 0x12, 0x32, 0x0a, 0x07, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e,
+	0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e,
+	0x74, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e,
+	0x74, 0x52, 0x07, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x22, 0xa9, 0x01, 0x0a, 0x0d, 0x55,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x52, 0x65, 0x71, 0x12, 0x1c, 0x0a, 0x09,
+	0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x09, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x49, 0x44, 0x12, 0x18, 0x0a, 0x07, 0x48, 0x6f,
+	0x74, 0x65, 0x6c, 0x49, 0x44, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x48, 0x6f, 0x74,
+	0x65, 0x6c, 0x49, 0x44, 0x12, 0x16, 0x0a, 0x06, 0x55, 0x73, 0x65, 0x72, 0x49, 0x44, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x55, 0x73, 0x65, 0x72, 0x49, 0x44, 0x12, 0x18, 0x0a, 0x07,
+	0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x4d,
+	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x50, 0x68, 0x6f, 0x74, 0x6f, 0x73,
+	0x18, 0x05, 0x20, 0x03, 0x28, 0x09, 0x52, 0x06, 0x50, 0x68, 0x6f, 0x74, 0x6f, 0x73, 0x12, 0x16,
+	0x0a, 0x06, 0x52, 0x61, 0x74, 0x69, 0x6e, 0x67, 0x18, 0x06, 0x20, 0x01, 0x28, 0x01, 0x52, 0x06,
+	0x52, 0x61, 0x74, 0x69, 0x6e, 0x67, 0x22, 0x43, 0x0a, 0x0d, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
+	0x43, 0x6f, 0x6d, 0x6d, 0x52, 0x65, 0x73, 0x12, 0x32, 0x0a, 0x07, 0x43, 0x6f, 0x6d, 0x6d, 0x65,
+	0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x65,
+	0x6e, 0x74, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x65,
+	0x6e, 0x74, 0x52, 0x07, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x22, 0x51, 0x0a, 0x0d, 0x47,
+	0x65, 0x74, 0x42, 0x79, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x52, 0x65, 0x71, 0x12, 0x18, 0x0a, 0x07,
+	0x48, 0x6f, 0x74, 0x65, 0x6c, 0x49, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x48,
+	0x6f, 0x74, 0x65, 0x6c, 0x49, 0x44, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x61, 0x67, 0x65, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x03, 0x52, 0x04, 0x70, 0x61, 0x67, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x73, 0x69,
+	0x7a, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x04, 0x73, 0x69, 0x7a, 0x65, 0x22, 0xc7,
+	0x01, 0x0a, 0x0d, 0x47, 0x65, 0x74, 0x42, 0x79, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x52, 0x65, 0x73,
+	0x12, 0x1e, 0x0a, 0x0a, 0x54, 0x6f, 0x74, 0x61, 0x6c, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x03, 0x52, 0x0a, 0x54, 0x6f, 0x74, 0x61, 0x6c, 0x43, 0x6f, 0x75, 0x6e, 0x74,
+	0x12, 0x1e, 0x0a, 0x0a, 0x54, 0x6f, 0x74, 0x61, 0x6c, 0x50, 0x61, 0x67, 0x65, 0x73, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x03, 0x52, 0x0a, 0x54, 0x6f, 0x74, 0x61, 0x6c, 0x50, 0x61, 0x67, 0x65, 0x73,
+	0x12, 0x12, 0x0a, 0x04, 0x50, 0x61, 0x67, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x04,
+	0x50, 0x61, 0x67, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x53, 0x69, 0x7a, 0x65, 0x18, 0x04, 0x20, 0x01,
+	0x28, 0x03, 0x52, 0x04, 0x53, 0x69, 0x7a, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x48, 0x61, 0x73, 0x4d,
+	0x6f, 0x72, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x48, 0x61, 0x73, 0x4d, 0x6f,
+	0x72, 0x65, 0x12, 0x34, 0x0a, 0x08, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x18, 0x06,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x53,
+	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x08,
+	0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x32, 0xe2, 0x02, 0x0a, 0x0f, 0x63, 0x6f, 0x6d,
+	0x6d, 0x65, 0x6e, 0x74, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x57, 0x0a, 0x0d,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x21, 0x2e,
+	0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71,
+	0x1a, 0x21, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69,
+	0x63, 0x65, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74,
+	0x52, 0x65, 0x73, 0x22, 0x00, 0x12, 0x51, 0x0a, 0x0b, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6d, 0x6d,
+	0x42, 0x79, 0x49, 0x44, 0x12, 0x1f, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x53,
+	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6d, 0x6d, 0x42, 0x79,
+	0x49, 0x44, 0x52, 0x65, 0x71, 0x1a, 0x1f, 0x2e, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x73,
+	0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6d, 0x6d, 0x42,
+	0x79, 0x49, 0x44, 0x52, 0x65, 0x73, 0x22, 0x00, 0x12, 0x51, 0x0a, 0x0d, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x1e, 0x2e, 0x63, 0x6f, 0x6d, 0x6d,
+	0x65, 0x6e, 0x74, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x52, 0x65, 0x71, 0x1a, 0x1e, 0x2e, 0x63, 0x6f, 0x6d, 0x6d,
+	0x65, 0x6e, 0x74, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x52, 0x65, 0x73, 0x22, 0x00, 0x12, 0x50, 0x0a, 0x0c, 0x47,
+	0x65, 0x74, 0x42, 0x79, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x49, 0x44, 0x12, 0x1e, 0x2e, 0x63, 0x6f,
+	0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47, 0x65,
+	0x74, 0x42, 0x79, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x52, 0x65, 0x71, 0x1a, 0x1e, 0x2e, 0x63, 0x6f,
+	0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47, 0x65,
+	0x74, 0x42, 0x79, 0x48, 0x6f, 0x74, 0x65, 0x6c, 0x52, 0x65, 0x73, 0x22, 0x00, 0x42, 0x13, 0x5a,
+	0x11, 0x2e, 0x3b, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x53, 0x65, 0x72, 0x76, 0x69,
+	0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -322,24 +794,39 @@ func file_comments_proto_rawDescGZIP() []byte {
 	return file_comments_proto_rawDescData
 }
 
-var file_comments_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_comments_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_comments_proto_goTypes = []interface{}{
 	(*Comment)(nil),               // 0: commentsService.Comment
 	(*CreateCommentReq)(nil),      // 1: commentsService.CreateCommentReq
 	(*CreateCommentRes)(nil),      // 2: commentsService.CreateCommentRes
-	(*timestamppb.Timestamp)(nil), // 3: google.protobuf.Timestamp
+	(*GetCommByIDReq)(nil),        // 3: commentsService.GetCommByIDReq
+	(*GetCommByIDRes)(nil),        // 4: commentsService.GetCommByIDRes
+	(*UpdateCommReq)(nil),         // 5: commentsService.UpdateCommReq
+	(*UpdateCommRes)(nil),         // 6: commentsService.UpdateCommRes
+	(*GetByHotelReq)(nil),         // 7: commentsService.GetByHotelReq
+	(*GetByHotelRes)(nil),         // 8: commentsService.GetByHotelRes
+	(*timestamppb.Timestamp)(nil), // 9: google.protobuf.Timestamp
 }
 var file_comments_proto_depIdxs = []int32{
-	3, // 0: commentsService.Comment.CreatedAt:type_name -> google.protobuf.Timestamp
-	3, // 1: commentsService.Comment.UpdatedAt:type_name -> google.protobuf.Timestamp
-	0, // 2: commentsService.CreateCommentRes.Comment:type_name -> commentsService.Comment
-	1, // 3: commentsService.commentsService.CreateComment:input_type -> commentsService.CreateCommentReq
-	2, // 4: commentsService.commentsService.CreateComment:output_type -> commentsService.CreateCommentRes
-	4, // [4:5] is the sub-list for method output_type
-	3, // [3:4] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	9,  // 0: commentsService.Comment.CreatedAt:type_name -> google.protobuf.Timestamp
+	9,  // 1: commentsService.Comment.UpdatedAt:type_name -> google.protobuf.Timestamp
+	0,  // 2: commentsService.CreateCommentRes.Comment:type_name -> commentsService.Comment
+	0,  // 3: commentsService.GetCommByIDRes.Comment:type_name -> commentsService.Comment
+	0,  // 4: commentsService.UpdateCommRes.Comment:type_name -> commentsService.Comment
+	0,  // 5: commentsService.GetByHotelRes.Comments:type_name -> commentsService.Comment
+	1,  // 6: commentsService.commentsService.CreateComment:input_type -> commentsService.CreateCommentReq
+	3,  // 7: commentsService.commentsService.GetCommByID:input_type -> commentsService.GetCommByIDReq
+	5,  // 8: commentsService.commentsService.UpdateComment:input_type -> commentsService.UpdateCommReq
+	7,  // 9: commentsService.commentsService.GetByHotelID:input_type -> commentsService.GetByHotelReq
+	2,  // 10: commentsService.commentsService.CreateComment:output_type -> commentsService.CreateCommentRes
+	4,  // 11: commentsService.commentsService.GetCommByID:output_type -> commentsService.GetCommByIDRes
+	6,  // 12: commentsService.commentsService.UpdateComment:output_type -> commentsService.UpdateCommRes
+	8,  // 13: commentsService.commentsService.GetByHotelID:output_type -> commentsService.GetByHotelRes
+	10, // [10:14] is the sub-list for method output_type
+	6,  // [6:10] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_comments_proto_init() }
@@ -384,6 +871,78 @@ func file_comments_proto_init() {
 				return nil
 			}
 		}
+		file_comments_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetCommByIDReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_comments_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetCommByIDRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_comments_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateCommReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_comments_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UpdateCommRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_comments_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetByHotelReq); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_comments_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetByHotelRes); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -391,7 +950,7 @@ func file_comments_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_comments_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -418,6 +977,9 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type CommentsServiceClient interface {
 	CreateComment(ctx context.Context, in *CreateCommentReq, opts ...grpc.CallOption) (*CreateCommentRes, error)
+	GetCommByID(ctx context.Context, in *GetCommByIDReq, opts ...grpc.CallOption) (*GetCommByIDRes, error)
+	UpdateComment(ctx context.Context, in *UpdateCommReq, opts ...grpc.CallOption) (*UpdateCommRes, error)
+	GetByHotelID(ctx context.Context, in *GetByHotelReq, opts ...grpc.CallOption) (*GetByHotelRes, error)
 }
 
 type commentsServiceClient struct {
@@ -437,9 +999,39 @@ func (c *commentsServiceClient) CreateComment(ctx context.Context, in *CreateCom
 	return out, nil
 }
 
+func (c *commentsServiceClient) GetCommByID(ctx context.Context, in *GetCommByIDReq, opts ...grpc.CallOption) (*GetCommByIDRes, error) {
+	out := new(GetCommByIDRes)
+	err := c.cc.Invoke(ctx, "/commentsService.commentsService/GetCommByID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *commentsServiceClient) UpdateComment(ctx context.Context, in *UpdateCommReq, opts ...grpc.CallOption) (*UpdateCommRes, error) {
+	out := new(UpdateCommRes)
+	err := c.cc.Invoke(ctx, "/commentsService.commentsService/UpdateComment", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *commentsServiceClient) GetByHotelID(ctx context.Context, in *GetByHotelReq, opts ...grpc.CallOption) (*GetByHotelRes, error) {
+	out := new(GetByHotelRes)
+	err := c.cc.Invoke(ctx, "/commentsService.commentsService/GetByHotelID", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CommentsServiceServer is the server API for CommentsService service.
 type CommentsServiceServer interface {
 	CreateComment(context.Context, *CreateCommentReq) (*CreateCommentRes, error)
+	GetCommByID(context.Context, *GetCommByIDReq) (*GetCommByIDRes, error)
+	UpdateComment(context.Context, *UpdateCommReq) (*UpdateCommRes, error)
+	GetByHotelID(context.Context, *GetByHotelReq) (*GetByHotelRes, error)
 }
 
 // UnimplementedCommentsServiceServer can be embedded to have forward compatible implementations.
@@ -448,6 +1040,15 @@ type UnimplementedCommentsServiceServer struct {
 
 func (*UnimplementedCommentsServiceServer) CreateComment(context.Context, *CreateCommentReq) (*CreateCommentRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateComment not implemented")
+}
+func (*UnimplementedCommentsServiceServer) GetCommByID(context.Context, *GetCommByIDReq) (*GetCommByIDRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCommByID not implemented")
+}
+func (*UnimplementedCommentsServiceServer) UpdateComment(context.Context, *UpdateCommReq) (*UpdateCommRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateComment not implemented")
+}
+func (*UnimplementedCommentsServiceServer) GetByHotelID(context.Context, *GetByHotelReq) (*GetByHotelRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByHotelID not implemented")
 }
 
 func RegisterCommentsServiceServer(s *grpc.Server, srv CommentsServiceServer) {
@@ -472,6 +1073,60 @@ func _CommentsService_CreateComment_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CommentsService_GetCommByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCommByIDReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommentsServiceServer).GetCommByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/commentsService.commentsService/GetCommByID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommentsServiceServer).GetCommByID(ctx, req.(*GetCommByIDReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommentsService_UpdateComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCommReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommentsServiceServer).UpdateComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/commentsService.commentsService/UpdateComment",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommentsServiceServer).UpdateComment(ctx, req.(*UpdateCommReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CommentsService_GetByHotelID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetByHotelReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommentsServiceServer).GetByHotelID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/commentsService.commentsService/GetByHotelID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommentsServiceServer).GetByHotelID(ctx, req.(*GetByHotelReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _CommentsService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "commentsService.commentsService",
 	HandlerType: (*CommentsServiceServer)(nil),
@@ -479,6 +1134,18 @@ var _CommentsService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateComment",
 			Handler:    _CommentsService_CreateComment_Handler,
+		},
+		{
+			MethodName: "GetCommByID",
+			Handler:    _CommentsService_GetCommByID_Handler,
+		},
+		{
+			MethodName: "UpdateComment",
+			Handler:    _CommentsService_UpdateComment_Handler,
+		},
+		{
+			MethodName: "GetByHotelID",
+			Handler:    _CommentsService_GetByHotelID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
