@@ -17,7 +17,6 @@ type Config struct {
 	Logger     Logger
 	Jaeger     Jaeger
 	RabbitMQ   RabbitMQ
-	AWS        AWS
 }
 
 type HttpServer struct {
@@ -51,23 +50,10 @@ type GRPCServer struct {
 
 // RabbitMQ
 type RabbitMQ struct {
-	Host           string
-	Port           string
-	User           string
-	Password       string
-	Exchange       string
-	Queue          string
-	RoutingKey     string
-	ConsumerTag    string
-	WorkerPoolSize int
-}
-
-type AWS struct {
-	S3Region         string
-	S3EndPoint       string
-	S3EndPointMinio  string
-	DisableSSL       bool
-	S3ForcePathStyle bool
+	Host     string
+	Port     string
+	User     string
+	Password string
 }
 
 // Logger config
@@ -105,6 +91,7 @@ type RedisConfig struct {
 
 // Metrics config
 type Metrics struct {
+	Port        string
 	URL         string
 	ServiceName string
 }

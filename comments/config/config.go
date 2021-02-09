@@ -17,7 +17,6 @@ type Config struct {
 	Logger     Logger
 	Jaeger     Jaeger
 	RabbitMQ   RabbitMQ
-	AWS        AWS
 }
 
 type HttpServer struct {
@@ -62,14 +61,6 @@ type RabbitMQ struct {
 	WorkerPoolSize int
 }
 
-type AWS struct {
-	S3Region         string
-	S3EndPoint       string
-	S3EndPointMinio  string
-	DisableSSL       bool
-	S3ForcePathStyle bool
-}
-
 // Logger config
 type Logger struct {
 	Development       bool
@@ -105,6 +96,7 @@ type RedisConfig struct {
 
 // Metrics config
 type Metrics struct {
+	Port        string
 	URL         string
 	ServiceName string
 }

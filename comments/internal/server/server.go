@@ -64,8 +64,8 @@ func (s *server) Run() error {
 	go func() {
 		router := echo.New()
 		router.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
-		s.logger.Infof("Metrics server is running on port: %s", s.cfg.Metrics.URL)
-		if err := router.Start(s.cfg.Metrics.URL); err != nil {
+		s.logger.Infof("Metrics server is running on port: %s", s.cfg.Metrics.Port)
+		if err := router.Start(s.cfg.Metrics.Port); err != nil {
 			s.logger.Error(err)
 			cancel()
 		}

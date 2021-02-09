@@ -59,6 +59,7 @@ redis:
   DB: 0
 
 metrics:
+  Port: ":7075"
   Url: 0.0.0.0:7075
   ServiceName: hotels_microservice
 
