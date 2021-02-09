@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strconv"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/opentracing/opentracing-go"
@@ -12,6 +11,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/models"
+	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/utils"
 )
 
 // UserPGRepository
@@ -142,14 +142,8 @@ func (u *UserPGRepository) GetUsersByIDs(ctx context.Context, userIDs []string) 
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserPGRepository.GetUsersByIDs")
 	defer span.Finish()
 
-	var placeholders string
-	for i, _ := range userIDs {
-		placeholders += `$` + strconv.Itoa(i+1) + `,`
-	}
-	placeholders = placeholders[:len(placeholders)-1]
-
-	query := fmt.Sprintf("SELECT user_id, first_name, last_name, email, avatar, role, updated_at, created_at FROM "+
-		"users WHERE user_id IN (%v)", placeholders)
+	placeholders := utils.CreateSQLPlaceholders(len(userIDs))
+	query := fmt.Sprintf("SELECT user_id, first_name, last_name, email, avatar, role, updated_at, created_at FROM users WHERE user_id IN (%v)", placeholders)
 
 	args := make([]interface{}, len(userIDs))
 	for i, id := range userIDs {
@@ -180,20 +174,5 @@ func (u *UserPGRepository) GetUsersByIDs(ctx context.Context, userIDs []string) 
 		users = append(users, &res)
 	}
 
-	log.Printf("USERS: %-v", users)
-
 	return users, nil
-}
-
-func (u UserPGRepository) convertStringArrToUUID(ids []string) ([]uuid.UUID, error) {
-	uids := make([]uuid.UUID, 0, len(ids))
-	for _, id := range ids {
-		uid, err := uuid.FromString(id)
-		if err != nil {
-			return nil, err
-		}
-		uids = append(uids, uid)
-	}
-
-	return uids, nil
 }
