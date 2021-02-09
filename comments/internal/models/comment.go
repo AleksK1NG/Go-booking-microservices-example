@@ -6,7 +6,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	commentsService "github.com/AleksK1NG/hotels-mocroservices/comments/proto"
+	"github.com/AleksK1NG/hotels-mocroservices/comments/proto/comments"
 )
 
 // Comment
@@ -22,8 +22,8 @@ type Comment struct {
 }
 
 // ToProto
-func (c *Comment) ToProto() *commentsService.Comment {
-	return &commentsService.Comment{
+func (c *Comment) ToProto() *comments.Comment {
+	return &comments.Comment{
 		CommentID: c.CommentID.String(),
 		HotelID:   c.HotelID.String(),
 		UserID:    c.UserID.String(),
@@ -46,8 +46,8 @@ type CommentsList struct {
 }
 
 // ToProto
-func (h *CommentsList) ToProto() []*commentsService.Comment {
-	commentsList := make([]*commentsService.Comment, 0, len(h.Comments))
+func (h *CommentsList) ToProto() []*comments.Comment {
+	commentsList := make([]*comments.Comment, 0, len(h.Comments))
 	for _, hotel := range h.Comments {
 		commentsList = append(commentsList, hotel.ToProto())
 	}

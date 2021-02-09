@@ -26,8 +26,11 @@ import (
 	commGRPC "github.com/AleksK1NG/hotels-mocroservices/comments/internal/comment/delivery/grpc"
 	"github.com/AleksK1NG/hotels-mocroservices/comments/internal/comment/repository"
 	"github.com/AleksK1NG/hotels-mocroservices/comments/internal/comment/usecase"
+	"github.com/AleksK1NG/hotels-mocroservices/comments/internal/interceptors"
+	grpcClient "github.com/AleksK1NG/hotels-mocroservices/comments/internal/user/grpc"
 	"github.com/AleksK1NG/hotels-mocroservices/comments/pkg/logger"
-	commentsService "github.com/AleksK1NG/hotels-mocroservices/comments/proto"
+	"github.com/AleksK1NG/hotels-mocroservices/comments/proto/comments"
+	userService "github.com/AleksK1NG/hotels-mocroservices/comments/proto/user"
 )
 
 // Server
@@ -50,9 +53,17 @@ func (s *server) Run() error {
 	defer cancel()
 
 	validate := validator.New()
+	im := interceptors.NewInterceptorManager(s.logger, s.cfg, s.tracer)
+
+	userGRPCConn, err := grpcClient.NewGRPCClientServiceConn(ctx, im, s.cfg.GRPCServer.UserGrpcServicePort)
+	if err != nil {
+		return errors.Wrap(err, "grpcClient.NewGRPCClientServiceConn")
+	}
+	defer userGRPCConn.Close()
+	userServiceClient := userService.NewUserServiceClient(userGRPCConn)
 
 	commPGRepo := repository.NewCommPGRepo(s.pgxPool)
-	commUC := usecase.NewCommUseCase(commPGRepo, s.logger)
+	commUC := usecase.NewCommUseCase(commPGRepo, s.logger, userServiceClient)
 	commService := commGRPC.NewCommentsService(commUC, s.logger, s.cfg, validate)
 
 	l, err := net.Listen("tcp", s.cfg.GRPCServer.Port)
@@ -85,7 +96,7 @@ func (s *server) Run() error {
 		),
 	)
 
-	commentsService.RegisterCommentsServiceServer(server, commService)
+	comments.RegisterCommentsServiceServer(server, commService)
 	grpc_prometheus.Register(server)
 
 	go func() {
