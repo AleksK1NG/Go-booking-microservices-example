@@ -29,7 +29,7 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/comments/internal/interceptors"
 	grpcClient "github.com/AleksK1NG/hotels-mocroservices/comments/internal/user/grpc"
 	"github.com/AleksK1NG/hotels-mocroservices/comments/pkg/logger"
-	"github.com/AleksK1NG/hotels-mocroservices/comments/proto/comments"
+	commentsService "github.com/AleksK1NG/hotels-mocroservices/comments/proto/comments"
 	userService "github.com/AleksK1NG/hotels-mocroservices/comments/proto/user"
 )
 
@@ -96,7 +96,7 @@ func (s *server) Run() error {
 		),
 	)
 
-	comments.RegisterCommentsServiceServer(server, commService)
+	commentsService.RegisterCommentsServiceServer(server, commService)
 	grpc_prometheus.Register(server)
 
 	go func() {
