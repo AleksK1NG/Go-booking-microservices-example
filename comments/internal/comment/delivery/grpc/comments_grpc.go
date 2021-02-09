@@ -13,7 +13,7 @@ import (
 	grpcErrors "github.com/AleksK1NG/hotels-mocroservices/comments/pkg/grpc_errors"
 	"github.com/AleksK1NG/hotels-mocroservices/comments/pkg/logger"
 	"github.com/AleksK1NG/hotels-mocroservices/comments/pkg/utils"
-	"github.com/AleksK1NG/hotels-mocroservices/comments/proto"
+	"github.com/AleksK1NG/hotels-mocroservices/comments/proto/comments"
 )
 
 // CommentsService
@@ -30,7 +30,7 @@ func NewCommentsService(commUC comment.UseCase, logger logger.Logger, cfg *confi
 }
 
 // CreateComment
-func (c *CommentsService) CreateComment(ctx context.Context, req *commentsService.CreateCommentReq) (*commentsService.CreateCommentRes, error) {
+func (c *CommentsService) CreateComment(ctx context.Context, req *comments.CreateCommentReq) (*comments.CreateCommentRes, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "CommentsService.CreateComment")
 	defer span.Finish()
 
@@ -53,11 +53,11 @@ func (c *CommentsService) CreateComment(ctx context.Context, req *commentsServic
 
 	c.logger.Infof("CREATED: %-v", createdComm)
 
-	return &commentsService.CreateCommentRes{Comment: createdComm.ToProto()}, nil
+	return &comments.CreateCommentRes{Comment: createdComm.ToProto()}, nil
 }
 
 // GetCommByID
-func (c *CommentsService) GetCommByID(ctx context.Context, req *commentsService.GetCommByIDReq) (*commentsService.GetCommByIDRes, error) {
+func (c *CommentsService) GetCommByID(ctx context.Context, req *comments.GetCommByIDReq) (*comments.GetCommByIDRes, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "CommentsService.GetCommByID")
 	defer span.Finish()
 
@@ -73,11 +73,11 @@ func (c *CommentsService) GetCommByID(ctx context.Context, req *commentsService.
 		return nil, grpcErrors.ErrorResponse(err, err.Error())
 	}
 
-	return &commentsService.GetCommByIDRes{Comment: comm.ToProto()}, nil
+	return &comments.GetCommByIDRes{Comment: comm.ToProto()}, nil
 }
 
 // UpdateComment
-func (c *CommentsService) UpdateComment(ctx context.Context, req *commentsService.UpdateCommReq) (*commentsService.UpdateCommRes, error) {
+func (c *CommentsService) UpdateComment(ctx context.Context, req *comments.UpdateCommReq) (*comments.UpdateCommRes, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "CommentsService.UpdateComment")
 	defer span.Finish()
 
@@ -104,11 +104,11 @@ func (c *CommentsService) UpdateComment(ctx context.Context, req *commentsServic
 		return nil, grpcErrors.ErrorResponse(err, err.Error())
 	}
 
-	return &commentsService.UpdateCommRes{Comment: updatedComm.ToProto()}, nil
+	return &comments.UpdateCommRes{Comment: updatedComm.ToProto()}, nil
 }
 
 // GetByHotelID
-func (c *CommentsService) GetByHotelID(ctx context.Context, req *commentsService.GetByHotelReq) (*commentsService.GetByHotelRes, error) {
+func (c *CommentsService) GetByHotelID(ctx context.Context, req *comments.GetByHotelReq) (*comments.GetByHotelRes, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "CommentsService.GetByHotelID")
 	defer span.Finish()
 
@@ -126,7 +126,7 @@ func (c *CommentsService) GetByHotelID(ctx context.Context, req *commentsService
 		return nil, grpcErrors.ErrorResponse(err, err.Error())
 	}
 
-	return &commentsService.GetByHotelRes{
+	return &comments.GetByHotelRes{
 		TotalCount: int64(commentsList.TotalCount),
 		TotalPages: int64(commentsList.TotalPages),
 		Page:       int64(commentsList.Page),
@@ -136,7 +136,7 @@ func (c *CommentsService) GetByHotelID(ctx context.Context, req *commentsService
 	}, nil
 }
 
-func (c *CommentsService) protoToModel(req *commentsService.CreateCommentReq) (*models.Comment, error) {
+func (c *CommentsService) protoToModel(req *comments.CreateCommentReq) (*models.Comment, error) {
 	hotelUUID, err := uuid.FromString(req.GetHotelID())
 	if err != nil {
 		return nil, err

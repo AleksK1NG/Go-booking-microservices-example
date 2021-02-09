@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+//protoc --go_out=plugins=grpc:. *.proto
+
+package userService;
+option go_package = ".;userService";
+
+
+message User {
+  string UserID = 1;
+  string FirstName = 2;
+  string LastName = 3;
+  string Email = 4;
+  string Avatar = 5;
+  string Role = 6;
+  google.protobuf.Timestamp CreatedAt = 7;
+  google.protobuf.Timestamp UpdatedAt = 8;
+}
+
+message GetByIDResponse {
+  User User = 1;
+}
+
+message GetByIDRequest {
+  string UserID = 1;
+}
+
+
+message GetByIDsRes {
+  repeated User Users = 1;
+}
+
+message GetByIDsReq {
+  repeated string UsersIDs = 1;
+}
+
+service UserService {
+  rpc GetUserByID(GetByIDRequest) returns (GetByIDResponse) {}
+  rpc GetUsersByIDs(GetByIDsReq) returns (GetByIDsRes) {}
+}

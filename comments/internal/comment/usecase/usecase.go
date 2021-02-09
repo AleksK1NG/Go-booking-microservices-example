@@ -10,17 +10,19 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/comments/internal/models"
 	"github.com/AleksK1NG/hotels-mocroservices/comments/pkg/logger"
 	"github.com/AleksK1NG/hotels-mocroservices/comments/pkg/utils"
+	userService "github.com/AleksK1NG/hotels-mocroservices/comments/proto/user"
 )
 
 // CommUseCase
 type commUseCase struct {
-	commRepo comment.PGRepository
-	logger   logger.Logger
+	commRepo   comment.PGRepository
+	logger     logger.Logger
+	userClient userService.UserServiceClient
 }
 
 // NewCommUseCase
-func NewCommUseCase(commRepo comment.PGRepository, logger logger.Logger) *commUseCase {
-	return &commUseCase{commRepo: commRepo, logger: logger}
+func NewCommUseCase(commRepo comment.PGRepository, logger logger.Logger, userClient userService.UserServiceClient) *commUseCase {
+	return &commUseCase{commRepo: commRepo, logger: logger, userClient: userClient}
 }
 
 // Create
@@ -48,5 +50,28 @@ func (c *commUseCase) Update(ctx context.Context, comment *models.Comment) (*mod
 func (c *commUseCase) GetByHotelID(ctx context.Context, hotelID uuid.UUID, query *utils.Pagination) (*models.CommentsList, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "commUseCase.GetByHotelID")
 	defer span.Finish()
-	return c.commRepo.GetByHotelID(ctx, hotelID, query)
+
+	commentsList, err := c.commRepo.GetByHotelID(ctx, hotelID, query)
+	if err != nil {
+		return nil, err
+	}
+
+	uniqUserIDsMap := make(map[string]struct{}, len(commentsList.Comments))
+	for _, comm := range commentsList.Comments {
+		uniqUserIDsMap[comm.UserID.String()] = struct{}{}
+	}
+
+	userIDS := make([]string, 0, len(commentsList.Comments))
+	for key, _ := range uniqUserIDsMap {
+		userIDS = append(userIDS, key)
+	}
+
+	usersByIDs, err := c.userClient.GetUsersByIDs(ctx, &userService.GetByIDsReq{UsersIDs: userIDS})
+	if err != nil {
+		return nil, err
+	}
+
+	c.logger.Infof("USER CLIENT RESPONSE: %-v", usersByIDs)
+
+	return commentsList, nil
 }

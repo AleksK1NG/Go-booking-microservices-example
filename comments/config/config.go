@@ -46,6 +46,7 @@ type GRPCServer struct {
 	MaxConnectionIdle      time.Duration
 	MaxConnectionAge       time.Duration
 	SessionGrpcServicePort string
+	UserGrpcServicePort    string
 }
 
 // RabbitMQ
@@ -113,7 +114,7 @@ func LoadConfig(filename string) (*viper.Viper, error) {
 	v := viper.New()
 
 	v.SetConfigName(filename)
-	v.AddConfigPath("./comments")
+	v.AddConfigPath(".")
 	v.AutomaticEnv()
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
