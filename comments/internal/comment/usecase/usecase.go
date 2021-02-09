@@ -47,7 +47,7 @@ func (c *commUseCase) Update(ctx context.Context, comment *models.Comment) (*mod
 }
 
 // GetByHotelID
-func (c *commUseCase) GetByHotelID(ctx context.Context, hotelID uuid.UUID, query *utils.Pagination) (*models.CommentsList, error) {
+func (c *commUseCase) GetByHotelID(ctx context.Context, hotelID uuid.UUID, query *utils.Pagination) (*models.CommentsFullList, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "commUseCase.GetByHotelID")
 	defer span.Finish()
 
@@ -71,7 +71,12 @@ func (c *commUseCase) GetByHotelID(ctx context.Context, hotelID uuid.UUID, query
 		return nil, err
 	}
 
-	c.logger.Infof("USER CLIENT RESPONSE: %-v", usersByIDs)
-
-	return commentsList, nil
+	return &models.CommentsFullList{
+		TotalCount: commentsList.TotalCount,
+		TotalPages: commentsList.TotalPages,
+		Page:       commentsList.Page,
+		Size:       commentsList.Size,
+		HasMore:    commentsList.HasMore,
+		Comments:   commentsList.ToHotelByIDProto(usersByIDs.GetUsers()),
+	}, nil
 }

@@ -19,6 +19,26 @@ message Comment {
   google.protobuf.Timestamp UpdatedAt = 8;
 }
 
+message User {
+  string UserID = 1;
+  string FirstName = 2;
+  string LastName = 3;
+  string Email = 4;
+  string Avatar = 5;
+  string Role = 6;
+}
+
+message CommentFull {
+  string CommentID = 1;
+  string HotelID = 2;
+  User User = 3;
+  string Message = 4;
+  repeated string Photos = 5;
+  double Rating = 6;
+  google.protobuf.Timestamp CreatedAt = 7;
+  google.protobuf.Timestamp UpdatedAt = 8;
+}
+
 message CreateCommentReq {
   string HotelID = 1;
   string UserID = 2;
@@ -62,7 +82,7 @@ message GetByHotelRes {
   int64 Page = 3;
   int64 Size = 4;
   bool HasMore = 5;
-  repeated Comment Comments = 6;
+  repeated CommentFull Comments = 6;
 }
 
 

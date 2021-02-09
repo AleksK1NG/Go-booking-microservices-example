@@ -14,5 +14,5 @@ type UseCase interface {
 	Create(ctx context.Context, comment *models.Comment) (*models.Comment, error)
 	GetByID(ctx context.Context, commentID uuid.UUID) (*models.Comment, error)
 	Update(ctx context.Context, comment *models.Comment) (*models.Comment, error)
-	GetByHotelID(ctx context.Context, hotelID uuid.UUID, query *utils.Pagination) (*models.CommentsList, error)
+	GetByHotelID(ctx context.Context, hotelID uuid.UUID, query *utils.Pagination) (*models.CommentsFullList, error)
 }
