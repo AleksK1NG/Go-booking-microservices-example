@@ -27,6 +27,16 @@ message GetByIDRequest {
   string UserID = 1;
 }
 
+
+message GetByIDsRes {
+  repeated User Users = 1;
+}
+
+message GetByIDsReq {
+  repeated string UsersIDs = 1;
+}
+
 service UserService {
   rpc GetUserByID(GetByIDRequest) returns (GetByIDResponse) {}
+  rpc GetUsersByIDs(GetByIDsReq) returns (GetByIDsRes) {}
 }

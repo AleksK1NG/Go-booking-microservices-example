@@ -252,3 +252,10 @@ func (u *UserUseCase) UpdateAvatar(ctx context.Context, data *models.UpdateAvata
 	u.log.Infof("Publish UpdateAvatar %-v", headers)
 	return nil
 }
+
+// GetUsersByIDs
+func (u *UserUseCase) GetUsersByIDs(ctx context.Context, userIDs []string) ([]*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.GetUsersByIDs")
+	defer span.Finish()
+	return u.userPGRepo.GetUsersByIDs(ctx, userIDs)
+}

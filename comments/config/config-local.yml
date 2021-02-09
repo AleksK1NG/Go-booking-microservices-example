@@ -59,7 +59,8 @@ redis:
   DB: 0
 
 metrics:
-  Url: 0.0.0.0:7075
+  Port: ":7078"
+  Url: 0.0.0.0:7078
   ServiceName: comments_microservice
 
 jaeger:

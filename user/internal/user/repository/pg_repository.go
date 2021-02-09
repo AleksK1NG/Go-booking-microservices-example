@@ -2,7 +2,9 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/opentracing/opentracing-go"
@@ -134,4 +136,64 @@ func (u *UserPGRepository) UpdateAvatar(ctx context.Context, msg models.Uploaded
 	}
 
 	return &res, nil
+}
+
+func (u *UserPGRepository) GetUsersByIDs(ctx context.Context, userIDs []string) ([]*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "UserPGRepository.GetUsersByIDs")
+	defer span.Finish()
+
+	var placeholders string
+	for i, _ := range userIDs {
+		placeholders += `$` + strconv.Itoa(i+1) + `,`
+	}
+	placeholders = placeholders[:len(placeholders)-1]
+
+	query := fmt.Sprintf("SELECT user_id, first_name, last_name, email, avatar, role, updated_at, created_at FROM "+
+		"users WHERE user_id IN (%v)", placeholders)
+
+	args := make([]interface{}, len(userIDs))
+	for i, id := range userIDs {
+		args[i] = id
+	}
+
+	rows, err := u.db.Query(ctx, query, args...)
+	if err != nil {
+		return nil, errors.Wrap(err, "db.Query")
+	}
+	defer rows.Close()
+
+	users := make([]*models.UserResponse, 0, len(userIDs))
+	for rows.Next() {
+		var res models.UserResponse
+		if err := rows.Scan(
+			&res.UserID,
+			&res.FirstName,
+			&res.LastName,
+			&res.Email,
+			&res.Avatar,
+			&res.Role,
+			&res.UpdatedAt,
+			&res.CreatedAt,
+		); err != nil {
+			return nil, errors.Wrap(err, "db.Query")
+		}
+		users = append(users, &res)
+	}
+
+	log.Printf("USERS: %-v", users)
+
+	return users, nil
+}
+
+func (u UserPGRepository) convertStringArrToUUID(ids []string) ([]uuid.UUID, error) {
+	uids := make([]uuid.UUID, 0, len(ids))
+	for _, id := range ids {
+		uid, err := uuid.FromString(id)
+		if err != nil {
+			return nil, err
+		}
+		uids = append(uids, uid)
+	}
+
+	return uids, nil
 }
