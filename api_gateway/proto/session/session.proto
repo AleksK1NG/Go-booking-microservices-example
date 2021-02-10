@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+//protoc --go_out=plugins=grpc:. *.proto
+
+package sessionService;
+option go_package = ".;sessionService";
+
+message Session {
+  string UserID = 1;
+  string SessionID = 2;
+}
+
+message CsrfTokenInput {
+  string SessionID = 1;
+}
+
+message CsrfToken {
+  string Token = 1;
+}
+
+message CsrfTokenCheck {
+  string SessionID = 1;
+  string Token = 2;
+}
+
+message CheckResult {
+  bool Result = 1;
+}
+
+message Empty {}
+
+message CreateSessionRequest {
+  string UserID = 1;
+}
+
+message CreateSessionResponse {
+  Session Session = 1;
+}
+
+message GetSessionByIDRequest {
+  string SessionID = 1;
+}
+
+message GetSessionByIDResponse {
+  Session Session = 1;
+}
+
+message DeleteSessionRequest {
+  string SessionID = 1;
+}
+
+message DeleteSessionResponse {
+  string SessionID = 1;
+}
+
+message CreateCsrfTokenRequest {
+  CsrfTokenInput CsrfTokenInput = 1;
+}
+
+message CreateCsrfTokenResponse {
+  CsrfToken CsrfToken = 1;
+}
+
+message CheckCsrfTokenRequest {
+  CsrfTokenCheck CsrfTokenCheck = 1;
+}
+
+message CheckCsrfTokenResponse {
+  CheckResult CheckResult = 1;
+}
+
+service AuthorizationService {
+  rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse) {}
+  rpc GetSessionByID(GetSessionByIDRequest) returns (GetSessionByIDResponse) {}
+  rpc DeleteSession(DeleteSessionRequest) returns (DeleteSessionResponse) {}
+
+  rpc CreateCsrfToken(CreateCsrfTokenRequest) returns (CreateCsrfTokenResponse) {}
+  rpc CheckCsrfToken(CheckCsrfTokenRequest) returns (CheckCsrfTokenResponse) {}
+}

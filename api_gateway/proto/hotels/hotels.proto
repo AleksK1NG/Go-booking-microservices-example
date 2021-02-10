@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+//protoc --go_out=plugins=grpc:. *.proto
+
+package hotelsService;
+option go_package = ".;hotelsService";
+
+
+message Hotel {
+  string HotelID = 1;
+  string Name = 2;
+  string Email = 3;
+  string Country = 4;
+  string City = 5;
+  string Description = 6;
+  string Location = 7;
+  double Rating = 8;
+  string Image = 9;
+  repeated string Photos = 10;
+  int64 CommentsCount = 11;
+  double Latitude = 12;
+  double Longitude = 13;
+  google.protobuf.Timestamp CreatedAt = 14;
+  google.protobuf.Timestamp UpdatedAt = 15;
+}
+
+message GetByIDReq {
+  string HotelID = 1;
+}
+
+message GetByIDRes {
+  Hotel Hotel = 1;
+}
+
+message GetHotelsReq {
+  int64 page = 1;
+  int64 size = 2;
+}
+
+message GetHotelsRes {
+  int64 TotalCount = 1;
+  int64 TotalPages = 2;
+  int64 Page = 3;
+  int64 Size = 4;
+  bool HasMore = 5;
+  repeated Hotel Hotels = 6;
+}
+
+message CreateHotelReq {
+  string Name = 1;
+  string Email = 2;
+  string Country = 3;
+  string City = 4;
+  string Description = 5;
+  string Location = 6;
+  double Rating = 7;
+  string Image = 8;
+  repeated string Photos = 9;
+  int64 CommentsCount = 10;
+  double Latitude = 11;
+  double Longitude = 12;
+}
+
+message CreateHotelRes {
+  Hotel Hotel = 1;
+}
+
+message UpdateHotelReq {
+  string HotelID = 1;
+  string Name = 2;
+  string Email = 3;
+  string Country = 4;
+  string City = 5;
+  string Description = 6;
+  string Location = 7;
+  double Rating = 8;
+  string Image = 9;
+  repeated string Photos = 10;
+  int64 CommentsCount = 11;
+  double Latitude = 12;
+  double Longitude = 13;
+}
+
+message UpdateHotelRes {
+  Hotel Hotel = 1;
+}
+
+message UploadImageReq {
+  string HotelID = 1;
+  bytes Data = 2;
+  string ContentType = 3;
+}
+
+message UploadImageRes {
+  string HotelID = 1;
+}
+
+
+service HotelsService {
+  rpc CreateHotel(CreateHotelReq) returns (CreateHotelRes) {}
+  rpc UpdateHotel(UpdateHotelReq) returns (UpdateHotelRes) {}
+  rpc GetHotelByID(GetByIDReq) returns (GetByIDRes) {}
+  rpc GetHotels(GetHotelsReq) returns (GetHotelsRes) {}
+  rpc UploadImage(UploadImageReq) returns (UploadImageRes) {}
+}

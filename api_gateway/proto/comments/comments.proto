@@ -1,0 +1,94 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+//protoc --go_out=plugins=grpc:. *.proto
+
+package commentsService;
+option go_package = ".;commentsService";
+
+
+message Comment {
+  string CommentID = 1;
+  string HotelID = 2;
+  string UserID = 3;
+  string Message = 4;
+  repeated string Photos = 5;
+  double Rating = 6;
+  google.protobuf.Timestamp CreatedAt = 7;
+  google.protobuf.Timestamp UpdatedAt = 8;
+}
+
+message User {
+  string UserID = 1;
+  string FirstName = 2;
+  string LastName = 3;
+  string Email = 4;
+  string Avatar = 5;
+  string Role = 6;
+}
+
+message CommentFull {
+  string CommentID = 1;
+  string HotelID = 2;
+  User User = 3;
+  string Message = 4;
+  repeated string Photos = 5;
+  double Rating = 6;
+  google.protobuf.Timestamp CreatedAt = 7;
+  google.protobuf.Timestamp UpdatedAt = 8;
+}
+
+message CreateCommentReq {
+  string HotelID = 1;
+  string UserID = 2;
+  string Message = 3;
+  repeated string Photos = 4;
+  double Rating = 5;
+}
+
+message CreateCommentRes {
+  Comment Comment = 1;
+}
+
+message GetCommByIDReq {
+  string CommentID = 1;
+}
+
+message GetCommByIDRes {
+  Comment Comment = 1;
+}
+
+message UpdateCommReq {
+  string CommentID = 1;
+  string Message = 2;
+  repeated string Photos = 3;
+  double Rating = 4;
+}
+
+message UpdateCommRes {
+  Comment Comment = 1;
+}
+
+message GetByHotelReq {
+  string HotelID = 1;
+  int64 page = 2;
+  int64 size = 3;
+}
+
+message GetByHotelRes {
+  int64 TotalCount = 1;
+  int64 TotalPages = 2;
+  int64 Page = 3;
+  int64 Size = 4;
+  bool HasMore = 5;
+  repeated CommentFull Comments = 6;
+}
+
+
+service commentsService {
+  rpc CreateComment(CreateCommentReq) returns (CreateCommentRes) {}
+  rpc GetCommByID(GetCommByIDReq) returns (GetCommByIDRes) {}
+  rpc UpdateComment(UpdateCommReq) returns (UpdateCommRes) {}
+  rpc GetByHotelID(GetByHotelReq) returns (GetByHotelRes) {}
+}
