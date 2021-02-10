@@ -59,11 +59,11 @@ func (s *Server) Run() error {
 	router.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
 
 	go func() {
-		if err := router.Start(":7070"); err != nil {
+		if err := router.Start(s.cfg.Metrics.Port); err != nil {
 			s.logger.Errorf("router.Start metrics: %v", err)
 			cancel()
 		}
-		s.logger.Infof("Metrics available on: %v", s.cfg.Metrics.URL)
+		s.logger.Infof("Prometheus Metrics available on: %v", s.cfg.Metrics.Port)
 	}()
 
 	l, err := net.Listen("tcp", s.cfg.GRPCServer.Port)

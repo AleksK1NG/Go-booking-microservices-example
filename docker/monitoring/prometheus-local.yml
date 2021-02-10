@@ -26,3 +26,7 @@ scrape_configs:
   - job_name: 'hotels-microservice'
     static_configs:
       - targets: [ 'localhost:7075' ]
+
+  - job_name: 'comments-microservice'
+    static_configs:
+      - targets: [ 'localhost:7078' ]

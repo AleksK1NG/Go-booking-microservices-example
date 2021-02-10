@@ -14,8 +14,6 @@ import (
 )
 
 func main() {
-	log.Println("StartingComments service")
-
 	configPath := config.GetConfigPath(os.Getenv("config"))
 	cfg, err := config.GetConfig(configPath)
 	if err != nil {
@@ -24,6 +22,7 @@ func main() {
 
 	appLogger := logger.NewApiLogger(cfg)
 	appLogger.InitLogger()
+	appLogger.Info("Starting Comments service")
 	appLogger.Infof(
 		"AppVersion: %s, LogLevel: %s, Mode: %s",
 		cfg.GRPCServer.AppVersion,
@@ -37,8 +36,6 @@ func main() {
 		appLogger.Fatal("cannot connect to postgres", err)
 	}
 	defer pgxConn.Close()
-
-	appLogger.Infof("CFG: %-v", cfg)
 
 	appLogger.Infof("%-v", pgxConn.Stat())
 

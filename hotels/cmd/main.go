@@ -15,8 +15,6 @@ import (
 )
 
 func main() {
-	log.Println("Starting hotels microservice")
-
 	configPath := config.GetConfigPath(os.Getenv("config"))
 	cfg, err := config.GetConfig(configPath)
 	if err != nil {
@@ -25,6 +23,7 @@ func main() {
 
 	appLogger := logger.NewApiLogger(cfg)
 	appLogger.InitLogger()
+	appLogger.Info("Starting hotels microservice")
 	appLogger.Infof(
 		"AppVersion: %s, LogLevel: %s, Mode: %s",
 		cfg.GRPCServer.AppVersion,
@@ -32,8 +31,6 @@ func main() {
 		cfg.GRPCServer.Mode,
 	)
 	appLogger.Infof("Success parsed config: %#v", cfg.GRPCServer.AppVersion)
-
-	log.Printf("CFG: %-v", cfg)
 
 	pgxConn, err := postgres.NewPgxConn(cfg)
 	if err != nil {
@@ -54,8 +51,8 @@ func main() {
 	defer closer.Close()
 	appLogger.Info("Opentracing connected")
 
-	log.Printf("%-v", pgxConn.Stat())
-	log.Printf("%-v", redisClient.PoolStats())
+	appLogger.Infof("%-v", pgxConn.Stat())
+	appLogger.Infof("%-v", redisClient.PoolStats())
 
 	s := server.NewServer(appLogger, cfg, redisClient, pgxConn, tracer)
 	appLogger.Fatal(s.Run())

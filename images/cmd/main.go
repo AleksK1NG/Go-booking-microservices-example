@@ -16,18 +16,15 @@ import (
 )
 
 func main() {
-	log.Println("Starting images microservice")
-
 	configPath := config.GetConfigPath(os.Getenv("config"))
 	cfg, err := config.GetConfig(configPath)
 	if err != nil {
 		log.Fatalf("Loading config: %v", err)
 	}
 
-	log.Printf("CFG: %-v", cfg)
-
 	appLogger := logger.NewApiLogger(cfg)
 	appLogger.InitLogger()
+	appLogger.Info("Starting images microservice")
 	appLogger.Infof(
 		"AppVersion: %s, LogLevel: %s, Mode: %s",
 		cfg.GRPCServer.AppVersion,

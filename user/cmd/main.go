@@ -22,8 +22,6 @@ import (
 // @contact.email alexander.bryksin@yandex.ru
 // @BasePath /api/v1
 func main() {
-	log.Println("Starting user server")
-
 	configPath := config.GetConfigPath(os.Getenv("config"))
 	cfg, err := config.GetConfig(configPath)
 	if err != nil {
@@ -32,6 +30,7 @@ func main() {
 
 	appLogger := logger.NewApiLogger(cfg)
 	appLogger.InitLogger()
+	appLogger.Info("Starting user server")
 	appLogger.Infof(
 		"AppVersion: %s, LogLevel: %s, Mode: %s",
 		cfg.GRPCServer.AppVersion,
