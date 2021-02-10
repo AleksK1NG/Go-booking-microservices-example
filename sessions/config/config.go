@@ -71,6 +71,7 @@ type RedisConfig struct {
 
 // Metrics config
 type Metrics struct {
+	Port        string
 	URL         string
 	ServiceName string
 }

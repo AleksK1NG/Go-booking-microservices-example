@@ -42,6 +42,7 @@ redis:
   DB: 0
 
 metrics:
+  Port: ":7070"
   Url: 0.0.0.0:7070
   ServiceName: sessions_microservice
 
