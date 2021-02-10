@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+//protoc --go_out=plugins=grpc:. *.proto
+
+package imageService;
+option go_package = ".;imageService";
+
+
+message Image {
+  string ImageID = 1;
+  string ImageURL = 2;
+  bool IsUploaded = 3;
+  google.protobuf.Timestamp CreatedAt = 4;
+}
+
+message GetByIDResponse {
+  Image Image = 1;
+}
+
+message GetByIDRequest {
+  string ImageID = 1;
+}
+
+service ImageService {
+  rpc GetImageByID(GetByIDRequest) returns (GetByIDResponse) {}
+}
