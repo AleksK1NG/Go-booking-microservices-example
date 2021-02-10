@@ -58,8 +58,8 @@ func main() {
 	defer closer.Close()
 	appLogger.Info("Opentracing connected")
 
-	log.Printf("%-v", pgxConn.Stat())
-	log.Printf("%-v", redisClient.PoolStats())
+	appLogger.Infof("%-v", pgxConn.Stat())
+	appLogger.Infof("%-v", redisClient.PoolStats())
 
 	s := server.NewServer(appLogger, cfg, redisClient, pgxConn, tracer)
 	appLogger.Fatal(s.Run())

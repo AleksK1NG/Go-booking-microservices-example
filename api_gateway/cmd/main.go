@@ -10,6 +10,7 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/config"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/jaeger"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/logger"
+	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/redis"
 )
 
 func main() {
@@ -41,6 +42,9 @@ func main() {
 	opentracing.SetGlobalTracer(tracer)
 	defer closer.Close()
 	appLogger.Info("Opentracing connected")
+
+	redisClient := redis.NewRedisClient(cfg)
+	appLogger.Infof("Redis connected: %-v", redisClient.PoolStats())
 
 	http.ListenAndServe(":7777", nil)
 }
