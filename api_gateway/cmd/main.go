@@ -2,20 +2,25 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/opentracing/opentracing-go"
 
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/config"
+	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/server"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/jaeger"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/logger"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/redis"
 )
 
+// @title API Gateway
+// @version 1.0
+// @description API Gateway
+// @contact.name Alexander Bryksin
+// @contact.url https://github.com/AleksK1NG
+// @contact.email alexander.bryksin@yandex.ru
+// @BasePath /api/v1
 func main() {
-	log.Println("Starting gateway api")
-
 	configPath := config.GetConfigPath(os.Getenv("config"))
 	cfg, err := config.GetConfig(configPath)
 	if err != nil {
@@ -24,7 +29,7 @@ func main() {
 
 	appLogger := logger.NewApiLogger(cfg)
 	appLogger.InitLogger()
-	appLogger.Info("Starting Comments service")
+	appLogger.Info("Starting API Gateway")
 	appLogger.Infof(
 		"AppVersion: %s, LogLevel: %s, Mode: %s",
 		cfg.HttpServer.AppVersion,
@@ -46,5 +51,6 @@ func main() {
 	redisClient := redis.NewRedisClient(cfg)
 	appLogger.Infof("Redis connected: %-v", redisClient.PoolStats())
 
-	http.ListenAndServe(":7777", nil)
+	s := server.NewServer(appLogger, cfg, redisClient, tracer)
+	appLogger.Fatal(s.Run())
 }
