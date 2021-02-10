@@ -1,0 +1,63 @@
+HttpServer:
+  AppVersion: "1.0.0"
+  Port: ":8016"
+  PprofPort: ":8116"
+  Timeout: 15
+  ReadTimeout: 5
+  WriteTimeout: 5
+  CookieLifeTime: 44640
+  SessionCookieName: "session_token"
+  CSRFHeader: "X-CSRF-Token"
+
+GRPC:
+  SessionServicePort: ":5000"
+  UserServicePort: ":5001"
+  HotelsServicePort: ":5055"
+  CommentsServicePort: ":5056"
+  ImagesServicePort: ":5050"
+
+Rabbitmq:
+  Host: localhost
+  Port: 5672
+  User: guest
+  Password: guest
+
+
+postgres:
+  PostgresqlHost: localhost
+  PostgresqlPort: 5436
+  PostgresqlUser: postgres
+  PostgresqlPassword: postgres
+  PostgresqlDbname: comments_db
+  PostgresqlSslmode: "disable"
+  PgDriver: pgx
+
+logger:
+  Development: true
+  DisableCaller: false
+  DisableStacktrace: false
+  Encoding: json
+  Level: info
+
+
+redis:
+  RedisAddr: localhost:6379
+  RedisPassword:
+  RedisDb: 0
+  RedisDefaultDB: 0
+  MinIdleConn: 200
+  PoolSize: 12000
+  PoolTimeout: 240
+  Password: ""
+  DB: 0
+
+metrics:
+  Port: ":7080"
+  Url: 0.0.0.0:7080
+  ServiceName: api_gateway
+
+jaeger:
+  Host: localhost:6831
+  ServiceName: APIGateWay_GRPC
+  LogSpans: false
+
