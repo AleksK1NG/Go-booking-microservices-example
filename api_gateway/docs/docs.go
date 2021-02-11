@@ -23,7 +23,135 @@ var doc = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/hotels": {
+            "get": {
+                "description": "Get hotels list with pagination using page and size query parameters",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Hotels"
+                ],
+                "summary": "Get hotels list new user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "number of elements",
+                        "name": "size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.HotelsListRes"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.Hotel": {
+            "type": "object",
+            "required": [
+                "city",
+                "country",
+                "description",
+                "email",
+                "location",
+                "name",
+                "rating"
+            ],
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "comments_count": {
+                    "type": "integer"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "hotel_id": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "latitude": {
+                    "type": "number"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "longitude": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "photos": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "rating": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.HotelsListRes": {
+            "type": "object",
+            "properties": {
+                "hasMore": {
+                    "type": "boolean"
+                },
+                "hotels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Hotel"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "totalCount": {
+                    "type": "integer"
+                },
+                "totalPages": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
 }`
 
 type swaggerInfo struct {
