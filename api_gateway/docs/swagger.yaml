@@ -1,4 +1,89 @@
+definitions:
+  models.Hotel:
+    properties:
+      city:
+        type: string
+      comments_count:
+        type: integer
+      country:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      email:
+        type: string
+      hotel_id:
+        type: string
+      image:
+        type: string
+      latitude:
+        type: number
+      location:
+        type: string
+      longitude:
+        type: number
+      name:
+        type: string
+      photos:
+        items:
+          type: string
+        type: array
+      rating:
+        type: number
+      updated_at:
+        type: string
+    required:
+    - city
+    - country
+    - description
+    - email
+    - location
+    - name
+    - rating
+    type: object
+  models.HotelsListRes:
+    properties:
+      hasMore:
+        type: boolean
+      hotels:
+        items:
+          $ref: '#/definitions/models.Hotel'
+        type: array
+      page:
+        type: integer
+      size:
+        type: integer
+      totalCount:
+        type: integer
+      totalPages:
+        type: integer
+    type: object
 info:
   contact: {}
-paths: {}
+paths:
+  /hotels:
+    get:
+      consumes:
+      - application/json
+      description: Get hotels list with pagination using page and size query parameters
+      parameters:
+      - description: page number
+        in: query
+        name: page
+        type: integer
+      - description: number of elements
+        in: query
+        name: size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.HotelsListRes'
+      summary: Get hotels list new user
+      tags:
+      - Hotels
 swagger: "2.0"

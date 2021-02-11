@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/go-redis/redis/v8"
 	"github.com/labstack/echo/v4"
 	"github.com/opentracing/opentracing-go"
@@ -15,7 +16,13 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/config"
+	hotelsHandlers "github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/hotels/delivery/http/v1"
+	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/hotels/repository"
+	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/hotels/usecase"
+	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/interceptors"
+	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/grpc_client"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/logger"
+	hotelsService "github.com/AleksK1NG/hotels-mocroservices/api-gateway/proto/hotels"
 )
 
 const (
@@ -44,16 +51,17 @@ func (s *server) Run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	// validate := validator.New()
-	v1 := s.echo.Group("/api/v1")
-	hotels := v1.Group("/hotels")
+	im := interceptors.NewInterceptorManager(s.logger, s.cfg, s.tracer)
+	hotelsConn, err := grpc_client.NewGRPCClientServiceConn(ctx, im, s.cfg.GRPC.HotelsServicePort)
+	if err != nil {
+		return err
+	}
 
-	hotels.GET("", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, "Ok")
-	})
-	s.echo.GET("/health", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Ok")
-	})
+	hotelsServiceClient := hotelsService.NewHotelsServiceClient(hotelsConn)
+	hotelRedisRepo := repository.NewHotelRedisRepo(s.redisConn)
+	hotelsUC := usecase.NewHotelsUseCase(s.logger, hotelsServiceClient, hotelRedisRepo)
+
+	validate := validator.New()
 
 	go func() {
 		router := echo.New()
@@ -81,6 +89,16 @@ func (s *server) Run() error {
 			s.logger.Errorf("Error PPROF ListenAndServe: %s", err)
 		}
 	}()
+
+	v1 := s.echo.Group("/api/v1")
+	hotelsGroup := v1.Group("/hotels")
+
+	s.echo.GET("/health", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Ok")
+	})
+
+	hotelHandlers := hotelsHandlers.NewHotelsHandlers(s.cfg, hotelsGroup, s.logger, validate, hotelsUC)
+	hotelHandlers.MapRoutes()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
