@@ -61,16 +61,19 @@ func (h *hotelsHandlers) CreateHotel() echo.HandlerFunc {
 
 		var hotelReq models.Hotel
 		if err := c.Bind(&hotelReq); err != nil {
-			return err
+			h.logger.Error("c.Bind")
+			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		if err := h.validate.StructCtx(ctx, &hotelReq); err != nil {
-			return err
+			h.logger.Error("validate.StructCtx")
+			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		hotel, err := h.hotelsUC.CreateHotel(ctx, &hotelReq)
 		if err != nil {
-			return err
+			h.logger.Error("hotelsUC.CreateHotel")
+			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		return c.JSON(http.StatusCreated, hotel)
@@ -93,22 +96,26 @@ func (h *hotelsHandlers) UpdateHotel() echo.HandlerFunc {
 
 		hotelUUID, err := uuid.FromString(c.QueryParam("hotel_id"))
 		if err != nil {
-			return err
+			h.logger.Error("uuid.FromString")
+			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		var hotelReq models.Hotel
 		if err := c.Bind(&hotelReq); err != nil {
-			return err
+			h.logger.Error("c.Bind")
+			return httpErrors.ErrorCtxResponse(c, err)
 		}
 		hotelReq.HotelID = hotelUUID
 
 		if err := h.validate.StructCtx(ctx, &hotelReq); err != nil {
-			return err
+			h.logger.Error("validate.StructCtx")
+			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		hotel, err := h.hotelsUC.UpdateHotel(ctx, &hotelReq)
 		if err != nil {
-			return err
+			h.logger.Error("hotelsUC.UpdateHotel")
+			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		return c.JSON(http.StatusOK, hotel)
@@ -131,12 +138,14 @@ func (h *hotelsHandlers) GetHotelByID() echo.HandlerFunc {
 
 		hotelUUID, err := uuid.FromString(c.QueryParam("hotel_id"))
 		if err != nil {
-			return err
+			h.logger.Error("uuid.FromString")
+			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		hotelByID, err := h.hotelsUC.GetHotelByID(ctx, hotelUUID)
 		if err != nil {
-			return err
+			h.logger.Error("hotelsUC.GetHotelByID")
+			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		return c.JSON(http.StatusOK, hotelByID)
@@ -160,16 +169,19 @@ func (h *hotelsHandlers) GetHotels() echo.HandlerFunc {
 
 		page, err := strconv.Atoi(c.QueryParam("page"))
 		if err != nil {
-			return err
+			h.logger.Error("strconv.Atoi")
+			return httpErrors.ErrorCtxResponse(c, err)
 		}
 		size, err := strconv.Atoi(c.QueryParam("size"))
 		if err != nil {
-			return err
+			h.logger.Error("strconv.Atoi")
+			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		hotelsList, err := h.hotelsUC.GetHotels(ctx, int64(page), int64(size))
 		if err != nil {
-			return err
+			h.logger.Error("hotelsUC.GetHotels")
+			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		return c.JSON(http.StatusOK, hotelsList)
@@ -232,7 +244,8 @@ func (h *hotelsHandlers) UploadImage() echo.HandlerFunc {
 		}
 
 		if err := h.hotelsUC.UploadImage(ctx, buf.Bytes(), fileType, hotelUUID.String()); err != nil {
-			return err
+			h.logger.Error("hotelsUC.UploadImage")
+			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		return c.NoContent(http.StatusOK)
