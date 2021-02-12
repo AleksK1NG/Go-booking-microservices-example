@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
@@ -30,6 +31,16 @@ func (h *hotelsUseCase) GetHotelByID(ctx context.Context, hotelID uuid.UUID) (*m
 	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsUseCase.GetHotelByID")
 	defer span.Finish()
 
+	cacheHotel, err := h.hotelsRepo.GetHotelByID(ctx, hotelID)
+	if err != nil {
+		if err != redis.Nil {
+			h.logger.Errorf("GetHotelByID: %v", err)
+		}
+	}
+	if cacheHotel != nil {
+		return cacheHotel, nil
+	}
+
 	hotelByID, err := h.hotelsService.GetHotelByID(ctx, &hotelsService.GetByIDReq{HotelID: hotelID.String()})
 	if err != nil {
 		return nil, errors.Wrap(err, "hotelsService.GetHotelByID")
@@ -38,6 +49,10 @@ func (h *hotelsUseCase) GetHotelByID(ctx context.Context, hotelID uuid.UUID) (*m
 	fromProto, err := models.HotelFromProto(hotelByID.GetHotel())
 	if err != nil {
 		return nil, errors.Wrap(err, "HotelFromProto")
+	}
+
+	if err := h.hotelsRepo.SetHotel(ctx, fromProto); err != nil {
+		h.logger.Errorf("SetHotel: %v", err)
 	}
 
 	return fromProto, nil
@@ -70,6 +85,10 @@ func (h *hotelsUseCase) UpdateHotel(ctx context.Context, hotel *models.Hotel) (*
 	fromProto, err := models.HotelFromProto(hotelRes.GetHotel())
 	if err != nil {
 		return nil, errors.Wrap(err, "HotelFromProto")
+	}
+
+	if err := h.hotelsRepo.SetHotel(ctx, fromProto); err != nil {
+		h.logger.Errorf("SetHotel: %v", err)
 	}
 
 	return fromProto, nil
