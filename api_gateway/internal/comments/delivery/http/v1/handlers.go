@@ -2,6 +2,7 @@ package v1
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -161,7 +162,18 @@ func (h *commentsHandlers) GetByHotelID() echo.HandlerFunc {
 			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
-		commentsList, err := h.commUC.GetByHotelID(ctx, hotelUUID)
+		page, err := strconv.Atoi(c.QueryParam("page"))
+		if err != nil {
+			h.logger.Error("strconv.Atoi")
+			return httpErrors.ErrorCtxResponse(c, err)
+		}
+		size, err := strconv.Atoi(c.QueryParam("size"))
+		if err != nil {
+			h.logger.Error("strconv.Atoi")
+			return httpErrors.ErrorCtxResponse(c, err)
+		}
+
+		commentsList, err := h.commUC.GetByHotelID(ctx, hotelUUID, int64(page), int64(size))
 		if err != nil {
 			h.logger.Error("commUC.GetByHotelID")
 			return httpErrors.ErrorCtxResponse(c, err)
