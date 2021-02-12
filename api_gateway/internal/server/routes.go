@@ -1,6 +1,7 @@
 package server
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -37,6 +38,10 @@ func (s *server) MapRoutes() {
 	}))
 	s.echo.Use(middleware.Secure())
 	s.echo.Use(middleware.BodyLimit(bodyLimit))
+
+	s.echo.GET("/health", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Ok")
+	})
 	// if s.cfg.Server.Debug {
 	// 	s.echo.Use(mw.DebugMiddleware)
 	// }

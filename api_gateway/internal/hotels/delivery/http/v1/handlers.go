@@ -51,9 +51,8 @@ func NewHotelsHandlers(
 // @Description Create new hotel instance
 // @Accept json
 // @Produce json
-// @Param hotel_id path int true "Hotel UUID"
-// @Success 200 {object} models.Hotel
-// @Router /hotels/{hotel_id} [post]
+// @Success 201 {object} models.Hotel
+// @Router /hotels [post]
 func (h *hotelsHandlers) CreateHotel() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "hotelsHandlers.CreateHotel")
@@ -130,7 +129,7 @@ func (h *hotelsHandlers) UpdateHotel() echo.HandlerFunc {
 // @Produce json
 // @Param hotel_id query string false "hotel uuid"
 // @Success 200 {object} models.Hotel
-// @Router /hotels [get]
+// @Router /hotels/{hotel_id} [get]
 func (h *hotelsHandlers) GetHotelByID() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "hotelsHandlers.GetHotelByID")

@@ -16,12 +16,16 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/config"
+	commentsHandlers "github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/comments/delivery/http/v1"
+	commRedisRepo "github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/comments/repository"
+	commUseCase "github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/comments/usecase"
 	hotelsHandlers "github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/hotels/delivery/http/v1"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/hotels/repository"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/hotels/usecase"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/interceptors"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/grpc_client"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/logger"
+	commentsService "github.com/AleksK1NG/hotels-mocroservices/api-gateway/proto/comments"
 	hotelsService "github.com/AleksK1NG/hotels-mocroservices/api-gateway/proto/hotels"
 )
 
@@ -56,10 +60,21 @@ func (s *server) Run() error {
 	if err != nil {
 		return err
 	}
+	defer hotelsConn.Close()
+
+	commConn, err := grpc_client.NewGRPCClientServiceConn(ctx, im, s.cfg.GRPC.CommentsServicePort)
+	if err != nil {
+		return err
+	}
+	defer commConn.Close()
 
 	hotelsServiceClient := hotelsService.NewHotelsServiceClient(hotelsConn)
 	hotelRedisRepo := repository.NewHotelRedisRepo(s.redisConn)
 	hotelsUC := usecase.NewHotelsUseCase(s.logger, hotelsServiceClient, hotelRedisRepo)
+
+	commRedisRepository := commRedisRepo.NewCommRedisRepository(s.redisConn)
+	commentsServiceClient := commentsService.NewCommentsServiceClient(commConn)
+	commUC := commUseCase.NewCommentUseCase(s.logger, commentsServiceClient, commRedisRepository)
 
 	validate := validator.New()
 
@@ -92,13 +107,13 @@ func (s *server) Run() error {
 
 	v1 := s.echo.Group("/api/v1")
 	hotelsGroup := v1.Group("/hotels")
-
-	s.echo.GET("/health", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Ok")
-	})
+	commentsGroup := v1.Group("/comments")
 
 	hotelHandlers := hotelsHandlers.NewHotelsHandlers(s.cfg, hotelsGroup, s.logger, validate, hotelsUC)
 	hotelHandlers.MapRoutes()
+
+	commentHandlers := commentsHandlers.NewCommentsHandlers(s.cfg, commentsGroup, s.logger, validate, commUC)
+	commentHandlers.MapRoutes()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
