@@ -34,7 +34,7 @@ deps-cleancache:
 # ==============================================================================
 # Generate swagger documentation
 
-swagger_user_api:
+swagger_api:
 	echo "Starting swagger generating"
 	cd ./user && swag init -g **/**/*.go
 	cd ..

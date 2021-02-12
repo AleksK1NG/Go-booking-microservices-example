@@ -9,7 +9,9 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/hotels"
+	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/middlewares"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/models"
+	httpErrors "github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/http_errors"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/logger"
 	hotelsService "github.com/AleksK1NG/hotels-mocroservices/api-gateway/proto/hotels"
 )
@@ -30,6 +32,11 @@ func NewHotelsUseCase(logger logger.Logger, hotelsService hotelsService.HotelsSe
 func (h *hotelsUseCase) GetHotelByID(ctx context.Context, hotelID uuid.UUID) (*models.Hotel, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsUseCase.GetHotelByID")
 	defer span.Finish()
+
+	ctxUser, ok := ctx.Value(middlewares.RequestCtxUser{}).(*models.UserResponse)
+	if !ok || ctxUser == nil {
+		return nil, errors.Wrap(httpErrors.Unauthorized, "ctx.Value user")
+	}
 
 	cacheHotel, err := h.hotelsRepo.GetHotelByID(ctx, hotelID)
 	if err != nil {

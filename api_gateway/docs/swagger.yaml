@@ -1,4 +1,81 @@
 definitions:
+  models.Comment:
+    properties:
+      comment_id:
+        type: string
+      created_at:
+        type: string
+      hotel_id:
+        type: string
+      message:
+        type: string
+      photos:
+        items:
+          type: string
+        type: array
+      rating:
+        type: number
+      updated_at:
+        type: string
+      user_id:
+        type: string
+    required:
+    - message
+    - rating
+    type: object
+  models.CommentFull:
+    properties:
+      comment_id:
+        type: string
+      createdAt:
+        type: string
+      hotel_id:
+        type: string
+      message:
+        type: string
+      photos:
+        items:
+          type: string
+        type: array
+      rating:
+        type: number
+      updatedAt:
+        type: string
+      user:
+        $ref: '#/definitions/models.CommentUser'
+    type: object
+  models.CommentUser:
+    properties:
+      avatar:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      role:
+        type: string
+      userId:
+        type: string
+    type: object
+  models.CommentsList:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/models.CommentFull'
+        type: array
+      hasMore:
+        type: boolean
+      page:
+        type: integer
+      size:
+        type: integer
+      totalCount:
+        type: integer
+      totalPages:
+        type: integer
+    type: object
   models.Hotel:
     properties:
       city:
@@ -62,6 +139,80 @@ definitions:
 info:
   contact: {}
 paths:
+  /comments:
+    post:
+      consumes:
+      - application/json
+      description: Create new single comment
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Comment'
+      summary: Create new comment
+      tags:
+      - Comments
+  /comments/{comment_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get comment by uuid
+      parameters:
+      - description: comment uuid
+        in: query
+        name: comment_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Comment'
+      summary: Get comment by id
+      tags:
+      - Comments
+    put:
+      consumes:
+      - application/json
+      description: Update comment by uuid
+      parameters:
+      - description: comment uuid
+        in: query
+        name: comment_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Comment'
+      summary: Update comment by id
+      tags:
+      - Comments
+  /comments/hotel/{hotel_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get comments list by hotel uuid
+      parameters:
+      - description: hotel uuid
+        in: query
+        name: hotel_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CommentsList'
+      summary: Get comments by hotel id
+      tags:
+      - Comments
   /hotels:
     get:
       consumes:
@@ -84,6 +235,80 @@ paths:
           schema:
             $ref: '#/definitions/models.HotelsListRes'
       summary: Get hotels list new user
+      tags:
+      - Hotels
+    post:
+      consumes:
+      - application/json
+      description: Create new hotel instance
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Hotel'
+      summary: Create new hotel
+      tags:
+      - Hotels
+  /hotels/{hotel_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get single hotel by uuid
+      parameters:
+      - description: hotel uuid
+        in: query
+        name: hotel_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Hotel'
+      summary: Get hotel by id
+      tags:
+      - Hotels
+    put:
+      consumes:
+      - application/json
+      description: Update single hotel data
+      parameters:
+      - description: Hotel UUID
+        in: path
+        name: hotel_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Hotel'
+      summary: Update hotel data
+      tags:
+      - Hotels
+  /hotels/{id}/image:
+    put:
+      consumes:
+      - multipart/form-data
+      description: Upload hotel logo image
+      parameters:
+      - description: hotel uuid
+        in: query
+        name: hotel_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Hotel'
+      summary: Upload hotel image
       tags:
       - Hotels
 swagger: "2.0"

@@ -11,6 +11,7 @@ import (
 
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/config"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/comments"
+	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/middlewares"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/models"
 	httpErrors "github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/http_errors"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/logger"
@@ -23,6 +24,7 @@ type commentsHandlers struct {
 	logger   logger.Logger
 	validate *validator.Validate
 	commUC   comments.UseCase
+	mw       *middlewares.MiddlewareManager
 }
 
 // NewCommentsHandlers
@@ -32,8 +34,9 @@ func NewCommentsHandlers(
 	logger logger.Logger,
 	validate *validator.Validate,
 	commUC comments.UseCase,
+	mw *middlewares.MiddlewareManager,
 ) *commentsHandlers {
-	return &commentsHandlers{cfg: cfg, group: group, logger: logger, validate: validate, commUC: commUC}
+	return &commentsHandlers{cfg: cfg, group: group, logger: logger, validate: validate, commUC: commUC, mw: mw}
 }
 
 // Register CreateComment

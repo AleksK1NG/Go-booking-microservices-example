@@ -23,10 +23,14 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/hotels/repository"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/hotels/usecase"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/interceptors"
+	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/middlewares"
+	userUseCase "github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/user/usecase"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/grpc_client"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/logger"
 	commentsService "github.com/AleksK1NG/hotels-mocroservices/api-gateway/proto/comments"
 	hotelsService "github.com/AleksK1NG/hotels-mocroservices/api-gateway/proto/hotels"
+	sessionService "github.com/AleksK1NG/hotels-mocroservices/api-gateway/proto/session"
+	userService "github.com/AleksK1NG/hotels-mocroservices/api-gateway/proto/user"
 )
 
 const (
@@ -56,6 +60,7 @@ func (s *server) Run() error {
 	defer cancel()
 
 	im := interceptors.NewInterceptorManager(s.logger, s.cfg, s.tracer)
+
 	hotelsConn, err := grpc_client.NewGRPCClientServiceConn(ctx, im, s.cfg.GRPC.HotelsServicePort)
 	if err != nil {
 		return err
@@ -68,6 +73,18 @@ func (s *server) Run() error {
 	}
 	defer commConn.Close()
 
+	userConn, err := grpc_client.NewGRPCClientServiceConn(ctx, im, s.cfg.GRPC.UserServicePort)
+	if err != nil {
+		return err
+	}
+	defer userConn.Close()
+
+	sessConn, err := grpc_client.NewGRPCClientServiceConn(ctx, im, s.cfg.GRPC.SessionServicePort)
+	if err != nil {
+		return err
+	}
+	defer sessConn.Close()
+
 	hotelsServiceClient := hotelsService.NewHotelsServiceClient(hotelsConn)
 	hotelRedisRepo := repository.NewHotelRedisRepo(s.redisConn)
 	hotelsUC := usecase.NewHotelsUseCase(s.logger, hotelsServiceClient, hotelRedisRepo)
@@ -75,6 +92,12 @@ func (s *server) Run() error {
 	commRedisRepository := commRedisRepo.NewCommRedisRepository(s.redisConn)
 	commentsServiceClient := commentsService.NewCommentsServiceClient(commConn)
 	commUC := commUseCase.NewCommentUseCase(s.logger, commentsServiceClient, commRedisRepository)
+
+	userServiceClient := userService.NewUserServiceClient(userConn)
+	sessServiceClient := sessionService.NewAuthorizationServiceClient(sessConn)
+
+	userUC := userUseCase.NewUserUseCase(sessServiceClient, userServiceClient, s.logger)
+	mw := middlewares.NewMiddlewareManager(s.logger, s.cfg, userUC)
 
 	validate := validator.New()
 
@@ -109,10 +132,10 @@ func (s *server) Run() error {
 	hotelsGroup := v1.Group("/hotels")
 	commentsGroup := v1.Group("/comments")
 
-	hotelHandlers := hotelsHandlers.NewHotelsHandlers(s.cfg, hotelsGroup, s.logger, validate, hotelsUC)
+	hotelHandlers := hotelsHandlers.NewHotelsHandlers(s.cfg, hotelsGroup, s.logger, validate, hotelsUC, mw)
 	hotelHandlers.MapRoutes()
 
-	commentHandlers := commentsHandlers.NewCommentsHandlers(s.cfg, commentsGroup, s.logger, validate, commUC)
+	commentHandlers := commentsHandlers.NewCommentsHandlers(s.cfg, commentsGroup, s.logger, validate, commUC, mw)
 	commentHandlers.MapRoutes()
 
 	quit := make(chan os.Signal, 1)

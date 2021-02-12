@@ -67,23 +67,6 @@ services:
     networks:
       - hotels_network
 
-  postgesql_main:
-    image: kartoza/postgis:13.0
-    container_name: main_postgesql
-    expose:
-      - "5432"
-    ports:
-      - "5432:5432"
-    restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=main_db
-    volumes:
-      - ./main_pgdata:/var/lib/postgresql/data
-    networks:
-      - hotels_network
-
   postgesql_image:
     image: kartoza/postgis:13.0
     container_name: images_postgesql
@@ -150,16 +133,7 @@ services:
       - 9411:9411
 
   rabbitmq:
-    # There is a prebuilt RabbitMQ image; see
-    # https://hub.docker.com/_/rabbitmq/ for details.
-    # This variant is built on Alpine Linux (it's smaller) and includes
-    # the management UI.
     image: 'rabbitmq:3.8-management-alpine'
-
-    # These ports are exposed on the host; 'hostport:containerport'.
-    # You could connect to this server from outside with the *host's*
-    # DNS name or IP address and port 5672 (the left-hand side of the
-    # colon).
     ports:
       # The standard AMQP protocol port
       - '5672:5672'
