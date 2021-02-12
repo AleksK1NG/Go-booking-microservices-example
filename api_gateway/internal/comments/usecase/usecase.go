@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
@@ -54,6 +55,16 @@ func (c *commentUseCase) GetCommByID(ctx context.Context, commentID uuid.UUID) (
 	span, ctx := opentracing.StartSpanFromContext(ctx, "commentUseCase.GetCommByID")
 	defer span.Finish()
 
+	cacheComm, err := c.commRepo.GetCommentByID(ctx, commentID)
+	if err != nil {
+		if err != redis.Nil {
+			c.logger.Errorf("GetCommentByID: %v", err)
+		}
+	}
+	if cacheComm != nil {
+		return cacheComm, nil
+	}
+
 	commByID, err := c.commService.GetCommByID(ctx, &commentsService.GetCommByIDReq{CommentID: commentID.String()})
 	if err != nil {
 		return nil, errors.Wrap(err, "commService.GetCommByID")
@@ -62,6 +73,10 @@ func (c *commentUseCase) GetCommByID(ctx context.Context, commentID uuid.UUID) (
 	comm, err := models.CommentFromProto(commByID.GetComment())
 	if err != nil {
 		return nil, errors.Wrap(err, "CommentFromProto")
+	}
+
+	if err := c.commRepo.SetComment(ctx, comm); err != nil {
+		c.logger.Errorf("SetComment: %v", err)
 	}
 
 	return comm, nil
@@ -85,6 +100,10 @@ func (c *commentUseCase) UpdateComment(ctx context.Context, comment *models.Comm
 	comm, err := models.CommentFromProto(commRes.GetComment())
 	if err != nil {
 		return nil, errors.Wrap(err, "CommentFromProto")
+	}
+
+	if err := c.commRepo.SetComment(ctx, comm); err != nil {
+		c.logger.Errorf("SetComment: %v", err)
 	}
 
 	return comm, nil
