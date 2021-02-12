@@ -3,6 +3,8 @@ package usecase
 import (
 	"context"
 
+	"github.com/opentracing/opentracing-go"
+	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/comments"
@@ -23,18 +25,100 @@ func NewCommentUseCase(logger logger.Logger, commService commentsService.Comment
 	return &commentUseCase{logger: logger, commService: commService, commRepo: commRepo}
 }
 
+// CreateComment
 func (c *commentUseCase) CreateComment(ctx context.Context, comment *models.Comment) (*models.Comment, error) {
-	panic("implement me")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "commentUseCase.CreateComment")
+	defer span.Finish()
+
+	commentRes, err := c.commService.CreateComment(ctx, &commentsService.CreateCommentReq{
+		HotelID: comment.HotelID.String(),
+		UserID:  comment.UserID.String(),
+		Message: comment.Message,
+		Photos:  comment.Photos,
+		Rating:  comment.Rating,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "hotelsService.CreateHotel")
+	}
+
+	comm, err := models.CommentFromProto(commentRes.GetComment())
+	if err != nil {
+		return nil, errors.Wrap(err, "CommentFromProto")
+	}
+
+	return comm, nil
 }
 
+// GetCommByID
 func (c *commentUseCase) GetCommByID(ctx context.Context, commentID uuid.UUID) (*models.Comment, error) {
-	panic("implement me")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "commentUseCase.GetCommByID")
+	defer span.Finish()
+
+	commByID, err := c.commService.GetCommByID(ctx, &commentsService.GetCommByIDReq{CommentID: commentID.String()})
+	if err != nil {
+		return nil, errors.Wrap(err, "commService.GetCommByID")
+	}
+
+	comm, err := models.CommentFromProto(commByID.GetComment())
+	if err != nil {
+		return nil, errors.Wrap(err, "CommentFromProto")
+	}
+
+	return comm, nil
 }
 
+// UpdateComment
 func (c *commentUseCase) UpdateComment(ctx context.Context, comment *models.Comment) (*models.Comment, error) {
-	panic("implement me")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "commentUseCase.CreateComment")
+	defer span.Finish()
+
+	commRes, err := c.commService.UpdateComment(ctx, &commentsService.UpdateCommReq{
+		CommentID: comment.CommentID.String(),
+		Message:   comment.Message,
+		Photos:    comment.Photos,
+		Rating:    comment.Rating,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "CommentFromProto")
+	}
+
+	comm, err := models.CommentFromProto(commRes.GetComment())
+	if err != nil {
+		return nil, errors.Wrap(err, "CommentFromProto")
+	}
+
+	return comm, nil
 }
 
-func (c *commentUseCase) GetByHotelID(ctx context.Context, hotelID uuid.UUID) (*models.CommentsList, error) {
-	panic("implement me")
+// GetByHotelID
+func (c *commentUseCase) GetByHotelID(ctx context.Context, hotelID uuid.UUID, page, size int64) (*models.CommentsList, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "commentUseCase.GetByHotelID")
+	defer span.Finish()
+
+	res, err := c.commService.GetByHotelID(ctx, &commentsService.GetByHotelReq{
+		HotelID: hotelID.String(),
+		Page:    page,
+		Size:    size,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "CommentFromProto")
+	}
+
+	commList := make([]*models.CommentFull, 0, len(res.Comments))
+	for _, comment := range res.Comments {
+		comm, err := models.CommentFullFromProto(comment)
+		if err != nil {
+			return nil, errors.Wrap(err, "CommentFullFromProto")
+		}
+		commList = append(commList, comm)
+	}
+
+	return &models.CommentsList{
+		TotalCount: res.GetTotalCount(),
+		TotalPages: res.GetTotalPages(),
+		Page:       res.GetPage(),
+		Size:       res.GetSize(),
+		HasMore:    res.GetHasMore(),
+		Comments:   commList,
+	}, nil
 }
