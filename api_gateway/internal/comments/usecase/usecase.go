@@ -9,7 +9,9 @@ import (
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/comments"
+	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/middlewares"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/models"
+	httpErrors "github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/http_errors"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/logger"
 	commentsService "github.com/AleksK1NG/hotels-mocroservices/api-gateway/proto/comments"
 )
@@ -31,9 +33,14 @@ func (c *commentUseCase) CreateComment(ctx context.Context, comment *models.Comm
 	span, ctx := opentracing.StartSpanFromContext(ctx, "commentUseCase.CreateComment")
 	defer span.Finish()
 
+	ctxUser, ok := ctx.Value(middlewares.RequestCtxUser{}).(*models.UserResponse)
+	if !ok || ctxUser == nil {
+		return nil, errors.Wrap(httpErrors.Unauthorized, "ctx.Value user")
+	}
+
 	commentRes, err := c.commService.CreateComment(ctx, &commentsService.CreateCommentReq{
 		HotelID: comment.HotelID.String(),
-		UserID:  comment.UserID.String(),
+		UserID:  ctxUser.UserID.String(),
 		Message: comment.Message,
 		Photos:  comment.Photos,
 		Rating:  comment.Rating,
@@ -86,6 +93,15 @@ func (c *commentUseCase) GetCommByID(ctx context.Context, commentID uuid.UUID) (
 func (c *commentUseCase) UpdateComment(ctx context.Context, comment *models.Comment) (*models.Comment, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "commentUseCase.CreateComment")
 	defer span.Finish()
+
+	ctxUser, ok := ctx.Value(middlewares.RequestCtxUser{}).(*models.UserResponse)
+	if !ok || ctxUser == nil {
+		return nil, errors.Wrap(httpErrors.Unauthorized, "ctx.Value user")
+	}
+
+	if ctxUser.UserID != comment.UserID {
+		return nil, errors.Wrap(httpErrors.WrongCredentials, "user is not owner")
+	}
 
 	commRes, err := c.commService.UpdateComment(ctx, &commentsService.UpdateCommReq{
 		CommentID: comment.CommentID.String(),

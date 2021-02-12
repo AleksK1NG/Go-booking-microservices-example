@@ -1,10 +1,9 @@
 package v1
 
-import "github.com/labstack/echo/v4"
-
 // MapRoutes
 func (c *commentsHandlers) MapRoutes() {
-	c.group.GET("", func(c echo.Context) error {
-		return c.JSON(200, "Ok")
-	})
+	c.group.GET("/:comment_id", c.GetCommByID())
+	c.group.POST("", c.CreateComment(), c.mw.SessionMiddleware)
+	c.group.PUT("/:comment_id", c.UpdateComment(), c.mw.SessionMiddleware)
+	c.group.PUT("/comments/hotel/:hotel_id", c.GetByHotelID())
 }

@@ -14,6 +14,7 @@ import (
 
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/config"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/hotels"
+	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/middlewares"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/internal/models"
 	httpErrors "github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/http_errors"
 	"github.com/AleksK1NG/hotels-mocroservices/api-gateway/pkg/logger"
@@ -31,7 +32,7 @@ type hotelsHandlers struct {
 	logger   logger.Logger
 	validate *validator.Validate
 	hotelsUC hotels.UseCase
-	// mw       *middlewares.MiddlewareManager
+	mw       *middlewares.MiddlewareManager
 }
 
 // NewHotelsHandlers
@@ -41,8 +42,9 @@ func NewHotelsHandlers(
 	logger logger.Logger,
 	validate *validator.Validate,
 	hotelsUC hotels.UseCase,
+	mw *middlewares.MiddlewareManager,
 ) *hotelsHandlers {
-	return &hotelsHandlers{cfg: cfg, group: group, logger: logger, validate: validate, hotelsUC: hotelsUC}
+	return &hotelsHandlers{cfg: cfg, group: group, logger: logger, validate: validate, hotelsUC: hotelsUC, mw: mw}
 }
 
 // Register CreateHotel
@@ -194,7 +196,7 @@ func (h *hotelsHandlers) GetHotels() echo.HandlerFunc {
 // @Accept mpfd
 // @Produce json
 // @Param hotel_id query string false "hotel uuid"
-// @Success 200 {string} ""
+// @Success 200 {object} models.Hotel
 // @Router /hotels/{id}/image [put]
 func (h *hotelsHandlers) UploadImage() echo.HandlerFunc {
 	bufferPool := &sync.Pool{New: func() interface{} {

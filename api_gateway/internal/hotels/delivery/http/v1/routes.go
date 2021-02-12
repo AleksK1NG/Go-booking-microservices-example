@@ -1,12 +1,10 @@
 package v1
 
-import (
-	"github.com/labstack/echo/v4"
-)
-
 // MapRoutes
 func (h *hotelsHandlers) MapRoutes() {
-	h.group.GET("", func(c echo.Context) error {
-		return c.JSON(200, "Ok")
-	})
+	h.group.GET("", h.GetHotels())
+	h.group.GET("/:hotel_id", h.GetHotelByID())
+	h.group.POST("", h.CreateHotel(), h.mw.SessionMiddleware)
+	h.group.PUT("/:hotel_id", h.UpdateHotel(), h.mw.SessionMiddleware)
+	h.group.PUT("/:hotel_id/image", h.UploadImage(), h.mw.SessionMiddleware)
 }
