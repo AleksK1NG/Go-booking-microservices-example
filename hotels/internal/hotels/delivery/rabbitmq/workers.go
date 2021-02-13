@@ -8,10 +8,10 @@ import (
 	"github.com/streadway/amqp"
 )
 
-func (c *HotelsConsumer) updateImageWorker(ctx context.Context, wg *sync.WaitGroup, messages <-chan amqp.Delivery) {
+func (c *hotelsConsumer) updateImageWorker(ctx context.Context, wg *sync.WaitGroup, messages <-chan amqp.Delivery) {
 	defer wg.Done()
 	for delivery := range messages {
-		span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsConsumer.uploadImageWorker")
+		span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsConsumer.uploadImageWorker")
 
 		c.logger.Infof("processDeliveries deliveryTag% v", delivery.DeliveryTag)
 

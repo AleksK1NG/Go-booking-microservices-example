@@ -11,16 +11,16 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/images-microservice/internal/models"
 )
 
-type ImagePGRepository struct {
+type imagePGRepository struct {
 	pgxPool *pgxpool.Pool
 }
 
-func NewImagePGRepository(pgxPool *pgxpool.Pool) *ImagePGRepository {
-	return &ImagePGRepository{pgxPool: pgxPool}
+func NewImagePGRepository(pgxPool *pgxpool.Pool) *imagePGRepository {
+	return &imagePGRepository{pgxPool: pgxPool}
 }
 
-func (i *ImagePGRepository) Create(ctx context.Context, msg *models.Image) (*models.Image, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "ImagePGRepository.Create")
+func (i *imagePGRepository) Create(ctx context.Context, msg *models.Image) (*models.Image, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "imagePGRepository.Create")
 	defer span.Finish()
 
 	var res models.Image
@@ -30,13 +30,13 @@ func (i *ImagePGRepository) Create(ctx context.Context, msg *models.Image) (*mod
 		msg.ImageURL,
 		msg.IsUploaded,
 	).Scan(&res.ImageID, &res.ImageURL, &res.IsUploaded, &res.CreatedAt); err != nil {
-		return nil, errors.Wrap(err, "ImagePGRepository.Scan")
+		return nil, errors.Wrap(err, "imagePGRepository.Scan")
 	}
 
 	return &res, nil
 }
-func (i *ImagePGRepository) GetImageByID(ctx context.Context, imageID uuid.UUID) (*models.Image, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "ImagePGRepository.GetImageByID")
+func (i *imagePGRepository) GetImageByID(ctx context.Context, imageID uuid.UUID) (*models.Image, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "imagePGRepository.GetImageByID")
 	defer span.Finish()
 
 	var img models.Image
@@ -47,7 +47,7 @@ func (i *ImagePGRepository) GetImageByID(ctx context.Context, imageID uuid.UUID)
 		&img.CreatedAt,
 		&img.UpdatedAt,
 	); err != nil {
-		return nil, errors.Wrap(err, "ImagePGRepository.Scan")
+		return nil, errors.Wrap(err, "imagePGRepository.Scan")
 	}
 
 	return &img, nil

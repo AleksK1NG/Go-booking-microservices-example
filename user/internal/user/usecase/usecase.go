@@ -24,8 +24,7 @@ const (
 	userUUIDHeader = "user_uuid"
 )
 
-// UserUseCase
-type UserUseCase struct {
+type userUseCase struct {
 	userPGRepo    user.PGRepository
 	sessClient    sessionService.AuthorizationServiceClient
 	redisRepo     user.RedisRepository
@@ -33,15 +32,14 @@ type UserUseCase struct {
 	amqpPublisher rabbitmq.Publisher
 }
 
-// NewUserUseCase
 func NewUserUseCase(
 	userPGRepo user.PGRepository,
 	sessClient sessionService.AuthorizationServiceClient,
 	redisRepo user.RedisRepository,
 	log logger.Logger,
 	amqpPublisher rabbitmq.Publisher,
-) *UserUseCase {
-	return &UserUseCase{
+) *userUseCase {
+	return &userUseCase{
 		userPGRepo:    userPGRepo,
 		sessClient:    sessClient,
 		redisRepo:     redisRepo,
@@ -50,9 +48,8 @@ func NewUserUseCase(
 	}
 }
 
-// GetByID
-func (u *UserUseCase) GetByID(ctx context.Context, userID uuid.UUID) (*models.UserResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.GetByID")
+func (u *userUseCase) GetByID(ctx context.Context, userID uuid.UUID) (*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.GetByID")
 	defer span.Finish()
 
 	cachedUser, err := u.redisRepo.GetUserByID(ctx, userID)
@@ -65,7 +62,7 @@ func (u *UserUseCase) GetByID(ctx context.Context, userID uuid.UUID) (*models.Us
 
 	userResponse, err := u.userPGRepo.GetByID(ctx, userID)
 	if err != nil {
-		return nil, errors.Wrap(err, "UserUseCase.userPGRepo.GetByID")
+		return nil, errors.Wrap(err, "userUseCase.userPGRepo.GetByID")
 	}
 
 	if err := u.redisRepo.SaveUser(ctx, userResponse); err != nil {
@@ -75,9 +72,8 @@ func (u *UserUseCase) GetByID(ctx context.Context, userID uuid.UUID) (*models.Us
 	return userResponse, nil
 }
 
-// Register
-func (u *UserUseCase) Register(ctx context.Context, user *models.User) (*models.UserResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.Register")
+func (u *userUseCase) Register(ctx context.Context, user *models.User) (*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.Register")
 	defer span.Finish()
 
 	if err := user.PrepareCreate(); err != nil {
@@ -92,9 +88,8 @@ func (u *UserUseCase) Register(ctx context.Context, user *models.User) (*models.
 	return created, err
 }
 
-// Login
-func (u *UserUseCase) Login(ctx context.Context, login models.Login) (*models.User, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.Login")
+func (u *userUseCase) Login(ctx context.Context, login models.Login) (*models.User, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.Login")
 	defer span.Finish()
 
 	userByEmail, err := u.userPGRepo.GetByEmail(ctx, login.Email)
@@ -103,7 +98,7 @@ func (u *UserUseCase) Login(ctx context.Context, login models.Login) (*models.Us
 	}
 
 	if err := userByEmail.ComparePasswords(login.Password); err != nil {
-		return nil, errors.Wrap(err, "UserUseCase.ComparePasswords")
+		return nil, errors.Wrap(err, "userUseCase.ComparePasswords")
 	}
 
 	userByEmail.SanitizePassword()
@@ -111,9 +106,8 @@ func (u *UserUseCase) Login(ctx context.Context, login models.Login) (*models.Us
 	return userByEmail, nil
 }
 
-// CreateSession
-func (u *UserUseCase) CreateSession(ctx context.Context, userID uuid.UUID) (string, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.CreateSession")
+func (u *userUseCase) CreateSession(ctx context.Context, userID uuid.UUID) (string, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.CreateSession")
 	defer span.Finish()
 
 	session, err := u.sessClient.CreateSession(ctx, &sessionService.CreateSessionRequest{UserID: userID.String()})
@@ -124,9 +118,8 @@ func (u *UserUseCase) CreateSession(ctx context.Context, userID uuid.UUID) (stri
 	return session.GetSession().GetSessionID(), err
 }
 
-// DeleteSession
-func (u *UserUseCase) DeleteSession(ctx context.Context, sessionID string) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.DeleteSession")
+func (u *userUseCase) DeleteSession(ctx context.Context, sessionID string) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.DeleteSession")
 	defer span.Finish()
 
 	_, err := u.sessClient.DeleteSession(ctx, &sessionService.DeleteSessionRequest{SessionID: sessionID})
@@ -137,9 +130,8 @@ func (u *UserUseCase) DeleteSession(ctx context.Context, sessionID string) error
 	return nil
 }
 
-// GetSessionByID
-func (u *UserUseCase) GetSessionByID(ctx context.Context, sessionID string) (*models.Session, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.GetSessionByID")
+func (u *userUseCase) GetSessionByID(ctx context.Context, sessionID string) (*models.Session, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.GetSessionByID")
 	defer span.Finish()
 
 	sessionByID, err := u.sessClient.GetSessionByID(ctx, &sessionService.GetSessionByIDRequest{SessionID: sessionID})
@@ -156,9 +148,8 @@ func (u *UserUseCase) GetSessionByID(ctx context.Context, sessionID string) (*mo
 	return sess, nil
 }
 
-// GetCSRFToken
-func (u *UserUseCase) GetCSRFToken(ctx context.Context, sessionID string) (string, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.GetCSRFToken")
+func (u *userUseCase) GetCSRFToken(ctx context.Context, sessionID string) (string, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.GetCSRFToken")
 	defer span.Finish()
 
 	csrfToken, err := u.sessClient.CreateCsrfToken(
@@ -172,9 +163,8 @@ func (u *UserUseCase) GetCSRFToken(ctx context.Context, sessionID string) (strin
 	return csrfToken.GetCsrfToken().GetToken(), nil
 }
 
-// Update
-func (u *UserUseCase) Update(ctx context.Context, user *models.UserUpdate) (*models.UserResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.Update")
+func (u *userUseCase) Update(ctx context.Context, user *models.UserUpdate) (*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.Update")
 	defer span.Finish()
 
 	ctxUser, ok := ctx.Value(middlewares.RequestCtxUser{}).(*models.UserResponse)
@@ -188,7 +178,7 @@ func (u *UserUseCase) Update(ctx context.Context, user *models.UserUpdate) (*mod
 
 	userResponse, err := u.userPGRepo.Update(ctx, user)
 	if err != nil {
-		return nil, errors.Wrap(err, "UserUseCase.Update.userPGRepo.Update")
+		return nil, errors.Wrap(err, "userUseCase.Update.userPGRepo.Update")
 	}
 
 	if err := u.redisRepo.SaveUser(ctx, userResponse); err != nil {
@@ -198,8 +188,8 @@ func (u *UserUseCase) Update(ctx context.Context, user *models.UserUpdate) (*mod
 	return userResponse, nil
 }
 
-func (u *UserUseCase) UpdateUploadedAvatar(ctx context.Context, delivery amqp.Delivery) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.UpdateUploadedAvatar")
+func (u *userUseCase) UpdateUploadedAvatar(ctx context.Context, delivery amqp.Delivery) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.UpdateUploadedAvatar")
 	defer span.Finish()
 
 	var img models.Image
@@ -232,8 +222,8 @@ func (u *UserUseCase) UpdateUploadedAvatar(ctx context.Context, delivery amqp.De
 	return nil
 }
 
-func (u *UserUseCase) UpdateAvatar(ctx context.Context, data *models.UpdateAvatarMsg) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.UpdateAvatar")
+func (u *userUseCase) UpdateAvatar(ctx context.Context, data *models.UpdateAvatarMsg) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.UpdateAvatar")
 	defer span.Finish()
 
 	headers := make(amqp.Table, 1)
@@ -253,9 +243,8 @@ func (u *UserUseCase) UpdateAvatar(ctx context.Context, data *models.UpdateAvata
 	return nil
 }
 
-// GetUsersByIDs
-func (u *UserUseCase) GetUsersByIDs(ctx context.Context, userIDs []string) ([]*models.UserResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserUseCase.GetUsersByIDs")
+func (u *userUseCase) GetUsersByIDs(ctx context.Context, userIDs []string) ([]*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userUseCase.GetUsersByIDs")
 	defer span.Finish()
 	return u.userPGRepo.GetUsersByIDs(ctx, userIDs)
 }

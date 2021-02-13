@@ -15,20 +15,20 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/proto/hotels"
 )
 
-// HotelsService
-type HotelsService struct {
+// hotelsGRPCService
+type hotelsGRPCService struct {
 	hotelsUC hotels.UseCase
 	logger   logger.Logger
 	validate *validator.Validate
 }
 
-func NewHotelsService(hotelsUC hotels.UseCase, logger logger.Logger, validate *validator.Validate) *HotelsService {
-	return &HotelsService{hotelsUC: hotelsUC, logger: logger, validate: validate}
+func NewHotelsService(hotelsUC hotels.UseCase, logger logger.Logger, validate *validator.Validate) *hotelsGRPCService {
+	return &hotelsGRPCService{hotelsUC: hotelsUC, logger: logger, validate: validate}
 }
 
 // CreateHotel create new hotel
-func (h *HotelsService) CreateHotel(ctx context.Context, req *hotelsService.CreateHotelReq) (*hotelsService.CreateHotelRes, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsService.CreateHotel")
+func (h *hotelsGRPCService) CreateHotel(ctx context.Context, req *hotelsService.CreateHotelReq) (*hotelsService.CreateHotelRes, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsGRPCService.CreateHotel")
 	defer span.Finish()
 
 	hotel := &models.Hotel{
@@ -61,8 +61,8 @@ func (h *HotelsService) CreateHotel(ctx context.Context, req *hotelsService.Crea
 }
 
 // UpdateHotel update existing hotel
-func (h *HotelsService) UpdateHotel(ctx context.Context, req *hotelsService.UpdateHotelReq) (*hotelsService.UpdateHotelRes, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsService.UpdateHotel")
+func (h *hotelsGRPCService) UpdateHotel(ctx context.Context, req *hotelsService.UpdateHotelReq) (*hotelsService.UpdateHotelRes, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsGRPCService.UpdateHotel")
 	defer span.Finish()
 
 	hotelUUID, err := uuid.FromString(req.GetHotelID())
@@ -102,8 +102,8 @@ func (h *HotelsService) UpdateHotel(ctx context.Context, req *hotelsService.Upda
 }
 
 // GetHotelByID get hotel by uuid
-func (h *HotelsService) GetHotelByID(ctx context.Context, req *hotelsService.GetByIDReq) (*hotelsService.GetByIDRes, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsService.GetHotelByID")
+func (h *hotelsGRPCService) GetHotelByID(ctx context.Context, req *hotelsService.GetByIDReq) (*hotelsService.GetByIDRes, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsGRPCService.GetHotelByID")
 	defer span.Finish()
 
 	hotelUUID, err := uuid.FromString(req.GetHotelID())
@@ -122,8 +122,8 @@ func (h *HotelsService) GetHotelByID(ctx context.Context, req *hotelsService.Get
 }
 
 // GetHotels
-func (h *HotelsService) GetHotels(ctx context.Context, req *hotelsService.GetHotelsReq) (*hotelsService.GetHotelsRes, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsService.GetHotels")
+func (h *hotelsGRPCService) GetHotels(ctx context.Context, req *hotelsService.GetHotelsReq) (*hotelsService.GetHotelsRes, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsGRPCService.GetHotels")
 	defer span.Finish()
 
 	query := utils.NewPaginationQuery(int(req.GetSize()), int(req.GetPage()))
@@ -145,8 +145,8 @@ func (h *HotelsService) GetHotels(ctx context.Context, req *hotelsService.GetHot
 }
 
 // UploadImage
-func (h *HotelsService) UploadImage(ctx context.Context, req *hotelsService.UploadImageReq) (*hotelsService.UploadImageRes, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsService.UploadImage")
+func (h *hotelsGRPCService) UploadImage(ctx context.Context, req *hotelsService.UploadImageReq) (*hotelsService.UploadImageRes, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsGRPCService.UploadImage")
 	defer span.Finish()
 
 	hotelUUID, err := uuid.FromString(req.GetHotelID())

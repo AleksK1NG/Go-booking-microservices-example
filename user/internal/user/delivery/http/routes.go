@@ -1,7 +1,7 @@
 package http
 
 // MapUserRoutes
-func (h *UserHandlers) MapUserRoutes() {
+func (h *userHandlers) MapUserRoutes() {
 	h.group.POST("/register", h.Register())
 	h.group.POST("/login", h.Login())
 	h.group.PUT("/:id/avatar", h.UpdateAvatar(), h.mw.SessionMiddleware)

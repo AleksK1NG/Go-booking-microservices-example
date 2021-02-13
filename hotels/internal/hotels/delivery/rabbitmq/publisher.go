@@ -32,21 +32,21 @@ type Publisher interface {
 	Publish(ctx context.Context, exchange, routingKey, contentType string, headers amqp.Table, body []byte) error
 }
 
-type HotelsPublisher struct {
+type hotelsPublisher struct {
 	amqpConn *amqp.Connection
 	cfg      *config.Config
 	logger   logger.Logger
 }
 
-func NewHotelsPublisher(cfg *config.Config, logger logger.Logger) (*HotelsPublisher, error) {
+func NewHotelsPublisher(cfg *config.Config, logger logger.Logger) (*hotelsPublisher, error) {
 	amqpConn, err := rabbitmq.NewRabbitMQConn(cfg)
 	if err != nil {
 		return nil, err
 	}
-	return &HotelsPublisher{cfg: cfg, logger: logger, amqpConn: amqpConn}, nil
+	return &hotelsPublisher{cfg: cfg, logger: logger, amqpConn: amqpConn}, nil
 }
 
-func (p *HotelsPublisher) CreateExchangeAndQueue(exchange, queueName, bindingKey string) (*amqp.Channel, error) {
+func (p *hotelsPublisher) CreateExchangeAndQueue(exchange, queueName, bindingKey string) (*amqp.Channel, error) {
 	amqpChan, err := p.amqpConn.Channel()
 	if err != nil {
 		return nil, errors.Wrap(err, "p.amqpConn.Channel")
@@ -101,8 +101,8 @@ func (p *HotelsPublisher) CreateExchangeAndQueue(exchange, queueName, bindingKey
 }
 
 // Publish message
-func (p *HotelsPublisher) Publish(ctx context.Context, exchange, routingKey, contentType string, headers amqp.Table, body []byte) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsPublisher.Publish")
+func (p *hotelsPublisher) Publish(ctx context.Context, exchange, routingKey, contentType string, headers amqp.Table, body []byte) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsPublisher.Publish")
 	defer span.Finish()
 
 	amqpChan, err := p.amqpConn.Channel()

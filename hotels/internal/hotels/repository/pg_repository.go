@@ -14,19 +14,16 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/hotels/pkg/utils"
 )
 
-// HotelsPGRepository
-type HotelsPGRepository struct {
+type hotelsPGRepository struct {
 	db *pgxpool.Pool
 }
 
-// NewHotelsPGRepository
-func NewHotelsPGRepository(db *pgxpool.Pool) *HotelsPGRepository {
-	return &HotelsPGRepository{db: db}
+func NewHotelsPGRepository(db *pgxpool.Pool) *hotelsPGRepository {
+	return &hotelsPGRepository{db: db}
 }
 
-// CreateHotel
-func (h *HotelsPGRepository) CreateHotel(ctx context.Context, hotel *models.Hotel) (*models.Hotel, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsPGRepository.CreateHotel")
+func (h *hotelsPGRepository) CreateHotel(ctx context.Context, hotel *models.Hotel) (*models.Hotel, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsPGRepository.CreateHotel")
 	defer span.Finish()
 
 	point := utils.GeneratePointToGeoFromFloat64(*hotel.Latitude, *hotel.Longitude)
@@ -57,8 +54,8 @@ func (h *HotelsPGRepository) CreateHotel(ctx context.Context, hotel *models.Hote
 }
 
 // UpdateHotel update single hotel
-func (h *HotelsPGRepository) UpdateHotel(ctx context.Context, hotel *models.Hotel) (*models.Hotel, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsPGRepository.UpdateHotel")
+func (h *hotelsPGRepository) UpdateHotel(ctx context.Context, hotel *models.Hotel) (*models.Hotel, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsPGRepository.UpdateHotel")
 	defer span.Finish()
 
 	point := utils.GeneratePointToGeoFromFloat64(*hotel.Latitude, *hotel.Longitude)
@@ -98,8 +95,8 @@ func (h *HotelsPGRepository) UpdateHotel(ctx context.Context, hotel *models.Hote
 }
 
 // GetHotelByID get hotel by id
-func (h *HotelsPGRepository) GetHotelByID(ctx context.Context, hotelID uuid.UUID) (*models.Hotel, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsPGRepository.GetHotelByID")
+func (h *hotelsPGRepository) GetHotelByID(ctx context.Context, hotelID uuid.UUID) (*models.Hotel, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsPGRepository.GetHotelByID")
 	defer span.Finish()
 
 	var hotel models.Hotel
@@ -127,8 +124,8 @@ func (h *HotelsPGRepository) GetHotelByID(ctx context.Context, hotelID uuid.UUID
 }
 
 // GetHotels
-func (h *HotelsPGRepository) GetHotels(ctx context.Context, query *utils.PaginationQuery) (*models.HotelsList, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsPGRepository.GetHotels")
+func (h *hotelsPGRepository) GetHotels(ctx context.Context, query *utils.PaginationQuery) (*models.HotelsList, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsPGRepository.GetHotels")
 	defer span.Finish()
 
 	var total int
@@ -194,8 +191,8 @@ func (h *HotelsPGRepository) GetHotels(ctx context.Context, query *utils.Paginat
 }
 
 // UpdateHotelImage
-func (h *HotelsPGRepository) UpdateHotelImage(ctx context.Context, hotelID uuid.UUID, imageURL string) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsPGRepository.UpdateHotelImage")
+func (h *hotelsPGRepository) UpdateHotelImage(ctx context.Context, hotelID uuid.UUID, imageURL string) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsPGRepository.UpdateHotelImage")
 	defer span.Finish()
 
 	updateHotelImageQuery := `UPDATE hotels SET image = $1 WHERE hotel_id = $2`

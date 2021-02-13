@@ -1090,16 +1090,16 @@ var file_hotels_proto_depIdxs = []int32{
 	0,  // 3: hotelsService.GetHotelsRes.Hotels:type_name -> hotelsService.Hotel
 	0,  // 4: hotelsService.CreateHotelRes.Hotel:type_name -> hotelsService.Hotel
 	0,  // 5: hotelsService.UpdateHotelRes.Hotel:type_name -> hotelsService.Hotel
-	5,  // 6: hotelsService.HotelsService.CreateHotel:input_type -> hotelsService.CreateHotelReq
-	7,  // 7: hotelsService.HotelsService.UpdateHotel:input_type -> hotelsService.UpdateHotelReq
-	1,  // 8: hotelsService.HotelsService.GetHotelByID:input_type -> hotelsService.GetByIDReq
-	3,  // 9: hotelsService.HotelsService.GetHotels:input_type -> hotelsService.GetHotelsReq
-	9,  // 10: hotelsService.HotelsService.UploadImage:input_type -> hotelsService.UploadImageReq
-	6,  // 11: hotelsService.HotelsService.CreateHotel:output_type -> hotelsService.CreateHotelRes
-	8,  // 12: hotelsService.HotelsService.UpdateHotel:output_type -> hotelsService.UpdateHotelRes
-	2,  // 13: hotelsService.HotelsService.GetHotelByID:output_type -> hotelsService.GetByIDRes
-	4,  // 14: hotelsService.HotelsService.GetHotels:output_type -> hotelsService.GetHotelsRes
-	10, // 15: hotelsService.HotelsService.UploadImage:output_type -> hotelsService.UploadImageRes
+	5,  // 6: hotelsService.hotelsGRPCService.CreateHotel:input_type -> hotelsService.CreateHotelReq
+	7,  // 7: hotelsService.hotelsGRPCService.UpdateHotel:input_type -> hotelsService.UpdateHotelReq
+	1,  // 8: hotelsService.hotelsGRPCService.GetHotelByID:input_type -> hotelsService.GetByIDReq
+	3,  // 9: hotelsService.hotelsGRPCService.GetHotels:input_type -> hotelsService.GetHotelsReq
+	9,  // 10: hotelsService.hotelsGRPCService.UploadImage:input_type -> hotelsService.UploadImageReq
+	6,  // 11: hotelsService.hotelsGRPCService.CreateHotel:output_type -> hotelsService.CreateHotelRes
+	8,  // 12: hotelsService.hotelsGRPCService.UpdateHotel:output_type -> hotelsService.UpdateHotelRes
+	2,  // 13: hotelsService.hotelsGRPCService.GetHotelByID:output_type -> hotelsService.GetByIDRes
+	4,  // 14: hotelsService.hotelsGRPCService.GetHotels:output_type -> hotelsService.GetHotelsRes
+	10, // 15: hotelsService.hotelsGRPCService.UploadImage:output_type -> hotelsService.UploadImageRes
 	11, // [11:16] is the sub-list for method output_type
 	6,  // [6:11] is the sub-list for method input_type
 	6,  // [6:6] is the sub-list for extension type_name
@@ -1274,7 +1274,7 @@ var _ grpc.ClientConnInterface
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion6
 
-// HotelsServiceClient is the client API for HotelsService service.
+// HotelsServiceClient is the client API for hotelsGRPCService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type HotelsServiceClient interface {
@@ -1295,7 +1295,7 @@ func NewHotelsServiceClient(cc grpc.ClientConnInterface) HotelsServiceClient {
 
 func (c *hotelsServiceClient) CreateHotel(ctx context.Context, in *CreateHotelReq, opts ...grpc.CallOption) (*CreateHotelRes, error) {
 	out := new(CreateHotelRes)
-	err := c.cc.Invoke(ctx, "/hotelsService.HotelsService/CreateHotel", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hotelsService.hotelsGRPCService/CreateHotel", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1304,7 +1304,7 @@ func (c *hotelsServiceClient) CreateHotel(ctx context.Context, in *CreateHotelRe
 
 func (c *hotelsServiceClient) UpdateHotel(ctx context.Context, in *UpdateHotelReq, opts ...grpc.CallOption) (*UpdateHotelRes, error) {
 	out := new(UpdateHotelRes)
-	err := c.cc.Invoke(ctx, "/hotelsService.HotelsService/UpdateHotel", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hotelsService.hotelsGRPCService/UpdateHotel", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1313,7 +1313,7 @@ func (c *hotelsServiceClient) UpdateHotel(ctx context.Context, in *UpdateHotelRe
 
 func (c *hotelsServiceClient) GetHotelByID(ctx context.Context, in *GetByIDReq, opts ...grpc.CallOption) (*GetByIDRes, error) {
 	out := new(GetByIDRes)
-	err := c.cc.Invoke(ctx, "/hotelsService.HotelsService/GetHotelByID", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hotelsService.hotelsGRPCService/GetHotelByID", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1322,7 +1322,7 @@ func (c *hotelsServiceClient) GetHotelByID(ctx context.Context, in *GetByIDReq, 
 
 func (c *hotelsServiceClient) GetHotels(ctx context.Context, in *GetHotelsReq, opts ...grpc.CallOption) (*GetHotelsRes, error) {
 	out := new(GetHotelsRes)
-	err := c.cc.Invoke(ctx, "/hotelsService.HotelsService/GetHotels", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hotelsService.hotelsGRPCService/GetHotels", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1331,14 +1331,14 @@ func (c *hotelsServiceClient) GetHotels(ctx context.Context, in *GetHotelsReq, o
 
 func (c *hotelsServiceClient) UploadImage(ctx context.Context, in *UploadImageReq, opts ...grpc.CallOption) (*UploadImageRes, error) {
 	out := new(UploadImageRes)
-	err := c.cc.Invoke(ctx, "/hotelsService.HotelsService/UploadImage", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/hotelsService.hotelsGRPCService/UploadImage", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// HotelsServiceServer is the server API for HotelsService service.
+// HotelsServiceServer is the server API for hotelsGRPCService service.
 type HotelsServiceServer interface {
 	CreateHotel(context.Context, *CreateHotelReq) (*CreateHotelRes, error)
 	UpdateHotel(context.Context, *UpdateHotelReq) (*UpdateHotelRes, error)
@@ -1381,7 +1381,7 @@ func _HotelsService_CreateHotel_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hotelsService.HotelsService/CreateHotel",
+		FullMethod: "/hotelsService.hotelsGRPCService/CreateHotel",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(HotelsServiceServer).CreateHotel(ctx, req.(*CreateHotelReq))
@@ -1399,7 +1399,7 @@ func _HotelsService_UpdateHotel_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hotelsService.HotelsService/UpdateHotel",
+		FullMethod: "/hotelsService.hotelsGRPCService/UpdateHotel",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(HotelsServiceServer).UpdateHotel(ctx, req.(*UpdateHotelReq))
@@ -1417,7 +1417,7 @@ func _HotelsService_GetHotelByID_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hotelsService.HotelsService/GetHotelByID",
+		FullMethod: "/hotelsService.hotelsGRPCService/GetHotelByID",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(HotelsServiceServer).GetHotelByID(ctx, req.(*GetByIDReq))
@@ -1435,7 +1435,7 @@ func _HotelsService_GetHotels_Handler(srv interface{}, ctx context.Context, dec 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hotelsService.HotelsService/GetHotels",
+		FullMethod: "/hotelsService.hotelsGRPCService/GetHotels",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(HotelsServiceServer).GetHotels(ctx, req.(*GetHotelsReq))
@@ -1453,7 +1453,7 @@ func _HotelsService_UploadImage_Handler(srv interface{}, ctx context.Context, de
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/hotelsService.HotelsService/UploadImage",
+		FullMethod: "/hotelsService.hotelsGRPCService/UploadImage",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(HotelsServiceServer).UploadImage(ctx, req.(*UploadImageReq))
@@ -1462,7 +1462,7 @@ func _HotelsService_UploadImage_Handler(srv interface{}, ctx context.Context, de
 }
 
 var _HotelsService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "hotelsService.HotelsService",
+	ServiceName: "hotelsService.hotelsGRPCService",
 	HandlerType: (*HotelsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

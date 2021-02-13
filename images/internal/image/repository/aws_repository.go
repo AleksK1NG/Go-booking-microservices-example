@@ -19,17 +19,17 @@ const (
 	imagesBucket = "images"
 )
 
-type ImageAWSRepository struct {
+type imageAWSRepository struct {
 	cfg *config.Config
 	s3  *s3.S3
 }
 
-func NewImageAWSRepository(cfg *config.Config, s3 *s3.S3) *ImageAWSRepository {
-	return &ImageAWSRepository{cfg: cfg, s3: s3}
+func NewImageAWSRepository(cfg *config.Config, s3 *s3.S3) *imageAWSRepository {
+	return &imageAWSRepository{cfg: cfg, s3: s3}
 }
 
-func (i *ImageAWSRepository) PutObject(ctx context.Context, data []byte, fileType string) (string, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "ImageAWSRepository.PutObject")
+func (i *imageAWSRepository) PutObject(ctx context.Context, data []byte, fileType string) (string, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "imageAWSRepository.PutObject")
 	defer span.Finish()
 
 	newFilename := uuid.NewV4().String()
@@ -50,8 +50,8 @@ func (i *ImageAWSRepository) PutObject(ctx context.Context, data []byte, fileTyp
 	return i.getFilePublicURL(key), err
 }
 
-func (i *ImageAWSRepository) GetObject(ctx context.Context, key string) (*s3.GetObjectOutput, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "ImageAWSRepository.GetObject")
+func (i *imageAWSRepository) GetObject(ctx context.Context, key string) (*s3.GetObjectOutput, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "imageAWSRepository.GetObject")
 	defer span.Finish()
 
 	obj, err := i.s3.GetObjectWithContext(ctx, &s3.GetObjectInput{
@@ -65,8 +65,8 @@ func (i *ImageAWSRepository) GetObject(ctx context.Context, key string) (*s3.Get
 	return obj, nil
 }
 
-func (i *ImageAWSRepository) DeleteObject(ctx context.Context, key string) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "ImageAWSRepository.DeleteObject")
+func (i *imageAWSRepository) DeleteObject(ctx context.Context, key string) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "imageAWSRepository.DeleteObject")
 	defer span.Finish()
 
 	_, err := i.s3.DeleteObjectWithContext(ctx, &s3.DeleteObjectInput{
@@ -80,10 +80,10 @@ func (i *ImageAWSRepository) DeleteObject(ctx context.Context, key string) error
 	return nil
 }
 
-func (i *ImageAWSRepository) getFileKey(fileID string, fileType string) string {
+func (i *imageAWSRepository) getFileKey(fileID string, fileType string) string {
 	return fmt.Sprintf("%s.%s", fileID, fileType)
 }
 
-func (i *ImageAWSRepository) getFilePublicURL(key string) string {
+func (i *imageAWSRepository) getFilePublicURL(key string) string {
 	return i.cfg.AWS.S3EndPointMinio + "/" + imagesBucket + "/" + key
 }

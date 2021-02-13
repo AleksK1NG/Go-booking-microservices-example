@@ -16,7 +16,6 @@ const (
 	backoffLinear = 100 * time.Millisecond
 )
 
-// NewGRPCClientServiceConn
 func NewGRPCClientServiceConn(ctx context.Context, manager *interceptors.InterceptorManager, target string) (*grpc.ClientConn, error) {
 	opts := []grpc_retry.CallOption{
 		grpc_retry.WithBackoff(grpc_retry.BackoffLinear(backoffLinear)),

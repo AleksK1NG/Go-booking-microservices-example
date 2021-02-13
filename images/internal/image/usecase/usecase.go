@@ -38,8 +38,8 @@ const (
 	updateImageRoutingKey = "update_hotel_image_key"
 )
 
-// ImageUseCase
-type ImageUseCase struct {
+// imageUseCase
+type imageUseCase struct {
 	pgRepo      img.PgRepository
 	awsRepo     img.AWSRepository
 	logger      logger.Logger
@@ -48,7 +48,7 @@ type ImageUseCase struct {
 }
 
 // NewImageUseCase
-func NewImageUseCase(pgRepo img.PgRepository, awsRepo img.AWSRepository, logger logger.Logger, publisher rabbitmq.Publisher) *ImageUseCase {
+func NewImageUseCase(pgRepo img.PgRepository, awsRepo img.AWSRepository, logger logger.Logger, publisher rabbitmq.Publisher) *imageUseCase {
 	resizerPool := &sync.Pool{New: func() interface{} {
 		return images.NewImgResizer(
 			gift.Resize(resizeWidth, resizeHeight, gift.LanczosResampling),
@@ -57,12 +57,12 @@ func NewImageUseCase(pgRepo img.PgRepository, awsRepo img.AWSRepository, logger 
 			gift.Gamma(0.5),
 		)
 	}}
-	return &ImageUseCase{pgRepo: pgRepo, awsRepo: awsRepo, logger: logger, publisher: publisher, resizerPool: resizerPool}
+	return &imageUseCase{pgRepo: pgRepo, awsRepo: awsRepo, logger: logger, publisher: publisher, resizerPool: resizerPool}
 }
 
 // Create
-func (i *ImageUseCase) Create(ctx context.Context, delivery amqp.Delivery) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "ImageUseCase.Create")
+func (i *imageUseCase) Create(ctx context.Context, delivery amqp.Delivery) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "imageUseCase.Create")
 	defer span.Finish()
 
 	i.logger.Infof("amqp.Delivery: %-v", delivery.DeliveryTag)
@@ -83,7 +83,7 @@ func (i *ImageUseCase) Create(ctx context.Context, delivery amqp.Delivery) error
 
 	msgBytes, err := json.Marshal(createdImage)
 	if err != nil {
-		return errors.Wrap(err, "ImageUseCase.Create.json.Marshal")
+		return errors.Wrap(err, "imageUseCase.Create.json.Marshal")
 	}
 
 	headers := make(amqp.Table)
@@ -96,15 +96,15 @@ func (i *ImageUseCase) Create(ctx context.Context, delivery amqp.Delivery) error
 		headers,
 		msgBytes,
 	); err != nil {
-		return errors.Wrap(err, "ImageUseCase.Create.Publish")
+		return errors.Wrap(err, "imageUseCase.Create.Publish")
 	}
 
 	return nil
 }
 
 // ResizeImage
-func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "ImageUseCase.ResizeImage")
+func (i *imageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "imageUseCase.ResizeImage")
 	defer span.Finish()
 
 	i.logger.Infof("amqp.Delivery: %-v", delivery.DeliveryTag)
@@ -133,7 +133,7 @@ func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) 
 
 	msgBytes, err := json.Marshal(msg)
 	if err != nil {
-		return errors.Wrap(err, "ImageUseCase.ResizeImage.json.Marshal")
+		return errors.Wrap(err, "imageUseCase.ResizeImage.json.Marshal")
 	}
 
 	headers := make(amqp.Table)
@@ -146,14 +146,14 @@ func (i *ImageUseCase) ResizeImage(ctx context.Context, delivery amqp.Delivery) 
 		headers,
 		msgBytes,
 	); err != nil {
-		return errors.Wrap(err, "ImageUseCase.ResizeImage.Publish")
+		return errors.Wrap(err, "imageUseCase.ResizeImage.Publish")
 	}
 
 	return nil
 }
 
-func (i *ImageUseCase) GetImageByID(ctx context.Context, imageID uuid.UUID) (*models.Image, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "ImageUseCase.GetImageByID")
+func (i *imageUseCase) GetImageByID(ctx context.Context, imageID uuid.UUID) (*models.Image, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "imageUseCase.GetImageByID")
 	defer span.Finish()
 
 	imgByID, err := i.pgRepo.GetImageByID(ctx, imageID)
@@ -165,8 +165,8 @@ func (i *ImageUseCase) GetImageByID(ctx context.Context, imageID uuid.UUID) (*mo
 }
 
 // ProcessHotelImage
-func (i *ImageUseCase) ProcessHotelImage(ctx context.Context, delivery amqp.Delivery) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "ImageUseCase.Create")
+func (i *imageUseCase) ProcessHotelImage(ctx context.Context, delivery amqp.Delivery) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "imageUseCase.Create")
 	defer span.Finish()
 
 	i.logger.Infof("amqp.Delivery: %-v", delivery.DeliveryTag)
@@ -213,7 +213,7 @@ func (i *ImageUseCase) ProcessHotelImage(ctx context.Context, delivery amqp.Deli
 	return nil
 }
 
-func (i *ImageUseCase) validateDeliveryHeaders(delivery amqp.Delivery) (*uuid.UUID, error) {
+func (i *imageUseCase) validateDeliveryHeaders(delivery amqp.Delivery) (*uuid.UUID, error) {
 	i.logger.Infof("amqp.Delivery header: %-v", delivery.Headers)
 
 	userUUID, ok := delivery.Headers[userUUIDHeader]
@@ -233,7 +233,7 @@ func (i *ImageUseCase) validateDeliveryHeaders(delivery amqp.Delivery) (*uuid.UU
 	return &parsedUUID, nil
 }
 
-func (i *ImageUseCase) extractUUIDHeader(delivery amqp.Delivery, key string) (*uuid.UUID, error) {
+func (i *imageUseCase) extractUUIDHeader(delivery amqp.Delivery, key string) (*uuid.UUID, error) {
 	i.logger.Infof("amqp.Delivery header: %-v", delivery.Headers)
 
 	uid, ok := delivery.Headers[key]
@@ -253,7 +253,7 @@ func (i *ImageUseCase) extractUUIDHeader(delivery amqp.Delivery, key string) (*u
 	return &parsedUUID, nil
 }
 
-func (i *ImageUseCase) processImage(img []byte) ([]byte, string, error) {
+func (i *imageUseCase) processImage(img []byte) ([]byte, string, error) {
 	src, imageType, err := image.Decode(bytes.NewReader(img))
 	if err != nil {
 		return nil, "", err

@@ -14,19 +14,17 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/user/pkg/utils"
 )
 
-// UserPGRepository
-type UserPGRepository struct {
+type userPGRepository struct {
 	db *pgxpool.Pool
 }
 
-// NewUserPGRepository
-func NewUserPGRepository(db *pgxpool.Pool) *UserPGRepository {
-	return &UserPGRepository{db: db}
+func NewUserPGRepository(db *pgxpool.Pool) *userPGRepository {
+	return &userPGRepository{db: db}
 }
 
 // Create new user
-func (u *UserPGRepository) Create(ctx context.Context, user *models.User) (*models.UserResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserPGRepository.Create")
+func (u *userPGRepository) Create(ctx context.Context, user *models.User) (*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userPGRepository.Create")
 	defer span.Finish()
 
 	var created models.UserResponse
@@ -49,8 +47,8 @@ func (u *UserPGRepository) Create(ctx context.Context, user *models.User) (*mode
 }
 
 // Get user by id
-func (u *UserPGRepository) GetByID(ctx context.Context, userID uuid.UUID) (*models.UserResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserPGRepository.GetByID")
+func (u *userPGRepository) GetByID(ctx context.Context, userID uuid.UUID) (*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userPGRepository.GetByID")
 	defer span.Finish()
 
 	var res models.UserResponse
@@ -71,8 +69,8 @@ func (u *UserPGRepository) GetByID(ctx context.Context, userID uuid.UUID) (*mode
 }
 
 // GetByEmail
-func (u *UserPGRepository) GetByEmail(ctx context.Context, email string) (*models.User, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserPGRepository.GetByEmail")
+func (u *userPGRepository) GetByEmail(ctx context.Context, email string) (*models.User, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userPGRepository.GetByEmail")
 	defer span.Finish()
 
 	var res models.User
@@ -94,8 +92,8 @@ func (u *UserPGRepository) GetByEmail(ctx context.Context, email string) (*model
 }
 
 // Update
-func (u *UserPGRepository) Update(ctx context.Context, user *models.UserUpdate) (*models.UserResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserPGRepository.Update")
+func (u *userPGRepository) Update(ctx context.Context, user *models.UserUpdate) (*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userPGRepository.Update")
 	defer span.Finish()
 
 	var res models.UserResponse
@@ -116,8 +114,8 @@ func (u *UserPGRepository) Update(ctx context.Context, user *models.UserUpdate) 
 	return &res, nil
 }
 
-func (u *UserPGRepository) UpdateAvatar(ctx context.Context, msg models.UploadedImageMsg) (*models.UserResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserPGRepository.UpdateUploadedAvatar")
+func (u *userPGRepository) UpdateAvatar(ctx context.Context, msg models.UploadedImageMsg) (*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userPGRepository.UpdateUploadedAvatar")
 	defer span.Finish()
 
 	log.Printf("REPO  IMAGE: %v", msg)
@@ -138,8 +136,8 @@ func (u *UserPGRepository) UpdateAvatar(ctx context.Context, msg models.Uploaded
 	return &res, nil
 }
 
-func (u *UserPGRepository) GetUsersByIDs(ctx context.Context, userIDs []string) ([]*models.UserResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserPGRepository.GetUsersByIDs")
+func (u *userPGRepository) GetUsersByIDs(ctx context.Context, userIDs []string) ([]*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userPGRepository.GetUsersByIDs")
 	defer span.Finish()
 
 	placeholders := utils.CreateSQLPlaceholders(len(userIDs))

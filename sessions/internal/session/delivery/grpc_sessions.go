@@ -15,19 +15,16 @@ import (
 	sessionService "github.com/AleksK1NG/hotels-mocroservices/sessions/proto"
 )
 
-// SessionsService
 type SessionsService struct {
 	logger logger.Logger
 	sessUC session.SessUseCase
 	csrfUC csrf.UseCase
 }
 
-// NewSessionsService
 func NewSessionsService(logger logger.Logger, sessUC session.SessUseCase, csrfUC csrf.UseCase) *SessionsService {
 	return &SessionsService{logger: logger, sessUC: sessUC, csrfUC: csrfUC}
 }
 
-// CreateSession
 func (s *SessionsService) CreateSession(ctx context.Context, r *sessionService.CreateSessionRequest) (*sessionService.CreateSessionResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsService.CreateSession")
 	defer span.Finish()
@@ -46,7 +43,6 @@ func (s *SessionsService) CreateSession(ctx context.Context, r *sessionService.C
 	return &sessionService.CreateSessionResponse{Session: s.sessionJSONToProto(sess)}, nil
 }
 
-// GetSessionByID
 func (s *SessionsService) GetSessionByID(ctx context.Context, r *sessionService.GetSessionByIDRequest) (*sessionService.GetSessionByIDResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsService.GetSessionByID")
 	defer span.Finish()
@@ -60,7 +56,6 @@ func (s *SessionsService) GetSessionByID(ctx context.Context, r *sessionService.
 	return &sessionService.GetSessionByIDResponse{Session: s.sessionJSONToProto(sess)}, nil
 }
 
-// DeleteSession
 func (s *SessionsService) DeleteSession(ctx context.Context, r *sessionService.DeleteSessionRequest) (*sessionService.DeleteSessionResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsService.DeleteSession")
 	defer span.Finish()
@@ -72,7 +67,6 @@ func (s *SessionsService) DeleteSession(ctx context.Context, r *sessionService.D
 	return &sessionService.DeleteSessionResponse{SessionID: r.SessionID}, nil
 }
 
-// CreateCsrfToken
 func (s *SessionsService) CreateCsrfToken(ctx context.Context, r *sessionService.CreateCsrfTokenRequest) (*sessionService.CreateCsrfTokenResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsService.CreateCsrfToken")
 	defer span.Finish()
@@ -85,7 +79,6 @@ func (s *SessionsService) CreateCsrfToken(ctx context.Context, r *sessionService
 	return &sessionService.CreateCsrfTokenResponse{CsrfToken: &sessionService.CsrfToken{Token: token}}, nil
 }
 
-// CheckCsrfToken
 func (s *SessionsService) CheckCsrfToken(ctx context.Context, r *sessionService.CheckCsrfTokenRequest) (*sessionService.CheckCsrfTokenResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "SessionsService.CheckCsrfToken")
 	defer span.Finish()

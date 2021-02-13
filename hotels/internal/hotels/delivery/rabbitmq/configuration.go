@@ -55,7 +55,7 @@ var (
 )
 
 // Initialize consumers
-func (c *HotelsConsumer) Initialize() error {
+func (c *hotelsConsumer) Initialize() error {
 	if err := c.Dial(); err != nil {
 		return errors.Wrap(err, "Consumer Dial")
 	}
@@ -71,7 +71,7 @@ func (c *HotelsConsumer) Initialize() error {
 }
 
 // CloseChannels close active channels
-func (c *HotelsConsumer) CloseChannels() {
+func (c *hotelsConsumer) CloseChannels() {
 	for _, channel := range c.channels {
 		go func(ch *amqp.Channel) {
 			if err := ch.Close(); err != nil {

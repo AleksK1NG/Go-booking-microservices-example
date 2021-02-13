@@ -14,64 +14,59 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/user/internal/models"
 )
 
-// UserRedisRepository
-type UserRedisRepository struct {
+type userRedisRepository struct {
 	redisConn  *redis.Client
 	prefix     string
 	expiration time.Duration
 }
 
-// NewUserRedisRepository
-func NewUserRedisRepository(redisConn *redis.Client, prefix string, expiration time.Duration) *UserRedisRepository {
-	return &UserRedisRepository{redisConn: redisConn, prefix: prefix, expiration: expiration}
+func NewUserRedisRepository(redisConn *redis.Client, prefix string, expiration time.Duration) *userRedisRepository {
+	return &userRedisRepository{redisConn: redisConn, prefix: prefix, expiration: expiration}
 }
 
-// SaveUser
-func (u *UserRedisRepository) SaveUser(ctx context.Context, user *models.UserResponse) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserRedisRepository.SaveUser")
+func (u *userRedisRepository) SaveUser(ctx context.Context, user *models.UserResponse) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userRedisRepository.SaveUser")
 	defer span.Finish()
 
 	userBytes, err := json.Marshal(user)
 	if err != nil {
-		return errors.Wrap(err, "UserRedisRepository.SaveUser.json.Marshal")
+		return errors.Wrap(err, "userRedisRepository.SaveUser.json.Marshal")
 	}
 
 	if err := u.redisConn.SetEX(ctx, u.createKey(user.UserID), string(userBytes), u.expiration).Err(); err != nil {
-		return errors.Wrap(err, "UserRedisRepository.SaveUser.redisConn.SetEX")
+		return errors.Wrap(err, "userRedisRepository.SaveUser.redisConn.SetEX")
 	}
 
 	return nil
 }
 
-// GetUserByID
-func (u *UserRedisRepository) GetUserByID(ctx context.Context, userID uuid.UUID) (*models.UserResponse, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserRedisRepository.GetUserByID")
+func (u *userRedisRepository) GetUserByID(ctx context.Context, userID uuid.UUID) (*models.UserResponse, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userRedisRepository.GetUserByID")
 	defer span.Finish()
 
 	result, err := u.redisConn.Get(ctx, u.createKey(userID)).Bytes()
 	if err != nil {
-		return nil, errors.Wrap(err, "UserRedisRepository.GetUserByID.redisConn.Get")
+		return nil, errors.Wrap(err, "userRedisRepository.GetUserByID.redisConn.Get")
 	}
 
 	var res models.UserResponse
 	if err := json.Unmarshal(result, &res); err != nil {
-		return nil, errors.Wrap(err, "UserRedisRepository.GetUserByID.json.Unmarshal")
+		return nil, errors.Wrap(err, "userRedisRepository.GetUserByID.json.Unmarshal")
 	}
 	return &res, nil
 }
 
-// DeleteUser
-func (u *UserRedisRepository) DeleteUser(ctx context.Context, userID uuid.UUID) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "UserRedisRepository.DeleteUser")
+func (u *userRedisRepository) DeleteUser(ctx context.Context, userID uuid.UUID) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "userRedisRepository.DeleteUser")
 	defer span.Finish()
 
 	if err := u.redisConn.Del(ctx, u.createKey(userID)).Err(); err != nil {
-		return errors.Wrap(err, "UserRedisRepository.GetUserByID.redisConn.Del")
+		return errors.Wrap(err, "userRedisRepository.GetUserByID.redisConn.Del")
 	}
 
 	return nil
 }
 
-func (u *UserRedisRepository) createKey(userID uuid.UUID) string {
+func (u *userRedisRepository) createKey(userID uuid.UUID) string {
 	return fmt.Sprintf("%s: %s", u.prefix, userID)
 }

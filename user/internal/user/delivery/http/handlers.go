@@ -27,8 +27,7 @@ const (
 	maxFileSize = 1024 * 1024 * 10
 )
 
-// UserHandlers
-type UserHandlers struct {
+type userHandlers struct {
 	cfg      *config.Config
 	group    *echo.Group
 	userUC   user.UseCase
@@ -37,7 +36,6 @@ type UserHandlers struct {
 	mw       *middlewares.MiddlewareManager
 }
 
-// NewUserHandlers
 func NewUserHandlers(
 	group *echo.Group,
 	userUC user.UseCase,
@@ -45,8 +43,8 @@ func NewUserHandlers(
 	validate *validator.Validate,
 	cfg *config.Config,
 	mw *middlewares.MiddlewareManager,
-) *UserHandlers {
-	return &UserHandlers{group: group, userUC: userUC, logger: logger, validate: validate, cfg: cfg, mw: mw}
+) *userHandlers {
+	return &userHandlers{group: group, userUC: userUC, logger: logger, validate: validate, cfg: cfg, mw: mw}
 }
 
 // Register godoc
@@ -58,7 +56,7 @@ func NewUserHandlers(
 // @Param data body models.User true "user data"
 // @Success 201 {object} models.UserResponse
 // @Router /user/register [post]
-func (h *UserHandlers) Register() echo.HandlerFunc {
+func (h *userHandlers) Register() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "auth.Register")
 		defer span.Finish()
@@ -76,13 +74,13 @@ func (h *UserHandlers) Register() echo.HandlerFunc {
 
 		regUser, err := h.userUC.Register(ctx, &u)
 		if err != nil {
-			h.logger.Errorf("UserHandlers.Register.userUC.Register: %v", err)
+			h.logger.Errorf("userHandlers.Register.userUC.Register: %v", err)
 			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		sessionID, err := h.userUC.CreateSession(ctx, regUser.UserID)
 		if err != nil {
-			h.logger.Errorf("UserHandlers.userUC.CreateSession: %v", err)
+			h.logger.Errorf("userHandlers.userUC.CreateSession: %v", err)
 			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
@@ -107,7 +105,7 @@ func (h *UserHandlers) Register() echo.HandlerFunc {
 // @Param data body models.Login true "email and password"
 // @Success 200 {object} models.UserResponse
 // @Router /user/login [post]
-func (h *UserHandlers) Login() echo.HandlerFunc {
+func (h *userHandlers) Login() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.Login")
 		defer span.Finish()
@@ -125,13 +123,13 @@ func (h *UserHandlers) Login() echo.HandlerFunc {
 
 		userResponse, err := h.userUC.Login(ctx, login)
 		if err != nil {
-			h.logger.Errorf("UserHandlers.userUC.Login: %v", err)
+			h.logger.Errorf("userHandlers.userUC.Login: %v", err)
 			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		sessionID, err := h.userUC.CreateSession(ctx, userResponse.UserID)
 		if err != nil {
-			h.logger.Errorf("UserHandlers.Login.CreateSession: %v", err)
+			h.logger.Errorf("userHandlers.Login.CreateSession: %v", err)
 			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
@@ -155,7 +153,7 @@ func (h *UserHandlers) Login() echo.HandlerFunc {
 // @Produce json
 // @Success 204 ""
 // @Router /user/logout [post]
-func (h *UserHandlers) Logout() echo.HandlerFunc {
+func (h *userHandlers) Logout() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.Logout")
 		defer span.Finish()
@@ -163,15 +161,15 @@ func (h *UserHandlers) Logout() echo.HandlerFunc {
 		cookie, err := c.Cookie(h.cfg.HttpServer.SessionCookieName)
 		if err != nil {
 			if errors.Is(err, http.ErrNoCookie) {
-				h.logger.Errorf("UserHandlers.Logout.http.ErrNoCookie: %v", err)
+				h.logger.Errorf("userHandlers.Logout.http.ErrNoCookie: %v", err)
 				return httpErrors.ErrorCtxResponse(c, err)
 			}
-			h.logger.Errorf("UserHandlers.Logout.c.Cookie: %v", err)
+			h.logger.Errorf("userHandlers.Logout.c.Cookie: %v", err)
 			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		if err := h.userUC.DeleteSession(ctx, cookie.Value); err != nil {
-			h.logger.Errorf("UserHandlers.userUC.DeleteSession: %v", err)
+			h.logger.Errorf("userHandlers.userUC.DeleteSession: %v", err)
 			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
@@ -194,7 +192,7 @@ func (h *UserHandlers) Logout() echo.HandlerFunc {
 // @Produce json
 // @Success 200 {object} models.UserResponse
 // @Router /user/me [get]
-func (h *UserHandlers) GetMe() echo.HandlerFunc {
+func (h *userHandlers) GetMe() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.GetMe")
 		defer span.Finish()
@@ -217,7 +215,7 @@ func (h *UserHandlers) GetMe() echo.HandlerFunc {
 // @Produce json
 // @Success 204 ""
 // @Router /user/csrf [get]
-func (h *UserHandlers) GetCSRFToken() echo.HandlerFunc {
+func (h *userHandlers) GetCSRFToken() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.GetCSRFToken")
 		defer span.Finish()
@@ -248,7 +246,7 @@ func (h *UserHandlers) GetCSRFToken() echo.HandlerFunc {
 // @Produce json
 // @Success 200 {object} models.UserResponse
 // @Router /user/{id} [get]
-func (h *UserHandlers) Update() echo.HandlerFunc {
+func (h *userHandlers) Update() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.Update")
 		defer span.Finish()
@@ -273,13 +271,13 @@ func (h *UserHandlers) Update() echo.HandlerFunc {
 		updUser.UserID = userUUID
 
 		if err := h.validate.StructCtx(ctx, updUser); err != nil {
-			h.logger.Errorf("UserHandlers.validate.StructCtx: %v", err)
+			h.logger.Errorf("userHandlers.validate.StructCtx: %v", err)
 			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
 		userResponse, err := h.userUC.Update(ctx, &updUser)
 		if err != nil {
-			h.logger.Errorf("UserHandlers.userUC.Update: %v", err)
+			h.logger.Errorf("userHandlers.userUC.Update: %v", err)
 			return httpErrors.ErrorCtxResponse(c, err)
 		}
 
@@ -287,7 +285,7 @@ func (h *UserHandlers) Update() echo.HandlerFunc {
 	}
 }
 
-func (h *UserHandlers) Delete() echo.HandlerFunc {
+func (h *userHandlers) Delete() echo.HandlerFunc {
 	panic("implement me")
 }
 
@@ -300,7 +298,7 @@ func (h *UserHandlers) Delete() echo.HandlerFunc {
 // @Param id path int false "user uuid"
 // @Success 200 {object} models.UserResponse
 // @Router /user/{id} [get]
-func (h *UserHandlers) GetUserByID() echo.HandlerFunc {
+func (h *userHandlers) GetUserByID() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		span, ctx := opentracing.StartSpanFromContext(c.Request().Context(), "user.GetUserByID")
 		defer span.Finish()
@@ -336,7 +334,7 @@ func (h *UserHandlers) GetUserByID() echo.HandlerFunc {
 // @Param id path int false "user uuid"
 // @Success 200 {object} models.UserResponse
 // @Router /user/{id}/avatar [put]
-func (h *UserHandlers) UpdateAvatar() echo.HandlerFunc {
+func (h *userHandlers) UpdateAvatar() echo.HandlerFunc {
 	bufferPool := &sync.Pool{New: func() interface{} {
 		return &bytes.Buffer{}
 	}}
@@ -398,7 +396,7 @@ func (h *UserHandlers) UpdateAvatar() echo.HandlerFunc {
 	}
 }
 
-func (h *UserHandlers) checkAvatar(file multipart.File) (string, error) {
+func (h *userHandlers) checkAvatar(file multipart.File) (string, error) {
 	fileHeader := make([]byte, maxFileSize)
 	ContentType := ""
 	if _, err := file.Read(fileHeader); err != nil {

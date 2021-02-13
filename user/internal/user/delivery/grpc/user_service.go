@@ -13,18 +13,15 @@ import (
 	"github.com/AleksK1NG/hotels-mocroservices/user/proto/user"
 )
 
-// UserService
 type UserService struct {
 	userUC user.UseCase
 	logger logger.Logger
 }
 
-// NewUserService
 func NewUserService(userUC user.UseCase, logger logger.Logger) *UserService {
 	return &UserService{userUC: userUC, logger: logger}
 }
 
-// GetUserByID
 func (u *UserService) GetUserByID(ctx context.Context, r *userService.GetByIDRequest) (*userService.GetByIDResponse, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserService.GetUserByID")
 	defer span.Finish()
@@ -44,7 +41,6 @@ func (u *UserService) GetUserByID(ctx context.Context, r *userService.GetByIDReq
 	return &userService.GetByIDResponse{User: foundUser.ToProto()}, nil
 }
 
-// GetUsersByIDs
 func (u *UserService) GetUsersByIDs(ctx context.Context, req *userService.GetByIDsReq) (*userService.GetByIDsRes, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "UserService.GetUserByID")
 	defer span.Finish()

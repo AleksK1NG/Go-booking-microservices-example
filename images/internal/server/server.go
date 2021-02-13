@@ -59,37 +59,16 @@ func (s *Server) Run() error {
 	}
 	defer uploadedChan.Close()
 
-	// Init repos, usecases, middlewares, interceptors
 	imagePGRepo := repository.NewImagePGRepository(s.pgxPool)
 	imageAWSRepo := repository.NewImageAWSRepository(s.cfg, s.s3)
 	imageUC := usecase.NewImageUseCase(imagePGRepo, imageAWSRepo, s.logger, imagePublisher)
 
-	// Init consumers, publishers, grpc server, metrics
 	imageConsumer := rabbitmq.NewImageConsumer(s.logger, s.cfg, imageUC)
 	if err := imageConsumer.Initialize(); err != nil {
 		return errors.Wrap(err, "imageConsumer.Initialize")
 	}
 	imageConsumer.RunConsumers(ctx, cancel)
 	defer imageConsumer.CloseChannels()
-	// if err := imageConsumer.Dial(); err != nil {
-	// 	return errors.Wrap(err, " imageConsumer.Dial")
-	// }
-
-	// resizeChan, err := imageConsumer.CreateExchangeAndQueue(rabbitmq.ImagesExchange, rabbitmq.ResizeQueueName, rabbitmq.ResizeBindingKey)
-	// if err != nil {
-	// 	return errors.Wrap(err, "CreateExchangeAndQueue")
-	// }
-	// defer resizeChan.Close()
-	//
-	// createImgChan, err := imageConsumer.CreateExchangeAndQueue(rabbitmq.ImagesExchange, rabbitmq.CreateQueueName, rabbitmq.CreateBindingKey)
-	// if err != nil {
-	// 	return errors.Wrap(err, "CreateExchangeAndQueue")
-	// }
-	// defer createImgChan.Close()
-
-	// go func() {
-	// 	imageConsumer.RunConsumers(ctx, cancel)
-	// }()
 
 	l, err := net.Listen("tcp", s.cfg.GRPCServer.Port)
 	if err != nil {

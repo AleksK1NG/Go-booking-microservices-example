@@ -24,53 +24,53 @@ const (
 	uploadHotelImageRoutingKey = "upload_hotel_image"
 )
 
-// HotelsUC Hotels usecase
-type HotelsUC struct {
+// hotelsUC Hotels usecase
+type hotelsUC struct {
 	hotelsRepo    hotels.PGRepository
 	logger        logger.Logger
 	amqpPublisher rabbitmq.Publisher
 }
 
 // NewHotelsUC constructor
-func NewHotelsUC(hotelsRepo hotels.PGRepository, logger logger.Logger, amqpPublisher rabbitmq.Publisher) *HotelsUC {
-	return &HotelsUC{hotelsRepo: hotelsRepo, logger: logger, amqpPublisher: amqpPublisher}
+func NewHotelsUC(hotelsRepo hotels.PGRepository, logger logger.Logger, amqpPublisher rabbitmq.Publisher) *hotelsUC {
+	return &hotelsUC{hotelsRepo: hotelsRepo, logger: logger, amqpPublisher: amqpPublisher}
 }
 
 // CreateHotel create new hotel
-func (h *HotelsUC) CreateHotel(ctx context.Context, hotel *models.Hotel) (*models.Hotel, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsUC.CreateHotel")
+func (h *hotelsUC) CreateHotel(ctx context.Context, hotel *models.Hotel) (*models.Hotel, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsUC.CreateHotel")
 	defer span.Finish()
 
 	return h.hotelsRepo.CreateHotel(ctx, hotel)
 }
 
 // UpdateHotel update existing hotel
-func (h *HotelsUC) UpdateHotel(ctx context.Context, hotel *models.Hotel) (*models.Hotel, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsUC.UpdateHotel")
+func (h *hotelsUC) UpdateHotel(ctx context.Context, hotel *models.Hotel) (*models.Hotel, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsUC.UpdateHotel")
 	defer span.Finish()
 
 	return h.hotelsRepo.UpdateHotel(ctx, hotel)
 }
 
 // GetHotelByID get hotel by uuid
-func (h *HotelsUC) GetHotelByID(ctx context.Context, hotelID uuid.UUID) (*models.Hotel, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsUC.GetHotelByID")
+func (h *hotelsUC) GetHotelByID(ctx context.Context, hotelID uuid.UUID) (*models.Hotel, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsUC.GetHotelByID")
 	defer span.Finish()
 
 	return h.hotelsRepo.GetHotelByID(ctx, hotelID)
 }
 
 // GetHotels
-func (h *HotelsUC) GetHotels(ctx context.Context, query *utils.PaginationQuery) (*models.HotelsList, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsUC.CreateHotel")
+func (h *hotelsUC) GetHotels(ctx context.Context, query *utils.PaginationQuery) (*models.HotelsList, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsUC.CreateHotel")
 	defer span.Finish()
 
 	return h.hotelsRepo.GetHotels(ctx, query)
 }
 
 // UploadImage
-func (h *HotelsUC) UploadImage(ctx context.Context, msg *models.UploadHotelImageMsg) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsUC.UploadImage")
+func (h *hotelsUC) UploadImage(ctx context.Context, msg *models.UploadHotelImageMsg) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsUC.UploadImage")
 	defer span.Finish()
 
 	headers := make(amqp.Table, 1)
@@ -90,8 +90,8 @@ func (h *HotelsUC) UploadImage(ctx context.Context, msg *models.UploadHotelImage
 }
 
 // UpdateHotelImage
-func (h *HotelsUC) UpdateHotelImage(ctx context.Context, delivery amqp.Delivery) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "HotelsUC.UpdateHotelImage")
+func (h *hotelsUC) UpdateHotelImage(ctx context.Context, delivery amqp.Delivery) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "hotelsUC.UpdateHotelImage")
 	defer span.Finish()
 
 	var msg models.UpdateHotelImageMsg
@@ -106,7 +106,7 @@ func (h *HotelsUC) UpdateHotelImage(ctx context.Context, delivery amqp.Delivery)
 	return nil
 }
 
-func (h *HotelsUC) validateDeliveryHeaders(delivery amqp.Delivery) (*uuid.UUID, error) {
+func (h *hotelsUC) validateDeliveryHeaders(delivery amqp.Delivery) (*uuid.UUID, error) {
 	h.logger.Infof("amqp.Delivery header: %-v", delivery.Headers)
 
 	hotelUUID, ok := delivery.Headers[hotelIDHeader]

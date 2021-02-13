@@ -21,8 +21,8 @@ type Consumer struct {
 	ConsumerTag    string
 }
 
-// HotelsConsumer
-type HotelsConsumer struct {
+// hotelsConsumer
+type hotelsConsumer struct {
 	amqpConn  *amqp.Connection
 	logger    logger.Logger
 	cfg       *config.Config
@@ -32,12 +32,12 @@ type HotelsConsumer struct {
 }
 
 // NewHotelsConsumer
-func NewHotelsConsumer(logger logger.Logger, cfg *config.Config, hotelsUC hotels.UseCase) *HotelsConsumer {
-	return &HotelsConsumer{logger: logger, cfg: cfg, hotelsUC: hotelsUC}
+func NewHotelsConsumer(logger logger.Logger, cfg *config.Config, hotelsUC hotels.UseCase) *hotelsConsumer {
+	return &hotelsConsumer{logger: logger, cfg: cfg, hotelsUC: hotelsUC}
 }
 
 // Dial
-func (c *HotelsConsumer) Dial() error {
+func (c *hotelsConsumer) Dial() error {
 	conn, err := rabbitmq.NewRabbitMQConn(c.cfg)
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ func (c *HotelsConsumer) Dial() error {
 }
 
 // Consume messages
-func (c *HotelsConsumer) CreateExchangeAndQueue(exchangeName, queueName, bindingKey string) (*amqp.Channel, error) {
+func (c *hotelsConsumer) CreateExchangeAndQueue(exchangeName, queueName, bindingKey string) (*amqp.Channel, error) {
 	ch, err := c.amqpConn.Channel()
 	if err != nil {
 		return nil, errors.Wrap(err, "Error amqpConn.Channel")
@@ -111,7 +111,7 @@ func (c *HotelsConsumer) CreateExchangeAndQueue(exchangeName, queueName, binding
 	return ch, nil
 }
 
-func (c *HotelsConsumer) startConsume(
+func (c *hotelsConsumer) startConsume(
 	ctx context.Context,
 	worker func(ctx context.Context, wg *sync.WaitGroup, messages <-chan amqp.Delivery),
 	workerPoolSize int,
@@ -151,11 +151,11 @@ func (c *HotelsConsumer) startConsume(
 	return chanErr
 }
 
-func (c *HotelsConsumer) AddConsumer(consumer *Consumer) {
+func (c *hotelsConsumer) AddConsumer(consumer *Consumer) {
 	c.consumers = append(c.consumers, consumer)
 }
 
-func (c *HotelsConsumer) run(ctx context.Context, cancel context.CancelFunc) {
+func (c *hotelsConsumer) run(ctx context.Context, cancel context.CancelFunc) {
 	for _, cs := range c.consumers {
 		go func(consumer *Consumer) {
 			if err := c.startConsume(
@@ -172,7 +172,7 @@ func (c *HotelsConsumer) run(ctx context.Context, cancel context.CancelFunc) {
 	}
 }
 
-func (c *HotelsConsumer) RunConsumers(ctx context.Context, cancel context.CancelFunc) {
+func (c *hotelsConsumer) RunConsumers(ctx context.Context, cancel context.CancelFunc) {
 	c.AddConsumer(&Consumer{
 		Worker:         c.updateImageWorker,
 		WorkerPoolSize: UpdateImageWorkers,
