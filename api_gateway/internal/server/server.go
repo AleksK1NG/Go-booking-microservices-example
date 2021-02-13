@@ -116,7 +116,7 @@ func (s *server) Run() error {
 		s.echo.Server.ReadTimeout = time.Second * s.cfg.HttpServer.ReadTimeout
 		s.echo.Server.WriteTimeout = time.Second * s.cfg.HttpServer.WriteTimeout
 		s.echo.Server.MaxHeaderBytes = maxHeaderBytes
-		if err := s.echo.StartTLS(":8016", certFile, keyFile); err != nil {
+		if err := s.echo.StartTLS(s.cfg.HttpServer.Port, certFile, keyFile); err != nil {
 			s.logger.Fatalf("Error starting TLS Server: ", err)
 		}
 	}()
@@ -155,6 +155,5 @@ func (s *server) Run() error {
 	}
 
 	s.logger.Info("Server Exited Properly")
-
 	return nil
 }

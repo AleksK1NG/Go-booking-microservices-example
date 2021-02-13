@@ -16,6 +16,7 @@ const (
 	bodyLimit       = "2M"
 )
 
+// MapRoutes
 func (s *server) MapRoutes() {
 	s.echo.GET("/swagger/*", echoSwagger.WrapHandler)
 	s.echo.Use(middleware.Logger())
