@@ -28,6 +28,30 @@ type Hotel struct {
 	UpdatedAt     *time.Time `json:"updated_at"`
 }
 
+func (h *Hotel) GetImage() string {
+	var image string
+	if h.Image != nil {
+		image = *h.Image
+	}
+	return image
+}
+
+func (h *Hotel) GetLatitude() float64 {
+	var lat float64
+	if h.Latitude != nil {
+		lat = *h.Latitude
+	}
+	return lat
+}
+
+func (h *Hotel) GetLongitude() float64 {
+	var lon float64
+	if h.Longitude != nil {
+		lon = *h.Longitude
+	}
+	return lon
+}
+
 func (h *Hotel) ToProto() *hotelsService.Hotel {
 	return &hotelsService.Hotel{
 		HotelID:       h.HotelID.String(),
@@ -36,11 +60,11 @@ func (h *Hotel) ToProto() *hotelsService.Hotel {
 		Country:       h.Country,
 		City:          h.City,
 		Description:   h.Description,
-		Image:         *h.Image,
+		Image:         h.GetImage(),
 		Photos:        h.Photos,
 		CommentsCount: int64(h.CommentsCount),
-		Latitude:      *h.Latitude,
-		Longitude:     *h.Longitude,
+		Latitude:      h.GetLatitude(),
+		Longitude:     h.GetLongitude(),
 		Location:      h.Location,
 		CreatedAt:     timestamppb.New(*h.CreatedAt),
 		UpdatedAt:     timestamppb.New(*h.UpdatedAt),

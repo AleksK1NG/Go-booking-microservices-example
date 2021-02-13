@@ -14,8 +14,6 @@ import (
 )
 
 func main() {
-	log.Println("Starting sessions server")
-
 	configPath := config.GetConfigPath(os.Getenv("config"))
 	cfg, err := config.GetConfig(configPath)
 	if err != nil {
@@ -24,6 +22,7 @@ func main() {
 
 	appLogger := logger.NewApiLogger(cfg)
 	appLogger.InitLogger()
+	appLogger.Info("Starting sessions server")
 	appLogger.Infof(
 		"AppVersion: %s, LogLevel: %s, Mode: %s",
 		cfg.GRPCServer.AppVersion,
@@ -45,7 +44,7 @@ func main() {
 	defer closer.Close()
 	appLogger.Info("Opentracing connected")
 
-	log.Printf("%-v", redisClient.PoolStats())
+	appLogger.Infof("%-v", redisClient.PoolStats())
 
 	s := server.NewSessionsServer(appLogger, cfg, redisClient, tracer)
 
