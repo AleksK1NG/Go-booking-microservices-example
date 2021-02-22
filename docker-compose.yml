@@ -1,0 +1,319 @@
+version: "3.8"
+
+services:
+  session_microservice:
+    container_name: session_microservice
+    build:
+      context: ./sessions
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+      - "7070:7070"
+    environment:
+      - PORT=5000
+      - CONFIG=docker
+      - CFG_PATH=config/config-docker.yml
+    depends_on:
+      - redis
+      - prometheus
+      - node_exporter
+      - grafana
+    restart: always
+    volumes:
+      - ./sessions:/app
+    networks:
+      - hotels_network
+
+  user_microservice:
+    container_name: user_microservice
+    build:
+      context: ./user
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+      - "7071:7071"
+    environment:
+      - PORT=5001
+      - CONFIG=docker
+      - CFG_PATH=config/config-docker.yml
+    depends_on:
+      - redis
+      - prometheus
+      - node_exporter
+      - grafana
+    restart: always
+    volumes:
+      - ./user:/app
+    networks:
+      - hotels_network
+
+  images_microservice:
+    container_name: images_microservice
+    build:
+      context: ./images
+      dockerfile: Dockerfile
+    ports:
+      - "5002:5002"
+      - "7072:7072"
+    environment:
+      - PORT=5002
+      - CONFIG=docker
+      - CFG_PATH=config/config-docker.yml
+    depends_on:
+      - redis
+      - prometheus
+      - node_exporter
+      - grafana
+    restart: always
+    volumes:
+      - ./images:/app
+    networks:
+      - hotels_network
+
+  hotels_microservice:
+    container_name: hotels_microservice
+    build:
+      context: ./hotels
+      dockerfile: Dockerfile
+    ports:
+      - "5003:5003"
+      - "7073:7073"
+    environment:
+      - PORT=5003
+      - CONFIG=docker
+      - CFG_PATH=config/config-docker.yml
+    depends_on:
+      - redis
+      - prometheus
+      - node_exporter
+      - grafana
+    restart: always
+    volumes:
+      - ./hotels:/app
+    networks:
+      - hotels_network
+
+
+  comments_microservice:
+    container_name: comments_microservice
+    build:
+      context: ./comments
+      dockerfile: Dockerfile
+    ports:
+      - "5004:5004"
+      - "7074:7074"
+    environment:
+      - PORT=5004
+      - CONFIG=docker
+      - CFG_PATH=config/config-docker.yml
+    depends_on:
+      - redis
+      - prometheus
+      - node_exporter
+      - grafana
+    restart: always
+    volumes:
+      - ./comments:/app
+    networks:
+      - hotels_network
+
+
+  api_gateway:
+    container_name: api_gateway
+    build:
+      context: ./api_gateway
+      dockerfile: Dockerfile
+    ports:
+      - "5005:5005"
+      - "7075:7075"
+    environment:
+      - PORT=5004
+      - CONFIG=docker
+      - CFG_PATH=config/config-docker.yml
+    depends_on:
+      - redis
+      - prometheus
+      - node_exporter
+      - grafana
+    restart: always
+    volumes:
+      - ./api_gateway:/app
+    networks:
+      - hotels_network
+
+
+  redis:
+    image: redis:6-alpine
+    container_name: booking_redis
+    ports:
+      - "6379:6379"
+    restart: always
+    networks:
+      - hotels_network
+
+  postgesql_user:
+    image: kartoza/postgis:13.0
+    container_name: user_postgesql
+    expose:
+      - "5433"
+    ports:
+      - "5433:5432"
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=user_db
+      - POSTGRES_HOST=5433
+    command: -p 5433
+    volumes:
+      - ./user_pgdata:/var/lib/postgresql/data
+    networks:
+      - hotels_network
+
+  postgesql_hotels:
+    image: kartoza/postgis:13.0
+    container_name: hotels_postgesql
+    expose:
+      - "5435"
+    ports:
+      - "5435:5432"
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=hotels_db
+      - POSTGRES_HOST=5435
+    command: -p 5435
+    volumes:
+      - ./hotels_pgdata:/var/lib/postgresql/data
+    networks:
+      - hotels_network
+
+  postgesql_comments:
+    image: kartoza/postgis:13.0
+    container_name: comments_postgesql
+    expose:
+      - "5436"
+    ports:
+      - "5436:5432"
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=comments_db
+      - POSTGRES_HOST=5436
+    command: -p 5436
+    volumes:
+      - ./comments_pgdata:/var/lib/postgresql/data
+    networks:
+      - hotels_network
+
+  postgesql_image:
+    image: kartoza/postgis:13.0
+    container_name: images_postgesql
+    expose:
+      - "5434"
+    ports:
+      - "5434:5432"
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=images_db
+    volumes:
+      - ./images_pgdata:/var/lib/postgresql/data
+    networks:
+      - hotels_network
+
+  prometheus:
+    container_name: prometheus_container
+    image: prom/prometheus
+    volumes:
+      - ./docker/monitoring/prometheus-local.yml:/etc/prometheus/prometheus.yml:Z
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=20d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - '9090:9090'
+    networks:
+      - hotels_network
+
+
+  node_exporter:
+    container_name: node_exporter_container
+    image: prom/node-exporter
+    ports:
+      - '9101:9100'
+    networks:
+      - hotels_network
+
+  grafana:
+    container_name: grafana_container
+    image: grafana/grafana
+    ports:
+      - '3000:3000'
+    networks:
+      - hotels_network
+
+  jaeger:
+    container_name: jaeger_container
+    image: jaegertracing/all-in-one:1.21
+    environment:
+      - COLLECTOR_ZIPKIN_HTTP_PORT=9411
+    ports:
+      - 5775:5775/udp
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 5778:5778
+      - 16686:16686
+      - 14268:14268
+      - 14250:14250
+      - 9411:9411
+
+  rabbitmq:
+    image: 'rabbitmq:3.8-management-alpine'
+    ports:
+      # The standard AMQP protocol port
+      - '5672:5672'
+      # HTTP management UI
+      - '15672:15672'
+
+  minio:
+    image: minio/minio:latest
+    ports:
+      - '9000:9000'
+    container_name: minio_aws
+    environment:
+      MINIO_ACCESS_KEY: minio123
+      MINIO_SECRET_KEY: minio123
+    command: server /data
+    networks:
+      - hotels_network
+
+  mc:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host rm local;
+      /usr/bin/mc config host add --quiet --api s3v4 local http://myminio:9000 minio123 minio123;
+      /usr/bin/mc rb --force local/images/;
+      /usr/bin/mc mb --quiet local/images/;
+      /usr/bin/mc policy set public local/images;
+      "
+    networks:
+      - hotels_network
+
+#
+#volumes:
+#  main_pgdata:
+#  user_pgdata:
+#  prometheus-data:
+
+networks:
+  hotels_network:
+    driver: bridge

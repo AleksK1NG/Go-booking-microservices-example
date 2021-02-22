@@ -1,34 +1,18 @@
-# Initial stage: download modules
-FROM golang:1.15 as modules
+FROM golang:1.16
 
-ADD go.mod go.sum /m/
-RUN cd /m && go mod download
+#ENV TZ=Europe/Moscow
+#RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# Intermediate stage: Build the binary
-FROM golang:1.15 as builder
+ENV config=docker
 
-COPY --from=modules /go/pkg /go/pkg
+WORKDIR /app
 
-# add a non-privileged user
-RUN useradd -u 10001 myapp
+COPY ./ /app
 
-RUN mkdir -p /myapp
-ADD . /myapp
-WORKDIR /myapp
+RUN go mod download
 
+RUN go get github.com/githubnemo/CompileDaemon
 
-# Build the binary with go build
-RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
-    go build -o ./bin/myapp ./cmd
+EXPOSE 5000
 
-# Final stage: Run the binary
-FROM scratch
-
-# don't forget /etc/passwd from previous stage
-COPY --from=builder /etc/passwd /etc/passwd
-USER myapp
-
-# and finally the binary
-COPY --from=builder /myapp/bin/myapp /myapp
-
-CMD ["/myapp"]
+ENTRYPOINT CompileDaemon --build="go build cmd/email_service/main.go" --command=./main

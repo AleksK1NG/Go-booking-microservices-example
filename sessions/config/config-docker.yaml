@@ -1,0 +1,52 @@
+GRPCServer:
+  AppVersion: 1.0.0
+  Port: ":5000"
+  CookieLifeTime: 44640
+  CsrfExpire: 15
+  SessionExpire: 60
+  SessionID: "SessionID"
+  Mode: "Development"
+  Timeout: 15
+  ReadTimeout: 5
+  WriteTimeout: 5
+  MaxConnectionIdle: 5
+  MaxConnectionAge: 5
+  SessionPrefix: "session"
+  CSRFPrefix: "csrf"
+
+logger:
+  Development: true
+  DisableCaller: false
+  DisableStacktrace: false
+  Encoding: json
+  Level: info
+
+postgres:
+  PostgresqlHost: localhost
+  PostgresqlPort: 5433
+  PostgresqlUser: postgres
+  PostgresqlPassword: postgres
+  PostgresqlDbname: user_db
+  PostgresqlSslmode: "disable"
+  PgDriver: pgx
+
+redis:
+  RedisAddr: localhost:6379
+  RedisPassword:
+  RedisDb: 0
+  RedisDefaultDB: 0
+  MinIdleConn: 200
+  PoolSize: 12000
+  PoolTimeout: 240
+  Password: ""
+  DB: 0
+
+metrics:
+  Port: ":7070"
+  Url: 0.0.0.0:7070
+  ServiceName: sessions_microservice
+
+jaeger:
+  Host: localhost:6831
+  ServiceName: SessionsSrvice_GRPC
+  LogSpans: false

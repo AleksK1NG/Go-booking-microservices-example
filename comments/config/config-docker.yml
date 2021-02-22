@@ -1,0 +1,71 @@
+GRPCServer:
+  AppVersion: 1.0.0
+  Port: ":5004"
+  CookieLifeTime: 360
+  CsrfExpire: 15
+  SessionExpire: 60
+  SessionID: "SessionID"
+  Mode: "Development"
+  Timeout: 15
+  ReadTimeout: 5
+  WriteTimeout: 5
+  MaxConnectionIdle: 5
+  MaxConnectionAge: 5
+  SessionPrefix: "session"
+  CSRFPrefix: "csrf"
+  SessionGrpcServicePort: ":5000"
+  UserGrpcServicePort: ":5001"
+
+Rabbitmq:
+  Host: localhost
+  Port: 5672
+  User: guest
+  Password: guest
+
+HttpServer:
+  Port: ":8015"
+  PprofPort: ":8115"
+  Timeout: 15
+  ReadTimeout: 5
+  WriteTimeout: 5
+  CookieLifeTime: 44640
+  SessionCookieName: "session_token"
+
+postgres:
+  PostgresqlHost: localhost
+  PostgresqlPort: 5436
+  PostgresqlUser: postgres
+  PostgresqlPassword: postgres
+  PostgresqlDbname: comments_db
+  PostgresqlSslmode: "disable"
+  PgDriver: pgx
+
+logger:
+  Development: true
+  DisableCaller: false
+  DisableStacktrace: false
+  Encoding: json
+  Level: info
+
+
+redis:
+  RedisAddr: localhost:6379
+  RedisPassword:
+  RedisDb: 0
+  RedisDefaultDB: 0
+  MinIdleConn: 200
+  PoolSize: 12000
+  PoolTimeout: 240
+  Password: ""
+  DB: 0
+
+metrics:
+  Port: ":7074"
+  Url: 0.0.0.0:7074
+  ServiceName: comments_microservice
+
+jaeger:
+  Host: localhost:6831
+  ServiceName: CommentsService_GRPC
+  LogSpans: false
+

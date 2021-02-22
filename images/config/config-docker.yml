@@ -1,0 +1,80 @@
+GRPCServer:
+  AppVersion: 1.0.0
+  Port: ":5002"
+  CookieLifeTime: 360
+  CsrfExpire: 15
+  SessionExpire: 60
+  SessionID: "SessionID"
+  Mode: "Development"
+  Timeout: 15
+  ReadTimeout: 5
+  WriteTimeout: 5
+  MaxConnectionIdle: 5
+  MaxConnectionAge: 5
+  SessionPrefix: "session"
+  CSRFPrefix: "csrf"
+  SessionGrpcServicePort: ":5000"
+
+rabbitmq:
+  Host: localhost
+  Port: 5672
+  User: guest
+  Password: guest
+  Exchange: emails-exchange
+  Queue: emails-queue
+  RoutingKey: emails-routing-key
+  ConsumerTag: emails-consumer
+  WorkerPoolSize: 24
+
+AWS:
+  S3Region: "us-east-1"
+  S3EndPointMinio: "http://localhost:9000/minio"
+  S3EndPoint: "http://localhost:9000"
+  DisableSSL: true
+  S3ForcePathStyle: true
+
+HttpServer:
+  Port: ":8007"
+  PprofPort: ":8100"
+  Timeout: 15
+  ReadTimeout: 5
+  WriteTimeout: 5
+  CookieLifeTime: 44640
+  SessionCookieName: "session_token"
+
+postgres:
+  PostgresqlHost: localhost
+  PostgresqlPort: 5434
+  PostgresqlUser: postgres
+  PostgresqlPassword: postgres
+  PostgresqlDbname: images_db
+  PostgresqlSslmode: "disable"
+  PgDriver: pgx
+
+logger:
+  Development: true
+  DisableCaller: false
+  DisableStacktrace: false
+  Encoding: json
+  Level: info
+
+
+redis:
+  RedisAddr: localhost:6379
+  RedisPassword:
+  RedisDb: 0
+  RedisDefaultDB: 0
+  MinIdleConn: 200
+  PoolSize: 12000
+  PoolTimeout: 240
+  Password: ""
+  DB: 0
+
+metrics:
+  Url: 0.0.0.0:7072
+  ServiceName: images_microservice
+
+jaeger:
+  Host: localhost:6831
+  ServiceName: ImagesService_GRPC
+  LogSpans: false
