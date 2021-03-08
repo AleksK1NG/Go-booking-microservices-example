@@ -18,7 +18,7 @@ linters-settings:
   dupl:
     threshold: 200
   lll:
-    line-length: 120
+    line-length: 150
   funlen:
     statements: 100
     lines: 160
